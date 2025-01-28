@@ -1,0 +1,58 @@
+# This is a sample GH Actions workflow file and is NOT intended to work out of the box.
+# Read through the comments below to understand each step of the job and what you need
+# to do to make a workflow that works for your project specifically.
+
+name: Sample Build & Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cleanup
+        # This step builds cleans up any old containers, images, and build layers to
+        # avoid running out of storage space on the actions runner. We filter by >24hr
+        # old to still allow multiple builds in the same day to be a bit faster using
+        # the build cache.
+        #
+        # It is important you prune your Docker repository regularly. This is because
+        # all containers, images, and layers used in the build stages are saved by
+        # Docker; this can quickly consume a lot of memory after a few builds. Using
+        # `docker <type> prune -af` here will free up some space, but you can consider
+        # running `docker system prune -af` on your GCP instance more regularly to
+        # free up additional cached objects if you are running out of storage space.
+        #
+        # You will need to point this command to the correct Docker Compose file.
+        run: |
+          docker system prune -a -f --filter "until=24h"
+
+      - name: Build
+        # This step builds both the frontend and backend docker images using
+        # Docker Compose. To change how the images are built or their actual
+        # buildscripts, modify the corresponding files in the docker/ directory.
+        #
+        # You will need to point this command to the correct Docker Compose file.
+        run: |
+          docker compose -f docker/production.docker-compose.yml build
+
+      - name: Deploy
+        # This script simply runs the images that were built in the previous step.
+        # This uses the same Docker Compose file in the previous step.
+        #
+        # If the frontend and backend are already running on the VM, we first
+        # need to stop them to free the port and delete them to free the
+        # container name before trying to start the new versions.
+        #
+        # This command assumes that the docker compose is also set up to properly
+        # manage a MYSQL server.
+        #
+        # You will need to point these commands to the correct Docker Compose file.
+        run: |
+          docker compose -f docker/production.docker-compose.yml down
+          docker compose -f docker/production.docker-compose.yml up -d --build
