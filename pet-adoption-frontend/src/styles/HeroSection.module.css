@@ -1,0 +1,15 @@
+.heroSection {
+    background-color: #7963e8;
+    color: white;
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.ctaButton {
+    background-color: #ff5a5f;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
