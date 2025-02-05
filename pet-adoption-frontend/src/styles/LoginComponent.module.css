@@ -1,0 +1,64 @@
+.loginFullWidth {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loginLeftSection {
+    width: 50%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.loginForm h2 {
+    font-family: 'Roboto', sans-serif;
+    font-size: 42px;
+    align-self: flex-start;
+}
+
+.loginForm {
+    height: 100vh;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.loginInput {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: left;
+    margin-top: 30px;
+    width: 100%;
+    gap: 15px;
+}
+
+.loginForm a {
+    align-self: flex-end;
+    color: #8B80F9;
+    text-decoration: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.loginRightSection {
+    height: 100%;
+    width: 50%;
+}
+
+.loginImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.loginButton{
+    gap: 20px;
+    width: 100%;
+}
