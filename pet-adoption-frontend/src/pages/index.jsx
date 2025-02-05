@@ -10,7 +10,7 @@ export default function HomePage() {
     <>
         <NavbarHome />
         <HeroSection />
-        {/* <AboutSection /> */}
+        <AboutSection />
         {/* <PetOptions /> */}
         {/* <CTASection /> */}
         {/* <Footer />  */}
