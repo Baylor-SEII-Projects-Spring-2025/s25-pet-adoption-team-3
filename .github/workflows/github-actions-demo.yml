@@ -39,7 +39,7 @@ jobs:
         #
         # You will need to point this command to the correct Docker Compose file.
         run: |
-          docker compose -f docker/production.docker-compose.yml build
+          docker compose -f docker/ci.docker-compose.yml build
 
       - name: Deploy
         # This script simply runs the images that were built in the previous step.
@@ -54,5 +54,5 @@ jobs:
         #
         # You will need to point these commands to the correct Docker Compose file.
         run: |
-          docker compose -f docker/production.docker-compose.yml down
-          docker compose -f docker/production.docker-compose.yml up -d --build
+          docker compose -f docker/ci.docker-compose.yml down
+          docker compose -f docker/ci.docker-compose.yml up -d --build
