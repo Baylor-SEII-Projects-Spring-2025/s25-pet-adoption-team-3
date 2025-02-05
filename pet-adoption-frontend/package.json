@@ -19,6 +19,7 @@
     "@reduxjs/toolkit": "^2.5.0",
     "axios": "^1.7.9",
     "next": "15.1.5",
+    "pet-adoption-frontend": "file:",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-redux": "^9.2.0",
