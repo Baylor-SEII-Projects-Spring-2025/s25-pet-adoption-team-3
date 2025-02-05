@@ -1,12 +1,20 @@
+import styles from "@/styles/CTASection.module.css";
+
 export default function CTASection() {
-  return (
-    <section className="cta-section">
-      <h2>Ready to Meet Your New Best Friend?</h2>
-      <p>
-        Join us at "Adopt, Don’t Shop" and help make the world a better place,
-        one pet at a time. Your future furry friend is just a click away!
-      </p>
-      <button className="cta-button">Start Exploring Now</button>
-    </section>
-  );
+    return (
+        <section className={styles.ctaSection}>
+            <img
+                src="/images/CTA_section_smile.png"
+                alt="Ready to Meet Your New Best Friend?"
+            />
+            <h2>Ready to Meet Your New Best Friend?</h2>
+            <p>
+                Join us at “Adopt don’t Shop” and let’s make the world a better
+                place for these lovely creatures. Swipe right for love, swipe
+                right for happiness, swipe right for a wagging tail to greet you
+                when you get home.
+            </p>
+            <button className={styles.ctaButton}>Start Swiping Now</button>
+        </section>
+    );
 }

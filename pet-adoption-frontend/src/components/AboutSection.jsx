@@ -1,18 +1,30 @@
+import styles from "@/styles/AboutSection.module.css";
+
 export default function AboutSection() {
-  return (
-    <section className="about-section">
-      <h2>Find Your New BFF</h2>
-      <p>
-        Welcome to "Adopt, Don’t Shop" – the evolutionary way to find your new
-        furry friend. From shelters to wagging tails, we’ve got the pet love you
-        could ask for and more.
-      </p>
-      <p>
-        Think of us as a pet matchmaking service. We pair you with lovable
-        animals from various adoption centers near you. Say yes, and it’s yours
-        to share with forever!
-      </p>
-      <p>So why wait? Get ready to swipe your way to unconditional love!</p>
-    </section>
-  );
+    return (
+        <section className={styles.aboutSection}>
+            <section className={styles.aboutSectionText}>
+                <h2>
+                    <strong>Find Your New BFF</strong>
+                </h2>
+                <p>
+                    Welcome to "Adopt, Don’t Shop" – the evolutionary way to
+                    find your new furry friend. From shelters to wagging tails,
+                    we’ve got the pet love you could ask for and more.
+                </p>
+                <br />
+                <p>
+                    Think of us as a pet matchmaking service. We pair you up with 
+                    adorable animals from various adoption centers. You can swipe,
+                    play, and get to know them virtually. Once you've matched,
+                    meet them offline and let the snuggles roll!
+                </p>
+                <br />
+                <p>
+                    So why wait? Get ready to swipe your way to unconditional
+                    love!
+                </p>
+            </section>
+        </section>
+    );
 }
