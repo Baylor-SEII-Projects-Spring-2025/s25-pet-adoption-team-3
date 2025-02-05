@@ -8,16 +8,18 @@ export default function AboutSection() {
                     <strong>Find Your New BFF</strong>
                 </h2>
                 <p>
-                    Welcome to "Adopt, Don’t Shop" – the evolutionary way to
-                    find your new furry friend. From shelters to wagging tails,
-                    we’ve got the pet love you could ask for and more.
+                    Welcome to &quot;Adopt, Don&apos;t Shop&quot; – the
+                    evolutionary way to find your new furry friend. From
+                    shelters to wagging tails, we&apos;ve got the pet love you
+                    could ask for and more.
                 </p>
                 <br />
                 <p>
-                    Think of us as a pet matchmaking service. We pair you up with 
-                    adorable animals from various adoption centers. You can swipe,
-                    play, and get to know them virtually. Once you've matched,
-                    meet them offline and let the snuggles roll!
+                    Think of us as a pet matchmaking service. We pair you up
+                    with adorable animals from various adoption centers. You can
+                    swipe, play, and get to know them virtually. Once
+                    you&apos;ve matched, meet them offline and let the snuggles
+                    roll!
                 </p>
                 <br />
                 <p>
