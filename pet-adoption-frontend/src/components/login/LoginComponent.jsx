@@ -30,11 +30,13 @@ export default function LoginComponent() {
                         <a href="/forgot-password">Forgot Password?</a>
                         <section className={styles.loginButton}>
                             <Button variant="contained">Sign in</Button>
-                            <Button variant="contained">Sign in with Google</Button>
+                            <Button variant="contained">
+                                Sign in with Google
+                            </Button>
                         </section>
 
                         <p>
-                            Don't have an account?{" "}
+                            Don&apos;t have an account?{" "}
                             <a href="/sign-up">Sign up</a>
                         </p>
                     </form>
