@@ -9,6 +9,11 @@ export default function HomePage() {
     return (
     <>
         <NavbarHome />
+        <HeroSection />
+        {/* <AboutSection /> */}
+        {/* <PetOptions /> */}
+        {/* <CTASection /> */}
+        {/* <Footer />  */}
     </>
     );
 }
