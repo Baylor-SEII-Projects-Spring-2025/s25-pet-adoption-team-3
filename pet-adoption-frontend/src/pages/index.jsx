@@ -13,7 +13,7 @@ export default function HomePage() {
         <AboutSection />
         <PetOptions />
         <CTASection />
-        {/* <Footer />  */}
+        <Footer /> 
     </>
     );
 }
