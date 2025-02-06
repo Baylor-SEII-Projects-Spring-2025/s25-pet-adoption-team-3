@@ -2,7 +2,8 @@
     "extends": ["next/core-web-vitals"],
     "settings": {
         "react": {
-            "version": "detect"
+            "version": "detect",
+            "defaultVersion": ""
         }
     }
 }
