@@ -1,3 +1,4 @@
+import React from "react";
 import NavbarHome from "@/components/homepage/NavbarHome";
 import HeroSection from "@/components/homepage/HeroSection";
 import AboutSection from "@/components/homepage/AboutSection";
@@ -7,13 +8,13 @@ import Footer from "@/components/homepage/Footer";
 
 export default function HomePage() {
     return (
-    <>
-        <NavbarHome />
-        <HeroSection />
-        <AboutSection />
-        <PetOptions />
-        <CTASection />
-        <Footer /> 
-    </>
+        <>
+            <NavbarHome />
+            <HeroSection />
+            <AboutSection />
+            <PetOptions />
+            <CTASection />
+            <Footer />
+        </>
     );
 }

@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { ThemeProvider, createTheme } from "@mui/material";
 
 // This file lets you modify the global theme of your project. Any changes here will affect all
@@ -65,7 +66,10 @@ export const theme = createTheme({
     },
 });
 
-
 export const PetAdoptionThemeProvider = ({ children }) => {
     return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+};
+
+PetAdoptionThemeProvider.propTypes = {
+    children: PropTypes.node.isRequired,
 };

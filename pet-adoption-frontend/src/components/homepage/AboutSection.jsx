@@ -1,3 +1,4 @@
+import React from "react";
 import styles from "@/styles/AboutSection.module.css";
 
 export default function AboutSection() {

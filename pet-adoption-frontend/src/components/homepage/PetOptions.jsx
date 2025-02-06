@@ -1,3 +1,4 @@
+import React from "react";
 import styles from "@/styles/PetOptions.module.css";
 
 export default function PetOptions() {
@@ -11,9 +12,8 @@ export default function PetOptions() {
                     />
                     <h3>Find Your Pooch</h3>
                     <p>
-                        Want someone to go fetch your ball, or
-                        to constantly keep your feet warm?
-                        Look no further!
+                        Want someone to go fetch your ball, or to constantly
+                        keep your feet warm? Look no further!
                     </p>
                 </div>
 
@@ -24,9 +24,8 @@ export default function PetOptions() {
                     />
                     <h3>Find Your Kitty</h3>
                     <p>
-                        Perfer someone to completely ignore
-                        you unless they want food or cuddles?
-                        Cats are waiting!
+                        Perfer someone to completely ignore you unless they want
+                        food or cuddles? Cats are waiting!
                     </p>
                 </div>
             </section>
