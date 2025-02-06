@@ -17,6 +17,7 @@
     font-family: 'Roboto', sans-serif;
     font-size: 42px;
     align-self: flex-start;
+    margin-bottom: 10px;
 }
 
 .loginForm {
@@ -40,11 +41,21 @@
 }
 
 .loginForm a {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
     align-self: flex-end;
     color: #8B80F9;
     text-decoration: none;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 5px;
+}
+
+.loginForm p{
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #808080;
+    margin-top: 20px;
 }
 
 .loginRightSection {
@@ -59,6 +70,16 @@
 }
 
 .loginButton{
-    gap: 20px;
     width: 100%;
 }
+
+.loginButton button {
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    width: 100%;
+    height: 40px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
