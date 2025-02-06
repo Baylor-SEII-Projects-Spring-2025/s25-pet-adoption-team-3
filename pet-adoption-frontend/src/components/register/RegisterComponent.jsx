@@ -6,6 +6,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "@/utils/theme";
 import { loginWithGoogle } from "@/utils/auth";
 
+
 export default function RegisterComponent() {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -64,6 +65,7 @@ export default function RegisterComponent() {
                                 id="password"
                                 type="password"
                                 size="small"
+                                className={styles.passwordInput}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                             />
@@ -109,7 +111,9 @@ export default function RegisterComponent() {
                                 Sign up with Google
                             </Button>
                         </section>
-                        <p>Already have an account? <a href="/login">Log in</a></p>
+                        <p>
+                            Already have an account? <a href="/login">Log in</a>
+                        </p>
                     </form>
                 </section>
                 <section className={styles.registerRightSection}>
