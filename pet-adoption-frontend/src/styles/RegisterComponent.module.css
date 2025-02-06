@@ -89,3 +89,7 @@
     color: #808080;
     margin-top: 20px;
 }
+
+.passwordInput{
+    width: 100%;
+}

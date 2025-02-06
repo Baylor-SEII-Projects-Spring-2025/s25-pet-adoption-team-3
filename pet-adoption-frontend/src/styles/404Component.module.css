@@ -1,0 +1,102 @@
+.notFoundFullWidth {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #000000;
+    overflow: hidden;
+}
+
+.notFoundWrapper {
+    width: 90%;
+    height: 60vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.backHomeText {
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    margin-top: 20px;
+    align-self: flex-start;
+}
+
+.backHomeText img {
+    width: auto;
+    height: 13px;
+    margin-right: 5px;
+    transition: transform 0.5s ease-in-out;
+}
+
+.backHomeText a {
+    text-decoration: none;
+    color: white;
+}
+
+.backHomeText:hover img {
+    transform: translateX(-5px);
+}
+
+.notFoundBodyFirst {
+    font-family: 'Bowlby One', sans-serif;
+    font-size: 64;
+    font-weight: 500;
+    color: white;
+    display: flex;
+    flex-direction: row;
+}
+
+.notFoundBodyFirst h1 {
+    margin-right: 50px;
+}
+
+.notFoundBodyFirst img {
+    width: auto;
+    height: 75px;
+}
+
+.notFoundBodySecond {
+    display: flex;
+    flex-direction: row;
+    margin-left: -10px;
+}
+
+.notFoundBodySecond img {
+    width: auto;
+    height: 75px;
+}
+
+.notFoundBodyThird {
+    display: flex;
+    flex-direction: row;
+    margin-left: -10px;
+}
+
+.notFoundBodyThird img {
+    width: auto;
+    height: 75px;
+}
+
+.notFoundBodyFourth {
+    font-family: 'Bowlby One', sans-serif;
+    font-size: 67px;
+    font-weight: 500;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    margin-left: -10px;
+}
+
+.notFoundBodyFourth img {
+    width: auto;
+    height: 75px;
+}
+
+.notFoundBodyFourth h1 {
+    margin-left: 35px;
+}
