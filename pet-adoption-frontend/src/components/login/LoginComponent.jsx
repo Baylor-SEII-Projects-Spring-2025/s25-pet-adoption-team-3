@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import styles from "@/styles/LoginComponent.module.css";
@@ -15,7 +15,7 @@ export default function LoginComponent() {
         try {
             await loginWithEmail(email, password);
             window.location.href = "/dashboard"; // Redirect after login
-        } catch (error) {
+        } catch {
             alert("Login failed. Please check your credentials.");
         }
     };
@@ -54,7 +54,7 @@ export default function LoginComponent() {
                             <Button type="submit" variant="contained">
                                 Sign in
                             </Button>
-                            
+
                             <Button
                                 variant="outlined" // Change to outlined for Google-style button
                                 startIcon={<img src="/icons/google_oauth.png" alt="Google Icon" style={{ width: 20, height: 20 }} />} // Add Google Icon
