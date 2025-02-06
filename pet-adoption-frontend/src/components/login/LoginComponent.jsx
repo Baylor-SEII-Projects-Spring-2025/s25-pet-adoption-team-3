@@ -76,7 +76,7 @@ export default function LoginComponent() {
 
                         <p>
                             Don&apos;t have an account?{" "}
-                            <a href="/sign-up">Sign up</a>
+                            <a href="/register">Sign up</a>
                         </p>
                     </form>
                 </section>
