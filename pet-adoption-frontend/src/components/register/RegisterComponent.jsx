@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { TextField } from "@mui/material";
-import { Button } from "@mui/material";
-import styles from "@/styles/RegisterComponent.module.css";
+import { TextField, Button } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
+import PasswordStrengthBar from "react-password-strength-bar";
 import { theme } from "@/utils/theme";
 import { loginWithGoogle } from "@/utils/auth";
-
+import styles from "@/styles/RegisterComponent.module.css";
 
 export default function RegisterComponent() {
     const [firstName, setFirstName] = useState("");
@@ -13,10 +12,19 @@ export default function RegisterComponent() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [passwordScore, setPasswordScore] = useState(0);
+    const [passwordFocused, setPasswordFocused] = useState(false);
+    const [isPasswordSame, setIsPasswordSame] = useState(false);
 
     const handleRegister = (e) => {
         e.preventDefault();
         console.log(firstName, lastName, email, password, confirmPassword);
+    };
+
+    const handleConfirmPasswordChange = (e) => {
+        const value = e.target.value;
+        setConfirmPassword(value);
+        setIsPasswordSame(value === password);
     };
 
     return (
@@ -67,23 +75,51 @@ export default function RegisterComponent() {
                                 size="small"
                                 className={styles.passwordInput}
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                onChange={(e) => {
+                                    setPassword(e.target.value);
+                                    setIsPasswordSame(
+                                        e.target.value === confirmPassword,
+                                    );
+                                }}
+                                onFocus={() => setPasswordFocused(true)}
+                                onBlur={() => setPasswordFocused(false)}
                             />
+
+                            {passwordFocused && (
+                                <PasswordStrengthBar
+                                    password={password}
+                                    onChangeScore={(score) =>
+                                        setPasswordScore(score)
+                                    }
+                                />
+                            )}
 
                             <TextField
                                 label="Confirm Password"
-                                id="password"
+                                id="confirmPassword"
                                 type="password"
                                 size="small"
                                 value={confirmPassword}
-                                onChange={(e) =>
-                                    setConfirmPassword(e.target.value)
+                                onChange={handleConfirmPasswordChange}
+                                error={
+                                    confirmPassword.length > 0 &&
+                                    !isPasswordSame
+                                }
+                                helperText={
+                                    confirmPassword.length > 0 &&
+                                    !isPasswordSame
+                                        ? "Passwords do not match"
+                                        : ""
                                 }
                             />
                         </section>
 
                         <section className={styles.registerButton}>
-                            <Button type="submit" variant="contained">
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                disabled={passwordScore < 2 || !isPasswordSame}
+                            >
                                 Sign up
                             </Button>
 

@@ -1042,11 +1042,6 @@ chalk@^4.0.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
-check-password-complexity@^1.4.9:
-  version "1.4.15"
-  resolved "https://registry.yarnpkg.com/check-password-complexity/-/check-password-complexity-1.4.15.tgz#03d45e4c98717eb5b5e2d5534bec122e2616d8e1"
-  integrity sha512-skVG1A87TaP9AAMjvXhg8dlGn25LhYE8MPRmD9BUvpyLk5pbBYakBBaqKWEj1HI9uNUfbHr9SdDEQBdcgZ1Vow==
-
 client-only@0.0.1:
   version "0.0.1"
   resolved "https://registry.npmjs.org/client-only/-/client-only-0.0.1.tgz"
@@ -2313,13 +2308,6 @@ ms@^2.1.1, ms@^2.1.3:
   resolved "https://registry.npmjs.org/ms/-/ms-2.1.3.tgz"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
 
-mui-password-strength-input@^0.1.14:
-  version "0.1.14"
-  resolved "https://registry.yarnpkg.com/mui-password-strength-input/-/mui-password-strength-input-0.1.14.tgz#6a199e4fc480e3aaef12b62c3cf8585f974cb614"
-  integrity sha512-WpqB4Iq7fxvLIR0zezIjRNTVF2lAzNexECuHyr9TiWnoScuu7pUdd6b3MIhedqHs4BsSq+9VURnLtQRdxeNm6w==
-  dependencies:
-    check-password-complexity "^1.4.9"
-
 multipipe@^1.0.2:
   version "1.0.2"
   resolved "https://registry.npmjs.org/multipipe/-/multipipe-1.0.2.tgz"
@@ -2582,6 +2570,13 @@ react-is@^19.0.0:
   version "19.0.0"
   resolved "https://registry.npmjs.org/react-is/-/react-is-19.0.0.tgz"
   integrity sha512-H91OHcwjZsbq3ClIDHMzBShc1rotbfACdWENsmEf0IFvZ3FgGPtdHMcsv45bQ1hAbgdfiA8SnxTKfDS+x/8m2g==
+
+react-password-strength-bar@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/react-password-strength-bar/-/react-password-strength-bar-0.4.1.tgz#381073552a99d3401b884195c5fa9a7d56913dd0"
+  integrity sha512-2NvYz4IUU8k7KDZgsXKoJWreKCZLKGaqF5QhIVhc09OsPBFXFMh0BeghNkBIRkaxLeI7/xjivknDCYfluBCXKA==
+  dependencies:
+    zxcvbn "4.4.2"
 
 react-redux@^9.2.0:
   version "9.2.0"
@@ -3262,3 +3257,8 @@ yocto-queue@^0.1.0:
   version "0.1.0"
   resolved "https://registry.npmjs.org/yocto-queue/-/yocto-queue-0.1.0.tgz"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
+
+zxcvbn@4.4.2:
+  version "4.4.2"
+  resolved "https://registry.yarnpkg.com/zxcvbn/-/zxcvbn-4.4.2.tgz#28ec17cf09743edcab056ddd8b1b06262cc73c30"
+  integrity sha512-Bq0B+ixT/DMyG8kgX2xWcI5jUvCwqrMxSFam7m0lAf78nf04hv6lNCsyLYdyYTrCVMqNDY/206K7eExYCeSyUQ==
