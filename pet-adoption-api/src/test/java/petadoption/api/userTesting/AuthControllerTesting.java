@@ -1,4 +1,6 @@
 package petadoption.api.userTesting;
+import petadoption.api.DTO.LoginRequestsDTO;
+import petadoption.api.DTO.UserDTO;
 
 import java.util.Map;
 
@@ -15,9 +17,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
-
-import DTO.LoginRequestsDTO;
-import DTO.UserDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import petadoption.api.controllers.AuthenticationController;
@@ -64,7 +63,7 @@ class AuthControllerTesting {
         loginRequest.setEmail("testuser@example.com");
         loginRequest.setPassword("SecurePass123");
 
-        // ✅ Mock request to return mock session
+
         when(mockRequest.getSession()).thenReturn(mockSession);
     }
 
@@ -83,7 +82,7 @@ class AuthControllerTesting {
         when(userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword()))
                 .thenReturn(testUser);
 
-        // ✅ Ensure `mockRequest` returns a session
+
         when(mockRequest.getSession()).thenReturn(mockSession);
 
         ResponseEntity<Map<String, Object>> response = authController.loginUser(loginRequest, mockRequest);

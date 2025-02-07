@@ -1,6 +1,6 @@
 package petadoption.api.services;
 
-import DTO.UserDTO;
+import petadoption.api.DTO.UserDTO;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import petadoption.api.models.User;
@@ -11,7 +11,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -29,13 +29,20 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 
-        return userRepository.save(user);
+        user.setEmailVerified(false);
+        user.setProfilePhoto(null);
+
+        user = userRepository.save(user);
+        return user;
     }
 
     public User authenticateUser(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
+        if (!user.isEmailVerified()) {
+            throw new RuntimeException("Email not verified. Please verify your email before logging in.");
+        }
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
