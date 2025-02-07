@@ -33,8 +33,10 @@ dependencies {
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
 	// Spring Security - you'll need this, but not immediately; here they are for when you are ready though!
-	// implementation 'org.springframework.boot:spring-boot-starter-security'
-	// testImplementation 'org.springframework.security:spring-security-test'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.springframework.security:spring-security-test'
+	implementation  'org.springframework.security:spring-security-config'
+	implementation  'org.springframework.security:spring-security-web'
 
 	// Utility libraries
 	implementation 'com.google.guava:guava:33.0.0-jre'
