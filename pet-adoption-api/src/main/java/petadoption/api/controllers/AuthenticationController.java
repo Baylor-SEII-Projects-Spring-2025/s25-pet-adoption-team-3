@@ -1,7 +1,7 @@
 package petadoption.api.controllers;
 
-import DTO.LoginRequestsDTO;
-import DTO.UserDTO;
+import petadoption.api.DTO.LoginRequestsDTO;
+import petadoption.api.DTO.UserDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

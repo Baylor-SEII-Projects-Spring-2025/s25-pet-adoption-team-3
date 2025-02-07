@@ -1,6 +1,6 @@
 package petadoption.api.userTesting;
-import DTO.LoginRequestsDTO;
-import DTO.UserDTO;
+import petadoption.api.DTO.LoginRequestsDTO;
+import petadoption.api.DTO.UserDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

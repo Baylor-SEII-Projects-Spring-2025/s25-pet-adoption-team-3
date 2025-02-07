@@ -1,6 +1,6 @@
 package petadoption.api.userTesting;
 
-import DTO.UserDTO;
+import petadoption.api.DTO.UserDTO;
 import petadoption.api.models.User;
 import petadoption.api.repository.UserRepository;
 import petadoption.api.services.UserService;

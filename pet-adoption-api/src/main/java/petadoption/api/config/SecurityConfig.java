@@ -18,13 +18,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for APIs
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/register", "/auth/login").permitAll() // Public routes
-                        .anyRequest().authenticated() // Protect all other routes
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/users/{userId}/verify-email").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Stateless JWT
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) //
                 );
 
         return http.build();
