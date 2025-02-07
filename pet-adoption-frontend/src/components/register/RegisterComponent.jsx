@@ -27,6 +27,16 @@ export default function RegisterComponent() {
         setIsPasswordSame(value === password);
     };
 
+    // Check if all fields are filled
+    const isFormValid =
+        firstName.trim() &&
+        lastName.trim() &&
+        email.trim() &&
+        password.trim() &&
+        confirmPassword.trim() &&
+        passwordScore >= 2 &&
+        isPasswordSame;
+
     return (
         <ThemeProvider theme={theme}>
             <section className={styles.registerFullWidth}>
@@ -118,7 +128,7 @@ export default function RegisterComponent() {
                             <Button
                                 type="submit"
                                 variant="contained"
-                                disabled={passwordScore < 2 || !isPasswordSame}
+                                disabled={!isFormValid} // Disable if form is invalid
                             >
                                 Sign up
                             </Button>
