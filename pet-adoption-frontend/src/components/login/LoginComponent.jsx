@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import styles from "@/styles/LoginComponent.module.css";
 import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "@/utils/theme";
-import { loginWithEmail, loginWithGoogle } from "@/utils/auth";
+import { loginWithGoogle } from "@/utils/auth";
 
 export default function LoginComponent() {
     const [email, setEmail] = useState("");

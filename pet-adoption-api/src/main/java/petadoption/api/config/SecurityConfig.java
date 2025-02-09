@@ -20,11 +20,15 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for APIs
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll() // Public routes
+                        .requestMatchers("/auth/**", "/", "/oauth2/**", "/login/oauth2/**").permitAll()
                         .anyRequest().authenticated() // Protect all other routes
                 )
+                .oauth2Login(oauth2 -> oauth2
+                        .defaultSuccessUrl("http://localhost:8080/oauth/google/success", true) // Redirect directly to frontend
+                        .failureUrl("/login?error=true"))
+
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Stateless JWT
+                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS) // Stateless JWT
                 );
 
         return http.build();
