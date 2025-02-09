@@ -24,6 +24,7 @@ export default function RegisterComponent() {
             lastName,
             email,
             password,
+            role: "ADOPTER",
         };
 
         try {
