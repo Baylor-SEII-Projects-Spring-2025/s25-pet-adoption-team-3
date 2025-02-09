@@ -16,9 +16,38 @@ export default function RegisterComponent() {
     const [passwordFocused, setPasswordFocused] = useState(false);
     const [isPasswordSame, setIsPasswordSame] = useState(false);
 
-    const handleRegister = (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
-        console.log(firstName, lastName, email, password, confirmPassword);
+
+        const userData = {
+            firstName,
+            lastName,
+            email,
+            password,
+        };
+
+        try {
+            const response = await fetch(
+                "http://localhost:8080/auth/register",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(userData),
+                },
+            );
+
+            if (!response.ok) {
+                const errorMessage = await response.text();
+                throw new Error(errorMessage);
+            }
+
+            window.location.href = "/login";
+        } catch (error) {
+            console.error("Registration failed:", error.message);
+            alert("Registration failed: " + error.message);
+        }
     };
 
     const handleConfirmPasswordChange = (e) => {
