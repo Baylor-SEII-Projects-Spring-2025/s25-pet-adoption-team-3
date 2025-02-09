@@ -4,8 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import petadoption.api.models.User;
 
-import javax.management.relation.Role;
-
 @Getter
 @Setter
 public class UserDTO {

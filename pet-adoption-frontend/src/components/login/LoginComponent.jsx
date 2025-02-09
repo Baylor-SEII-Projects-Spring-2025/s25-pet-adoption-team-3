@@ -4,21 +4,43 @@ import Button from "@mui/material/Button";
 import styles from "@/styles/LoginComponent.module.css";
 import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "@/utils/theme";
-import { loginWithEmail, loginWithGoogle } from "@/utils/auth";
+import { loginWithGoogle } from "@/utils/auth";
 
 export default function LoginComponent() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleEmailLogin = async (e) => {
-        e.preventDefault();
-        try {
-            await loginWithEmail(email, password);
-            window.location.href = "/dashboard"; // Redirect after login
-        } catch {
-            alert("Login failed. Please check your credentials.");
+const handleEmailLogin = async (e) => {
+    e.preventDefault();
+    try {
+        const response = await fetch("http://localhost:8080/auth/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password }),
+            credentials: "include",
+        });
+
+        const contentType = response.headers.get("content-type");
+
+        if (!response.ok) {
+            if (contentType && contentType.includes("application/json")) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || "Invalid credentials");
+            }
+            throw new Error("Invalid credentials");
         }
-    };
+
+        const data = await response.json();
+        console.log("Login successful:", data);
+
+        window.location.href = "/dashboard"; // Redirect on success
+    } catch (error) {
+        alert(error.message);
+    }
+};
+
 
     return (
         <ThemeProvider theme={theme}>
@@ -56,8 +78,14 @@ export default function LoginComponent() {
                             </Button>
 
                             <Button
-                                variant="outlined" // Change to outlined for Google-style button
-                                startIcon={<img src="/icons/google_oauth.png" alt="Google Icon" style={{ width: 20, height: 20 }} />} // Add Google Icon
+                                variant="outlined"
+                                startIcon={
+                                    <img
+                                        src="/icons/google_oauth.png"
+                                        alt="Google Icon"
+                                        style={{ width: 20, height: 20 }}
+                                    />
+                                }
                                 onClick={loginWithGoogle}
                                 sx={{
                                     textTransform: "none",
