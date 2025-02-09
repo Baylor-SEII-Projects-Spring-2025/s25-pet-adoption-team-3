@@ -1,5 +1,7 @@
 package petadoption.api.controllers;
 
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,8 +31,11 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody LoginRequestsDTO loginRequest) {
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequestsDTO loginRequest) {
         User user = userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
-        return ResponseEntity.ok("Login successful: " + user.getFirstName());
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Login successful",
+                "user", user.getFirstName()));
     }
 }
