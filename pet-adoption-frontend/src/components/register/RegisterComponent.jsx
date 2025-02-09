@@ -27,7 +27,6 @@ export default function RegisterComponent() {
         setIsPasswordSame(value === password);
     };
 
-    // Check if all fields are filled
     const isFormValid =
         firstName.trim() &&
         lastName.trim() &&
@@ -128,7 +127,7 @@ export default function RegisterComponent() {
                             <Button
                                 type="submit"
                                 variant="contained"
-                                disabled={!isFormValid} // Disable if form is invalid
+                                disabled={!isFormValid}
                             >
                                 Sign up
                             </Button>
