@@ -19,6 +19,7 @@ const handleEmailLogin = async (e) => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({ email, password }),
+            credentials: "include",
         });
 
         const contentType = response.headers.get("content-type");
