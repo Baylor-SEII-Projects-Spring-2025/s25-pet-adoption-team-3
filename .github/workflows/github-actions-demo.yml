@@ -17,6 +17,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Ensure Gradle Wrapper Exists
+        run: chmod +x ./gradlew
+
+      - name: Clean Gradle Cache
+        run: ./gradlew clean
+
+      - name: Run Tests
+        run: SPRING_PROFILES_ACTIVE=testdb ./gradlew test --no-daemon
+
       - name: Cleanup
         # This step builds cleans up any old containers, images, and build layers to
         # avoid running out of storage space on the actions runner. We filter by >24hr
