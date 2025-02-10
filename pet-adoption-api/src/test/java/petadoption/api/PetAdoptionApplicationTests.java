@@ -1,20 +1,23 @@
 package petadoption.api;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @SpringBootTest
-@ActiveProfiles("testdb")  // make these tests use the H2 in-memory DB instead of your actual DB
+@ActiveProfiles("testdb")
 class PetAdoptionApplicationTests {
+
+	@Value("${spring.datasource.url}")
+	private String dbUrl;
+
 	@Test
-	void emptyTest() {
+	void printDatabaseUrl() {
+		System.out.println("Using Database: " + dbUrl);
 	}
 
 	@Test
-	void exampleTest() {
-		assertEquals(2, 1 + 1);
+	void emptyTest() {
 	}
 }
