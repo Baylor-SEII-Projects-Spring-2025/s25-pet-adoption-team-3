@@ -1,4 +1,5 @@
 package petadoption.api.userTesting;
+
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,15 +19,21 @@ import org.springframework.http.ResponseEntity;
 import DTO.LoginRequestsDTO;
 import DTO.UserDTO;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import petadoption.api.controllers.AuthenticationController;
 import petadoption.api.models.User;
 import petadoption.api.services.UserService;
 
-class AuthControllerTest {
+class AuthControllerTesting {
 
     @Mock
     private UserService userService;
+
+    @Mock
     private HttpServletRequest mockRequest;
+
+    @Mock
+    private HttpSession mockSession;
 
     @InjectMocks
     private AuthenticationController authController;
@@ -56,6 +63,9 @@ class AuthControllerTest {
         loginRequest = new LoginRequestsDTO();
         loginRequest.setEmail("testuser@example.com");
         loginRequest.setPassword("SecurePass123");
+
+        // ✅ Mock request to return mock session
+        when(mockRequest.getSession()).thenReturn(mockSession);
     }
 
     @Test
@@ -73,11 +83,13 @@ class AuthControllerTest {
         when(userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword()))
                 .thenReturn(testUser);
 
-        ResponseEntity<Map<String, Object>> response = authController.loginUser(loginRequest, mockRequest); // ✅ Pass
-                                                                                                            // mockRequest
+        // ✅ Ensure `mockRequest` returns a session
+        when(mockRequest.getSession()).thenReturn(mockSession);
+
+        ResponseEntity<Map<String, Object>> response = authController.loginUser(loginRequest, mockRequest);
 
         assertEquals(200, response.getStatusCode().value());
-        assertEquals("Login successful", response.getBody().get("message")); // ✅ Correct expected response format
+        assertEquals("Login successful", response.getBody().get("message"));
     }
 
     @Test

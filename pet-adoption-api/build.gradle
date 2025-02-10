@@ -25,6 +25,7 @@ dependencies {
 	// Spring dependencies
 	// The versions of all of these are managed by Spring's dependency management Gradle plugin
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-loader-tools:3.4.2'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
