@@ -4,9 +4,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import petadoption.api.DTO.LoginRequestsDTO;
 import petadoption.api.DTO.UserDTO;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,6 +38,7 @@ public class AuthenticationController {
     public ResponseEntity<Map<String, Object>> loginUser(
             @RequestBody LoginRequestsDTO loginRequest, HttpServletRequest request) {
 
+    public ResponseEntity<String> loginUser(HttpServletResponse response, @RequestBody LoginRequestsDTO loginRequest) {
         User user = userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
 
         HttpSession session = request.getSession();

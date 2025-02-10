@@ -6,6 +6,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import petadoption.api.DTO.LoginRequestsDTO;
+import petadoption.api.DTO.UserDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
@@ -62,9 +64,6 @@ class AuthControllerTesting {
         loginRequest = new LoginRequestsDTO();
         loginRequest.setEmail("testuser@example.com");
         loginRequest.setPassword("SecurePass123");
-
-
-        when(mockRequest.getSession()).thenReturn(mockSession);
     }
 
     @Test
@@ -72,32 +71,26 @@ class AuthControllerTesting {
         when(userService.registerUser(any(UserDTO.class))).thenReturn(testUser);
         ResponseEntity<String> response = authController.registerUser(userDTO);
 
-        assertEquals(200, response.getStatusCode().value());
+        assertEquals(200, response.getStatusCodeValue());
         assertEquals("User registered successfully.", response.getBody());
         verify(userService, times(1)).registerUser(any(UserDTO.class));
     }
 
     @Test
     void testLoginUserSuccess() {
-        when(userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword()))
-                .thenReturn(testUser);
+        when(userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword())).thenReturn(testUser);
+        ResponseEntity<String> response = authController.loginUser(loginRequest);
+        assertEquals(200, response.getStatusCodeValue());
 
-
-        when(mockRequest.getSession()).thenReturn(mockSession);
-
-        ResponseEntity<Map<String, Object>> response = authController.loginUser(loginRequest, mockRequest);
-
-        assertEquals(200, response.getStatusCode().value());
-        assertEquals("Login successful", response.getBody().get("message"));
+        assertEquals("Login successful: " + testUser.getFirstName(), response.getBody());
     }
+
 
     @Test
     void testLoginUserInvalidCredentials() {
-        when(userService.authenticateUser(anyString(), anyString()))
-                .thenThrow(new RuntimeException("Invalid credentials"));
-
-        Exception exception = assertThrows(RuntimeException.class,
-                () -> authController.loginUser(loginRequest, mockRequest)); // ✅ Pass mockRequest
+        when(userService.authenticateUser(anyString(), anyString())).thenThrow(new RuntimeException("Invalid credentials"));
+        Exception exception = assertThrows(RuntimeException.class, () ->
+                authController.loginUser(loginRequest));
 
         assertEquals("Invalid credentials", exception.getMessage());
     }
