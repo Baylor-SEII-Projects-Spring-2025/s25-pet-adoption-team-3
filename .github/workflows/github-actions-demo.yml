@@ -17,6 +17,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Debug Environment
+        run: |
+          echo "Spring Profile: $SPRING_PROFILES_ACTIVE"
+
+        
+
       - name: Cleanup
         # This step builds cleans up any old containers, images, and build layers to
         # avoid running out of storage space on the actions runner. We filter by >24hr
