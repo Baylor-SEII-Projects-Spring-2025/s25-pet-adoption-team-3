@@ -16,6 +16,8 @@ import jakarta.servlet.http.HttpSession;
 import petadoption.api.models.User;
 import petadoption.api.services.UserService;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -38,7 +40,6 @@ public class AuthenticationController {
     public ResponseEntity<Map<String, Object>> loginUser(
             @RequestBody LoginRequestsDTO loginRequest, HttpServletRequest request) {
 
-    public ResponseEntity<String> loginUser(HttpServletResponse response, @RequestBody LoginRequestsDTO loginRequest) {
         User user = userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
 
         HttpSession session = request.getSession();
@@ -50,6 +51,7 @@ public class AuthenticationController {
 
         return ResponseEntity.ok(response);
     }
+
 
     // Check if user has an active session
     @GetMapping("/session")
@@ -67,26 +69,13 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logoutUser(HttpServletResponse response) {
-        Cookie usernameCookie = new Cookie("username",null);
-        Cookie userIdCookie = new Cookie("userId", null);
-        Cookie passwordCookie = new Cookie("password", null);
+    public ResponseEntity<String> logoutUser(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
 
-        usernameCookie.setPath("/");
-        userIdCookie.setPath("/");
-        passwordCookie.setPath("/");
-
-
-        usernameCookie.setMaxAge(0);
-        userIdCookie.setMaxAge(0);
-        passwordCookie.setMaxAge(0);
-
-
-        response.addCookie(usernameCookie);
-        response.addCookie(userIdCookie);
-        response.addCookie(passwordCookie);
-
-
-        return ResponseEntity.ok("Logout successful.");
+        if(session == null){
+            return ResponseEntity.ok("User is already logged out");
+        }
+        session.invalidate();
+        return ResponseEntity.ok("Logout successful");
     }
 }

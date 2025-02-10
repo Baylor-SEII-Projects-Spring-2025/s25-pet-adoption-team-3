@@ -78,19 +78,25 @@ class AuthControllerTesting {
 
     @Test
     void testLoginUserSuccess() {
-        when(userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword())).thenReturn(testUser);
-        ResponseEntity<String> response = authController.loginUser(loginRequest);
-        assertEquals(200, response.getStatusCodeValue());
+        when(userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword()))
+                .thenReturn(testUser);
 
-        assertEquals("Login successful: " + testUser.getFirstName(), response.getBody());
+        when(mockRequest.getSession()).thenReturn(mockSession);
+
+        ResponseEntity<Map<String, Object>> response = authController.loginUser(loginRequest, mockRequest);
+
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals("Login successful", response.getBody().get("message"));
     }
 
 
     @Test
     void testLoginUserInvalidCredentials() {
-        when(userService.authenticateUser(anyString(), anyString())).thenThrow(new RuntimeException("Invalid credentials"));
-        Exception exception = assertThrows(RuntimeException.class, () ->
-                authController.loginUser(loginRequest));
+        when(userService.authenticateUser(anyString(), anyString()))
+                .thenThrow(new RuntimeException("Invalid credentials"));
+
+        Exception exception = assertThrows(RuntimeException.class,
+                () -> authController.loginUser(loginRequest, mockRequest));
 
         assertEquals("Invalid credentials", exception.getMessage());
     }

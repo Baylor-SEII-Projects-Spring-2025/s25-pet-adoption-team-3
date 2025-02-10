@@ -30,11 +30,8 @@ public class SecurityConfig {
                     return config;
                 }))
                 .csrf(csrf -> csrf.disable())
-                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/", "/oauth2/**", "/login/oauth2/**").permitAll()
-                        .anyRequest().authenticated()
-                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/users/{userId}/verify-email").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -44,7 +41,7 @@ public class SecurityConfig {
 
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) //
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
 
         return http.build();
