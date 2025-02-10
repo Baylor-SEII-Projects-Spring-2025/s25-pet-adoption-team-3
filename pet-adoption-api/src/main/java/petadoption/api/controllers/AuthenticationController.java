@@ -39,37 +39,18 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> loginUser(
-            @RequestBody LoginRequestsDTO loginRequest, HttpServletRequest request, HttpServletResponse response) {
+            @RequestBody LoginRequestsDTO loginRequest, HttpServletRequest request) {
 
         User user = userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
 
-        Cookie passwordCookie = new Cookie("password", null);
-        passwordCookie.setPath("/");
-        passwordCookie.setMaxAge(0);
-        response.addCookie(passwordCookie);
+        HttpSession session = request.getSession();
+        session.setAttribute("user", user);
 
-        Cookie usernameCookie = new Cookie("username", user.getEmail());
-        Cookie userIdCookie = new Cookie("userId", user.getId().toString());
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Login successful");
+        response.put("user", user.getFirstName());
 
-        usernameCookie.setPath("/");
-        userIdCookie.setPath("/");
-
-        usernameCookie.setMaxAge(-1);
-        userIdCookie.setMaxAge(-1);
-
-        response.addCookie(usernameCookie);
-        response.addCookie(userIdCookie);
-
-        return ResponseEntity.ok("Login successful: " + user.getFirstName());
-
-       // HttpSession session = request.getSession();
-        //session.setAttribute("user", user);
-
-       // Map<String, Object> response = new HashMap<>();
-        //response.put("message", "Login successful");
-        //response.put("user", user.getFirstName());
-
-        //return ResponseEntity.ok(response);
+        return ResponseEntity.ok(response);
     }
 
     // Check if user has an active session
