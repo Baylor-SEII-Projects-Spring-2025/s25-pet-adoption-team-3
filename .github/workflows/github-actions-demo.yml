@@ -49,6 +49,11 @@ jobs:
         run: |
           docker compose -f docker/ci.docker-compose.yml build
 
+      - name: Print Test Report
+        if: failure()
+        run: cat build/reports/tests/test/index.html || true
+
+
       - name: Deploy
         # This script simply runs the images that were built in the previous step.
         # This uses the same Docker Compose file in the previous step.
