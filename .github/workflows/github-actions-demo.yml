@@ -18,13 +18,16 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Ensure Gradle Wrapper Exists
-        run: chmod +x ./gradlew
+        run: chmod +x pet-adoption-api/gradlew
+        working-directory: pet-adoption-api
 
       - name: Clean Gradle Cache
         run: ./gradlew clean
+        working-directory: pet-adoption-api
 
       - name: Run Tests
         run: SPRING_PROFILES_ACTIVE=testdb ./gradlew test --no-daemon
+        working-directory: pet-adoption-api
 
       - name: Cleanup
         # This step builds cleans up any old containers, images, and build layers to
