@@ -12,6 +12,8 @@ on:
 jobs:
   build-and-deploy:
     runs-on: self-hosted
+    env:
+      SPRING_PROFILES_ACTIVE: testdb
     steps:
       - uses: actions/checkout@v3
 
