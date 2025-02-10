@@ -1,0 +1,85 @@
+.loginFullWidth {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.loginLeftSection {
+    width: 50%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+.loginForm h2 {
+    font-family: 'Roboto', sans-serif;
+    font-size: 42px;
+    align-self: flex-start;
+    margin-bottom: 10px;
+}
+
+.loginForm {
+    height: 100vh;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.loginInput {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: left;
+    margin-top: 30px;
+    width: 100%;
+    gap: 15px;
+}
+
+.loginForm a {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    align-self: flex-end;
+    color: #8B80F9;
+    text-decoration: none;
+    padding-top: 5px;
+}
+
+.loginForm p {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #808080;
+    margin-top: 20px;
+}
+
+.loginRightSection {
+    height: 100%;
+    width: 50%;
+}
+
+.loginImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.loginButton {
+    width: 100%;
+}
+
+.loginButton button {
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    width: 100%;
+    height: 40px;
+    cursor: pointer;
+    margin-top: 15px;
+}

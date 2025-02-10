@@ -8,6 +8,9 @@ RUN ./gradlew build --no-daemon -p .
 # Copy the build artifacts
 FROM openjdk:22
 WORKDIR /app
+
+ENV SPRING_PROFILES_ACTIVE=testdb
+
 COPY --from=build /build/build/libs/pet-adoption-api-1.0.0-SNAPSHOT.jar app.jar
 
 # Run the app
