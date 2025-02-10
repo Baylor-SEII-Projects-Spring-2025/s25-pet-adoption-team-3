@@ -9,15 +9,4 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("testdb")
 class PetAdoptionApplicationTests {
 
-	@Value("${spring.datasource.url}")
-	private String dbUrl;
-
-	@Test
-	void printDatabaseUrl() {
-		System.out.println("Using Database: " + dbUrl);
-	}
-
-	@Test
-	void emptyTest() {
-	}
 }
