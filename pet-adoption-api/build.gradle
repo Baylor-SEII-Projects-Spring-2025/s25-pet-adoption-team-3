@@ -8,7 +8,9 @@ group = 'petadoption'
 version = '1.0.0-SNAPSHOT'
 
 java {
-	sourceCompatibility = '22'
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(22)) // ✅ Ensures Java 22 compatibility
+    }
 }
 
 configurations {
