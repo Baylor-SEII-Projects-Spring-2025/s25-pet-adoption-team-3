@@ -9,7 +9,7 @@ version = '1.0.0-SNAPSHOT'
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(22)) // ✅ Ensures Java 22 compatibility
+        languageVersion.set(JavaLanguageVersion.of(23))
     }
 }
 

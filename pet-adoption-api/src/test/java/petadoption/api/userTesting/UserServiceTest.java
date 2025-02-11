@@ -1,5 +1,9 @@
 package petadoption.api.userTesting;
 
+import petadoption.api.DTO.UserDTO;
+import petadoption.api.models.User;
+import petadoption.api.repository.UserRepository;
+import petadoption.api.services.UserService;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,7 +21,6 @@ import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import DTO.UserDTO;
 import petadoption.api.models.User;
 import petadoption.api.repository.UserRepository;
 import petadoption.api.services.UserService;
