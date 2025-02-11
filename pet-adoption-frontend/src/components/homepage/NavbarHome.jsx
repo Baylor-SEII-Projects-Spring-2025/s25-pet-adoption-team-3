@@ -1,42 +1,82 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import styles from "@/styles/NavbarHome.module.css";
+import Avatar from "@mui/material/Avatar";
+import Popper from "@mui/material/Popper";
+import Grow from "@mui/material/Grow";
+import Paper from "@mui/material/Paper";
+import ClickAwayListener from "@mui/material/ClickAwayListener";
+import MenuList from "@mui/material/MenuList";
+import MenuItem from "@mui/material/MenuItem";
 
 export default function Navbar() {
     const [user, setUser] = useState(null);
+    const [open, setOpen] = useState(false);
+    const anchorRef = useRef(null);
 
-const fetchUserSession = async () => {
-    try {
-        const response = await fetch("http://localhost:8080/auth/session", {
-            method: "GET",
-            credentials: "include", // ✅ Required for session persistence
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+    const fetchUserSession = async () => {
+        try {
+            const response = await fetch("http://localhost:8080/auth/session", {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
 
-        if (response.status === 401) {
-            console.warn("No active session.");
-            return; // ✅ No session, just exit
+            if (response.status === 401) {
+                console.warn("No active session.");
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error("Error fetching session");
+            }
+
+            const data = await response.json();
+            console.log("✅ Session found:", data);
+            setUser(data.user);
+        } catch (error) {
+            console.error("Error fetching session:", error);
         }
+    };
 
-        if (!response.ok) {
-            throw new Error("Error fetching session");
+    useEffect(() => {
+        fetchUserSession();
+    }, []);
+
+    const handleToggle = () => {
+        setOpen((prevOpen) => !prevOpen);
+    };
+
+    const handleClose = (event) => {
+        if (anchorRef.current && anchorRef.current.contains(event.target)) {
+            return;
         }
+        setOpen(false);
+    };
 
-        const data = await response.json();
-        console.log("✅ Session found:", data);
-        setUser(data);
-    } catch (error) {
-        console.error("Error fetching session:", error);
+    const handleLogout = async () => {
+        try {
+            const response = await fetch("http://localhost:8080/auth/logout", {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Error logging out");
+            }
+
+            console.log("✅ Logged out");
+            setUser(null);
+            setOpen(false);
+        } catch (error) {
+            console.error("Error logging out:", error);
+        }
     }
-};
-
-useEffect(() => {
-    fetchUserSession();
-}, []);
-
-
 
     return (
         <nav className={styles.navbar}>
@@ -61,9 +101,87 @@ useEffect(() => {
             </ul>
             <div className={styles.auth}>
                 {user ? (
-                    <Link href="/profile" className={styles.loginButton}>
-                        Hello, {user.user}
-                    </Link>
+                    <div style={{ position: "relative" }}>
+                        <div className={styles.profileItems}>
+                            <Avatar
+                                ref={anchorRef}
+                                sx={{ bgcolor: "#f50057", cursor: "pointer" }}
+                                onClick={handleToggle}
+                            >
+                                {user.firstName.charAt(0)}
+                                {user.lastName.charAt(0)}
+                            </Avatar>
+                            <img
+                                src="/icons/profile_expand_arrow.png"
+                                alt="Expand"
+                                style={{ cursor: "pointer", marginLeft: "3px", width: "15px", marginRight: "10px" }}
+                                onClick={handleToggle}
+                            />
+                        </div>
+
+                        <Popper
+                            open={open}
+                            anchorEl={anchorRef.current}
+                            role={undefined}
+                            placement="bottom-start"
+                            transition
+                            disablePortal
+                        >
+                            {({ TransitionProps }) => (
+                                <Grow
+                                    {...TransitionProps}
+                                    style={{ transformOrigin: "left top" }}
+                                >
+                                    <Paper>
+                                        <ClickAwayListener
+                                            onClickAway={handleClose}
+                                        >
+                                            <MenuList autoFocusItem={open}>
+                                                <MenuItem onClick={handleClose}>
+                                                    <Link
+                                                        href="/profile/dashboard"
+                                                        className={
+                                                            styles.navbarLink
+                                                        }
+                                                    >
+                                                        Dashboard
+                                                    </Link>
+                                                </MenuItem>
+                                                <MenuItem onClick={handleClose}>
+                                                    <Link
+                                                        href="/profile/my-likes"
+                                                        className={
+                                                            styles.navbarLink
+                                                        }
+                                                    >
+                                                        My Likes
+                                                    </Link>
+                                                </MenuItem>
+                                                <MenuItem onClick={handleClose}>
+                                                    <Link
+                                                        href="/profile/settings"
+                                                        className={
+                                                            styles.navbarLink
+                                                        }
+                                                    >
+                                                        Settings
+                                                    </Link>
+                                                </MenuItem>
+                                                <MenuItem
+                                                    onClick={handleLogout}
+                                                    className={
+                                                        styles.navbarLink
+                                                    }
+                                                >
+                                                    Logout
+                                                </MenuItem>
+                                            </MenuList>
+                                        </ClickAwayListener>
+                                    </Paper>
+                                </Grow>
+                            )}
+                        </Popper>
+                    </div>
                 ) : (
                     <Link href="/login" className={styles.loginButton}>
                         Log In
