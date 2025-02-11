@@ -63,6 +63,25 @@ export const theme = createTheme({
                 },
             },
         },
+
+        MuiOutlinedInput: {
+            styleOverrides: {
+                root: {
+                    "&:-webkit-autofill": {
+                        backgroundColor: "transparent !important",
+                        WebkitBoxShadow: "0 0 0px 1000px #f5f5f5 inset !important",
+                        WebkitTextFillColor: "#000 !important",
+                    },
+                },
+                input: {
+                    "&:-webkit-autofill": {
+                        backgroundColor: "transparent !important",
+                        WebkitBoxShadow: "0 0 0px 1000px white inset !important",
+                        WebkitTextFillColor: "#000 !important",
+                    },
+                },
+            },
+        },
     },
 });
 

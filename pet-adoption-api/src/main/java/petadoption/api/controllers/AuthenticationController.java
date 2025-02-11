@@ -63,7 +63,7 @@ public class AuthenticationController {
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("user", user.getFirstName());
+        response.put("user", user);
 
         return ResponseEntity.ok(response);
     }

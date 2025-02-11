@@ -65,3 +65,13 @@
 .loginButton:hover {
     background-color: #CFBFF7;
 }
+
+.navbarLink{
+    text-decoration: none;
+    color: black;
+}
+
+.profileItems{
+    display: flex;
+    align-items: center;
+}
