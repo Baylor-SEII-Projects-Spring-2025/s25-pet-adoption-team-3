@@ -1,4 +1,4 @@
-package DTO;
+package petadoption.api.DTO;
 import lombok.Getter;
 import lombok.Setter;
 
