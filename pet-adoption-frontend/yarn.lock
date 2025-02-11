@@ -2517,7 +2517,7 @@ path-type@^4.0.0:
     axios "^1.7.9"
     next "^15.1.6"
     node "^23.7.0"
-    pet-adoption-frontend "file:../../../AppData/Local/Yarn/Cache/v6/npm-pet-adoption-frontend-1.0.0-81362f1f-53ac-466a-80e8-422186629a50-1739306577999/node_modules/pet-adoption-frontend"
+    pet-adoption-frontend "file:../../../AppData/Local/Yarn/Cache/v6/npm-pet-adoption-frontend-1.0.0-f9dc0d79-8d43-43fd-9dd6-177a7c189774-1739261432828/node_modules/pet-adoption-frontend"
     react "^19.0.0"
     react-dom "^19.0.0"
     react-password-strength-bar "^0.4.1"

@@ -32,16 +32,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/", "/oauth2/**", "/login/oauth2/**").permitAll()
-                        .requestMatchers("/users/{userId}/verify-email").permitAll()
+                        .requestMatchers("/api/users/{userId}/verify-email").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        .defaultSuccessUrl("http://localhost:8080/oauth/google/success", true)
+                        .defaultSuccessUrl("/oauth/google/success", true)
                         .failureUrl("/login?error=true"))
 
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
 
         return http.build();

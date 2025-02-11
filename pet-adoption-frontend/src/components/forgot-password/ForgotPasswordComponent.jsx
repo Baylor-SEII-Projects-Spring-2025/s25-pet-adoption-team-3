@@ -1,12 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TextField } from "@mui/material";
 import { Button } from "@mui/material";
 import styles from "@/styles/ForgotPasswordComponent.module.css";
 import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "@/utils/theme";
+import { useRouter } from "next/router";
+
 
 export default function ForgotPasswordComponent() {
     const [email, setEmail] = useState("");
+    const router = useRouter();
+
+    const fetchUserSession = async () => {
+        try {
+            const response = await fetch("http://localhost:8080/auth/session", {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (response.status === 401) {
+                console.warn("No active session.");
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error("Error fetching session");
+            }
+
+            const data = await response.json();
+            console.log("✅ Session found:", data);
+
+            router.push("/");
+        } catch (error) {
+            console.error("Error fetching session:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchUserSession();
+    }, []);
 
     const handleforgotPassword = (e) => {
         e.preventDefault();
@@ -24,7 +59,6 @@ export default function ForgotPasswordComponent() {
                         <h2>Forgot password?</h2>
 
                         <section className={styles.forgotPasswordInput}>
-
                             <TextField
                                 label="Email"
                                 id="email"
@@ -40,7 +74,8 @@ export default function ForgotPasswordComponent() {
                             </Button>
                         </section>
                         <p>
-                            Remembered your password? <a href="/login">Log in</a>
+                            Remembered your password?{" "}
+                            <a href="/login">Log in</a>
                         </p>
                     </form>
                 </section>

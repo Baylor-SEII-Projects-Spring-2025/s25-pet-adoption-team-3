@@ -11,7 +11,7 @@ import java.util.Optional;
 
 //Usages: View User profile, edit user Profile, and Maybe Delete Account.
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UsersController {
     private final UserService userService;
     private final UserRepository userRepository;
