@@ -37,8 +37,17 @@ public class User {
     @Column(name = "role", nullable = false)
     private Role role;
 
+
+    @Column(nullable = false)
+    private boolean isEmailVerified = false;
+
+    @Column(nullable = true)
+    private String profilePhoto;
+
+
     public enum Role {
         ADOPTER,
         ADOPTION_CENTER
     }
+
 }
