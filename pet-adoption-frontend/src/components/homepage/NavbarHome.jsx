@@ -76,7 +76,21 @@ export default function Navbar() {
         } catch (error) {
             console.error("Error logging out:", error);
         }
-    }
+    };
+
+    const generateGradient = (name) => {
+        if (!name) return "#f50057";
+
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) {
+            hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        }
+
+        const color1 = `hsl(${hash % 360}, 70%, 50%)`;
+        const color2 = `hsl(${(hash * 3) % 360}, 70%, 60%)`;
+
+        return `linear-gradient(135deg, ${color1}, ${color2})`;
+    };
 
     return (
         <nav className={styles.navbar}>
@@ -105,7 +119,13 @@ export default function Navbar() {
                         <div className={styles.profileItems}>
                             <Avatar
                                 ref={anchorRef}
-                                sx={{ bgcolor: "#f50057", cursor: "pointer" }}
+                                sx={{
+                                    background: generateGradient(
+                                        user.firstName + user.lastName,
+                                    ),
+                                    cursor: "pointer",
+                                    color: "#fff",
+                                }}
                                 onClick={handleToggle}
                             >
                                 {user.firstName.charAt(0)}
@@ -114,7 +134,12 @@ export default function Navbar() {
                             <img
                                 src="/icons/profile_expand_arrow.png"
                                 alt="Expand"
-                                style={{ cursor: "pointer", marginLeft: "3px", width: "15px", marginRight: "10px" }}
+                                style={{
+                                    cursor: "pointer",
+                                    marginLeft: "3px",
+                                    width: "15px",
+                                    marginRight: "10px",
+                                }}
                                 onClick={handleToggle}
                             />
                         </div>
