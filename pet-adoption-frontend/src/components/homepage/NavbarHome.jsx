@@ -121,7 +121,7 @@ export default function Navbar() {
                                 ref={anchorRef}
                                 sx={{
                                     background: generateGradient(
-                                        user.firstName + user.lastName,
+                                        user.firstName + (user.lastName || ""),
                                     ),
                                     cursor: "pointer",
                                     color: "#fff",
@@ -129,8 +129,9 @@ export default function Navbar() {
                                 onClick={handleToggle}
                             >
                                 {user.firstName.charAt(0)}
-                                {user.lastName.charAt(0)}
+                                {user.lastName ? user.lastName.charAt(0) : ""}
                             </Avatar>
+
                             <img
                                 src="/icons/profile_expand_arrow.png"
                                 alt="Expand"

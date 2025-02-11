@@ -36,12 +36,11 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        .defaultSuccessUrl("http://localhost:8080/oauth/google/success", true)
+                        .defaultSuccessUrl("/oauth/google/success", true)
                         .failureUrl("/login?error=true"))
 
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
 
         return http.build();
