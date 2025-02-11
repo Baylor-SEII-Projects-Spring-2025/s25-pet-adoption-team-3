@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import { TextField, Button } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import PasswordStrengthBar from "react-password-strength-bar";
@@ -15,6 +16,39 @@ export default function RegisterComponent() {
     const [passwordScore, setPasswordScore] = useState(0);
     const [passwordFocused, setPasswordFocused] = useState(false);
     const [isPasswordSame, setIsPasswordSame] = useState(false);
+    const router = useRouter();
+
+    const fetchUserSession = async () => {
+        try {
+            const response = await fetch("http://localhost:8080/auth/session", {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (response.status === 401) {
+                console.warn("No active session.");
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error("Error fetching session");
+            }
+
+            const data = await response.json();
+            console.log("✅ Session found:", data);
+
+            router.push("/");
+        } catch (error) {
+            console.error("Error fetching session:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchUserSession();
+    }, []);
 
     const handleRegister = async (e) => {
         e.preventDefault();

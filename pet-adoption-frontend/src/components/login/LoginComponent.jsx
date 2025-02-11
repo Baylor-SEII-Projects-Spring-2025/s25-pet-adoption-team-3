@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import styles from "@/styles/LoginComponent.module.css";
@@ -9,38 +10,70 @@ import { loginWithGoogle } from "@/utils/auth";
 export default function LoginComponent() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const router = useRouter();
 
-const handleEmailLogin = async (e) => {
-    e.preventDefault();
-    try {
-        const response = await fetch("http://localhost:8080/auth/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email, password }),
-            credentials: "include",
-        });
+    const handleEmailLogin = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await fetch("http://localhost:8080/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, password }),
+                credentials: "include",
+            });
 
-        const contentType = response.headers.get("content-type");
+            const contentType = response.headers.get("content-type");
 
-        if (!response.ok) {
-            if (contentType && contentType.includes("application/json")) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || "Invalid credentials");
+            if (!response.ok) {
+                if (contentType && contentType.includes("application/json")) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Invalid credentials");
+                }
+                throw new Error("Invalid credentials");
             }
-            throw new Error("Invalid credentials");
+
+            const data = await response.json();
+            console.log("Login successful:", data);
+
+            router.push("/dashboard");
+        } catch (error) {
+            alert(error.message);
         }
+    };
 
-        const data = await response.json();
-        console.log("Login successful:", data);
+    const fetchUserSession = async () => {
+        try {
+            const response = await fetch("http://localhost:8080/auth/session", {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
 
-        window.location.href = "/dashboard"; // Redirect on success
-    } catch (error) {
-        alert(error.message);
-    }
-};
+            if (response.status === 401) {
+                console.warn("No active session.");
+                return;
+            }
 
+            if (!response.ok) {
+                throw new Error("Error fetching session");
+            }
+
+            const data = await response.json();
+            console.log("✅ Session found:", data);
+
+            router.push("/");
+        } catch (error) {
+            console.error("Error fetching session:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchUserSession();
+    }, []);
 
     return (
         <ThemeProvider theme={theme}>
