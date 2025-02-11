@@ -20,6 +20,7 @@
     "appwrite": "^17.0.0",
     "axios": "^1.7.9",
     "next": "^15.1.6",
+    "node": "^23.7.0",
     "pet-adoption-frontend": "file:",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
