@@ -6,3 +6,5 @@
 /node_modules
 .DS_Store
 pet-adoption-api/src/main/resources/application.properties
+pet-adoption-frontend/package-lock.json
+pet-adoption-frontend/yarn.lock
