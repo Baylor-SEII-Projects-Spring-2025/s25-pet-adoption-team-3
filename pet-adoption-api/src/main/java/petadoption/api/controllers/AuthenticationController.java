@@ -31,16 +31,21 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody UserDTO userDTO) {
-        userService.registerUser(userDTO);
-        return ResponseEntity.ok("User registered successfully.");
+    public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO) {
+        return userService.registerUser(userDTO);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> loginUser(
+    public ResponseEntity<?> loginUser(
             @RequestBody LoginRequestsDTO loginRequest, HttpServletRequest request) {
 
-        User user = userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
+        ResponseEntity<?> authResponse = userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword());
+
+        if(!authResponse.getStatusCode().is2xxSuccessful()) {
+            return authResponse;
+        }
+
+        User user = (User) authResponse.getBody();
 
         HttpSession session = request.getSession();
         session.setAttribute("user", user);

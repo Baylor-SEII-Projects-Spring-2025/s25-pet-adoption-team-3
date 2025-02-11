@@ -1,16 +1,17 @@
 package petadoption.api.userTesting;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import petadoption.api.DTO.UserDTO;
 import petadoption.api.models.User;
 import petadoption.api.repository.UserRepository;
 import petadoption.api.services.UserService;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.InjectMocks;
@@ -51,54 +52,85 @@ class UserServiceTest {
         userDTO.setRole(User.Role.ADOPTER);
 
         testUser = new User();
+        testUser.setId(1L);
         testUser.setEmail("testuser@example.com");
         testUser.setFirstName("Dan");
         testUser.setLastName("R");
         testUser.setPassword("hashedPassword");
         testUser.setRole(User.Role.ADOPTER);
+        testUser.setEmailVerified(true);
     }
+
 
     @Test
     void testRegisterUserSuccess() {
         when(userRepository.findByEmail(userDTO.getEmail())).thenReturn(Optional.empty());
         when(passwordEncoder.encode(userDTO.getPassword())).thenReturn("hashedPassword");
-        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User savedUser = invocation.getArgument(0);
+            savedUser.setId(1L);
+            return savedUser;
+        });
 
-        User savedUser = userService.registerUser(userDTO);
+        ResponseEntity<?> response = userService.registerUser(userDTO);
 
-        assertNotNull(savedUser);
-        assertEquals("testuser@example.com", savedUser.getEmail());
-        assertEquals("hashedPassword", savedUser.getPassword());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+
+        String expectedResponse = "User: " + userDTO.getEmail() + " created successfully";
+        assertEquals(expectedResponse, response.getBody());
+
         verify(userRepository, times(1)).save(any(User.class));
     }
+
 
     @Test
     void testRegisterUserEmailAlreadyExists() {
         when(userRepository.findByEmail(userDTO.getEmail())).thenReturn(Optional.of(testUser));
 
-        Exception exception = assertThrows(RuntimeException.class, () -> userService.registerUser(userDTO));
-        assertEquals("Email already exists.", exception.getMessage());
+        ResponseEntity<?> response = userService.registerUser(userDTO);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Email already exists", response.getBody());
     }
 
     @Test
     void testAuthenticateUserSuccess() {
-        when(userRepository.findByEmail(testUser.getEmail())).thenReturn(Optional.of(testUser));
-        when(passwordEncoder.matches("password", testUser.getPassword())).thenReturn(true); // ✅ Matches hashed password
+        when(userRepository.findByEmail(userDTO.getEmail())).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(userDTO.getPassword())).thenReturn("hashedPassword");
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User savedUser = invocation.getArgument(0);
+            savedUser.setId(1L);
+            return savedUser;
+        });
 
-        User authenticatedUser = userService.authenticateUser(testUser.getEmail(), "password");
+        ResponseEntity<?> response = userService.registerUser(userDTO);
 
-        assertNotNull(authenticatedUser);
-        assertEquals("testuser@example.com", authenticatedUser.getEmail());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User: testuser@example.com created successfully"));
+        verify(userRepository, times(1)).save(any(User.class));
     }
+
 
     @Test
     void testAuthenticateUserInvalidPassword() {
         when(userRepository.findByEmail(testUser.getEmail())).thenReturn(Optional.of(testUser));
-        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
+        when(passwordEncoder.matches("wrongPassword", testUser.getPassword())).thenReturn(false);
 
-        Exception exception = assertThrows(RuntimeException.class, () ->
-                userService.authenticateUser(testUser.getEmail(), "WrongPassword"));
+        ResponseEntity<?> response = userService.authenticateUser(testUser.getEmail(), "wrongPassword");
 
-        assertEquals("Invalid credentials", exception.getMessage());
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Invalid Password", response.getBody());
+    }
+
+    @Test
+    void testAuthenticateUserEmailNotVerified() {
+        testUser.setEmailVerified(false);
+        when(userRepository.findByEmail(testUser.getEmail())).thenReturn(Optional.of(testUser));
+        when(passwordEncoder.matches("password", testUser.getPassword())).thenReturn(true);
+
+        ResponseEntity<?> response = userService.authenticateUser(testUser.getEmail(), "password");
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+        assertEquals("Email not verified. Please verify your email before logging in.", response.getBody());
     }
 }

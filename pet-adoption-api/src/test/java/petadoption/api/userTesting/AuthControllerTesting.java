@@ -1,15 +1,17 @@
 package petadoption.api.userTesting;
+import org.springframework.http.HttpStatus;
 import petadoption.api.DTO.LoginRequestsDTO;
 import petadoption.api.DTO.UserDTO;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import petadoption.api.DTO.LoginRequestsDTO;
 import petadoption.api.DTO.UserDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.InjectMocks;
@@ -48,11 +50,14 @@ class AuthControllerTesting {
         MockitoAnnotations.openMocks(this);
 
         testUser = new User();
+        testUser.setId(1L);
         testUser.setEmail("testuser@example.com");
         testUser.setFirstName("David");
         testUser.setLastName("R");
-        testUser.setPassword("password");
+        testUser.setPassword("hashedPassword");
         testUser.setRole(User.Role.ADOPTER);
+        testUser.setEmailVerified(true);
+
 
         userDTO = new UserDTO();
         userDTO.setEmail("testuser@example.com");
@@ -63,41 +68,52 @@ class AuthControllerTesting {
 
         loginRequest = new LoginRequestsDTO();
         loginRequest.setEmail("testuser@example.com");
-        loginRequest.setPassword("SecurePass123");
+        loginRequest.setPassword("password");
     }
 
     @Test
     void testRegisterUserSuccess() {
-        when(userService.registerUser(any(UserDTO.class))).thenReturn(testUser);
-        ResponseEntity<String> response = authController.registerUser(userDTO);
+        when(userService.registerUser(any(UserDTO.class)))
+                .thenAnswer(invocation -> ResponseEntity.status(HttpStatus.CREATED)
+                        .body("User: testuser@example.com created successfully"));
 
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("User registered successfully.", response.getBody());
+        ResponseEntity<?> response = authController.registerUser(userDTO);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertTrue(response.getBody().toString().contains("User: testuser@example.com created successfully"));
         verify(userService, times(1)).registerUser(any(UserDTO.class));
     }
 
     @Test
     void testLoginUserSuccess() {
         when(userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword()))
-                .thenReturn(testUser);
+                .thenAnswer(invocation -> ResponseEntity.ok(testUser));
 
         when(mockRequest.getSession()).thenReturn(mockSession);
 
-        ResponseEntity<Map<String, Object>> response = authController.loginUser(loginRequest, mockRequest);
+        ResponseEntity<?> response = authController.loginUser(loginRequest, mockRequest);
 
-        assertEquals(200, response.getStatusCode().value());
-        assertEquals("Login successful", response.getBody().get("message"));
+        assertInstanceOf(Map.class, response.getBody());
+        Map<String, Object> responseBody = (Map<String, Object>) response.getBody();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Login successful", responseBody.get("message"));
+        assertEquals("David", responseBody.get("user"));
+
     }
 
 
     @Test
     void testLoginUserInvalidCredentials() {
-        when(userService.authenticateUser(anyString(), anyString()))
-                .thenThrow(new RuntimeException("Invalid credentials"));
+        when(userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword()))
+                .thenAnswer(invocation -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials"));
 
-        Exception exception = assertThrows(RuntimeException.class,
-                () -> authController.loginUser(loginRequest, mockRequest));
+        ResponseEntity<?> response = authController.loginUser(loginRequest, mockRequest);
 
-        assertEquals("Invalid credentials", exception.getMessage());
+        String responseBody = (String) response.getBody();
+
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals("Invalid credentials", responseBody);
     }
+
 }

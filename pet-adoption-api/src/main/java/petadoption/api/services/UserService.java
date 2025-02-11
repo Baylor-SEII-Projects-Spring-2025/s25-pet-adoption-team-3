@@ -1,10 +1,14 @@
 package petadoption.api.services;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import petadoption.api.DTO.UserDTO;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import petadoption.api.models.User;
 import petadoption.api.repository.UserRepository;
+
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -16,9 +20,9 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User registerUser(UserDTO userDTO) {
+    public ResponseEntity<?>registerUser(UserDTO userDTO) {
         if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already exists.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email already exists");
         }
 
         User user = new User();
@@ -33,20 +37,21 @@ public class UserService {
         user.setProfilePhoto(null);
 
         user = userRepository.save(user);
-        return user;
+        return ResponseEntity.status(HttpStatus.CREATED).body("User: " + user.getEmail() + " created successfully");
     }
 
-    public User authenticateUser(String email, String password) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
-
-        if (!user.isEmailVerified()) {
-            throw new RuntimeException("Email not verified. Please verify your email before logging in.");
+    public ResponseEntity<?>authenticateUser(String email, String password) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if(optionalUser.isEmpty()){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Email or Password");
         }
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+        User user = optionalUser.get();
+        if(!user.isEmailVerified()){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Email not verified. Please verify your email before logging in.");
         }
-
-        return user;
+        if(!passwordEncoder.matches(password, user.getPassword())){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Password");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 }
