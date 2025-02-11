@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import styles from "@/styles/NavbarHome.module.css";
+import styles from "@/styles/ProfileNavbar.module.css";
 import Avatar from "@mui/material/Avatar";
 import Popper from "@mui/material/Popper";
 import Grow from "@mui/material/Grow";
@@ -9,7 +9,7 @@ import ClickAwayListener from "@mui/material/ClickAwayListener";
 import MenuList from "@mui/material/MenuList";
 import MenuItem from "@mui/material/MenuItem";
 
-export default function Navbar() {
+export default function ProfileNavbar() {
     const [user, setUser] = useState(null);
     const [open, setOpen] = useState(false);
     const anchorRef = useRef(null);
@@ -97,7 +97,7 @@ export default function Navbar() {
             <div className={styles.logo}>
                 <Link href="/">
                     <img
-                        src="/logos/adopt_logo_white_text.png"
+                        src="/logos/adopt_logo_black_text.png"
                         alt="Adopt, Don't Shop Logo"
                     />
                 </Link>
@@ -129,7 +129,7 @@ export default function Navbar() {
                                 src={user.profilePhoto || undefined}
                                 onClick={handleToggle}
                             >
-                                {!user.profilePhoto && (
+                                {!user.picture && (
                                     <>
                                         {user.firstName.charAt(0)}
                                         {user.lastName

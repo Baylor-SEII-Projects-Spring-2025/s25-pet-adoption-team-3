@@ -1,0 +1,47 @@
+.container{
+    font-family: 'Unbounded', sans-serif;
+    display: flex;
+    flex-direction: row;
+    margin-top: 80px;
+}
+
+.profileLeftSection{
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    margin-left: 100px;
+    width: 200px;
+}
+
+.profileNavbarLeft h1{
+    font-size: 24px;
+    font-weight: regular;
+    margin-bottom: 20px;
+}
+
+.profileNavbarLeft p{
+    margin-top: 20px;
+    cursor: pointer;
+}
+
+.selectedItem{
+    margin-top: 0px;
+}
+
+.divider{
+    border-left: 1px solid #000000;
+    height: 70vh;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.navbarItemSelector{
+    border: 2px solid black;
+    padding: 10px 20px;
+}
+
+.active {
+    border: 2px solid black;
+    padding: 5px;
+    border-radius: 5px;
+}

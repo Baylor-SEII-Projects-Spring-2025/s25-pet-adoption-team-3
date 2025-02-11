@@ -43,6 +43,7 @@ public class OAuthController {
         String email = (String) attributes.get("email");
         String firstName = (String) attributes.get("given_name");
         String lastName = (String) attributes.get("family_name");
+        String photo = (String) attributes.get("picture");
 
         // Check if the user exists, otherwise create a new one
         User user = userRepository.findByEmail(email).orElse(null);
@@ -54,7 +55,8 @@ public class OAuthController {
             user.setRole(User.Role.ADOPTER);
             user.setEmailVerified(true);
             user.setPassword(UUID.randomUUID().toString()); // Assign a random password
-            System.out.println("OAUTH: NEW USER CREATED: " + user.getEmail() + " " + user.getFirstName() + " " + user.getLastName() + " " + user.getRole() + " " + user.isEmailVerified() + " " + user.getPassword());
+            user.setProfilePhoto(photo);
+            System.out.println("OAUTH: NEW USER CREATED: " + user.getEmail() + " " + user.getFirstName() + " " + user.getLastName() + " " + user.getRole() + " " + user.isEmailVerified() + " " + user.getPassword() + " " + user.getProfilePhoto());
             userRepository.save(user);
             System.out.println("OAUTH: NEW USER CREATED: " + user.getEmail());
         }
@@ -72,7 +74,7 @@ public class OAuthController {
         System.out.println("Session set for: " + user.getEmail());
 
         // Redirect to frontend dashboard
-        response.sendRedirect("http://localhost:3000/profile/dashboard");
+        response.sendRedirect("http://localhost:3000/profile");
     }
 
 }
