@@ -37,7 +37,7 @@ export default function LoginComponent() {
             const data = await response.json();
             console.log("Login successful:", data);
 
-            router.push("/dashboard");
+            router.push("/profile/dashboard");
         } catch (error) {
             alert(error.message);
         }

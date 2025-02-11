@@ -72,7 +72,7 @@ public class OAuthController {
         System.out.println("Session set for: " + user.getEmail());
 
         // Redirect to frontend dashboard
-        response.sendRedirect("http://localhost:3000/dashboard");
+        response.sendRedirect("http://localhost:3000/profile/dashboard");
     }
 
 }
