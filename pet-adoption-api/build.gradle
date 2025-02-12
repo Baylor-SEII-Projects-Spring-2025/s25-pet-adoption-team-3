@@ -46,6 +46,14 @@ dependencies {
 	// Utility libraries
 	implementation 'com.google.guava:guava:33.0.0-jre'
 	implementation 'org.apache.commons:commons-lang3:3.12.0'
+
+	// Google Cloud Platform libraries
+	implementation("com.google.cloud:spring-cloud-gcp-starter-secretmanager:3.2.1")
+	implementation 'com.google.cloud:google-cloud-secretmanager:2.57.0'
+	implementation 'com.google.protobuf:protobuf-java:3.25.1'
+
+
+
 }
 
 tasks.named('test') {
