@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styles from "@/styles/ProfileDashboardComponent.module.css";
 
 export default function ProfileDashboardComponent() {
-    const [selectedNav, setSelectedNav] = useState("dashboard");
+    const [selectedNav, setSelectedNav] = useState("Dashboard");
 
     return (
         <div className={styles.container}>
