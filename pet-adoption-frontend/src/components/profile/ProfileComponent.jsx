@@ -25,10 +25,9 @@ export default function ProfileDashboardComponent() {
     const [user, setUser] = useState(null);
     const anchorRef = useRef(null);
 
-      const [open, setOpen] = React.useState(false);
-      const handleOpen = () => setOpen(true);
-      const handleClose = () => setOpen(false);
-
+    const [open, setOpen] = React.useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
 
     const fetchUserSession = async () => {
         try {
@@ -37,6 +36,7 @@ export default function ProfileDashboardComponent() {
                 credentials: "include",
                 headers: {
                     "Content-Type": "application/json",
+                    "Cache-Control": "no-cache",
                 },
             });
 
@@ -51,10 +51,8 @@ export default function ProfileDashboardComponent() {
             }
 
             const data = await response.json();
-            console.log("✅ Session found:", data);
+            console.log("✅ Session refreshed:", data);
             setUser(data.user);
-
-            console.log("user: " + user);
         } catch (error) {
             console.error("Error fetching session:", error);
         }
@@ -63,6 +61,64 @@ export default function ProfileDashboardComponent() {
     useEffect(() => {
         fetchUserSession();
     }, []);
+
+    const handleDeletePhoto = async () => {
+        try {
+            const response = await fetch(
+                `http://localhost:8080/api/users/deleteProfilePhoto/${user.id}`,
+                {
+                    method: "PUT",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                },
+            );
+
+            if (response.status === 400) {
+                // Correct way to check for bad request
+                console.log("User not found");
+                return;
+            }
+
+            if (response.ok) {
+                console.log("✅ Profile photo deleted successfully");
+            } else {
+                console.error("Failed to delete profile photo");
+            }
+        } catch (error) {
+            console.error("Error deleting profile photo:", error);
+        }
+    };
+
+    const handleUploadPhoto = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await fetch(
+                `http://localhost:8080/api/users/${user.id}/uploadProfilePhoto`,
+                {
+                    method: "POST",
+                    body: formData,
+                    credentials: "include",
+                },
+            );
+
+            if (response.ok) {
+                const updatedUser = await response.json();
+                console.log("✅ Photo uploaded, updated user:", updatedUser);
+                setUser(updatedUser);
+            } else {
+                console.error("❌ Upload failed");
+            }
+        } catch (error) {
+            console.error("❌ Error uploading photo:", error);
+        }
+    };
 
     const generateGradient = (name) => {
         if (!name) return "#f50057";
@@ -383,7 +439,21 @@ export default function ProfileDashboardComponent() {
                                         styles.settingsChangePhotoButtons
                                     }
                                 >
-                                    <Button type="submit" variant="contained">
+                                    <input
+                                        type="file"
+                                        accept=".png, .jpg, .jpeg"
+                                        onChange={handleUploadPhoto}
+                                        style={{ display: "none" }}
+                                        id="upload-photo"
+                                    />
+                                    <Button
+                                        variant="contained"
+                                        onClick={() =>
+                                            document
+                                                .getElementById("upload-photo")
+                                                .click()
+                                        }
+                                    >
                                         Upload Photo
                                     </Button>
                                     <Button
@@ -422,6 +492,10 @@ export default function ProfileDashboardComponent() {
                                                 variant="outlined"
                                                 color="error"
                                                 sx="margin-top: 20px"
+                                                onClick={() => {
+                                                    handleDeletePhoto();
+                                                    handleClose();
+                                                }}
                                             >
                                                 Yes, I&apos;m Sure
                                             </Button>
