@@ -257,6 +257,19 @@
     border-radius: 16px;
 }
 
+.settingsUploadEror p {
+    color: red;
+    font-size: 14px;
+    font-weight: regular;
+}
+
+.settingsChangeProfilePhoto{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto;
+}
 
 
 

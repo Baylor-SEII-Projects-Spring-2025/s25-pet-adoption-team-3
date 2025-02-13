@@ -23,6 +23,7 @@ export default function ProfileDashboardComponent() {
     const [selectedNav, setSelectedNav] = useState("Dashboard");
     const [selectedLikes, setSelectedLikes] = useState("My Likes");
     const [user, setUser] = useState(null);
+    const [uploadError, setUploadError] = useState("");
     const anchorRef = useRef(null);
 
     const [open, setOpen] = React.useState(false);
@@ -76,13 +77,13 @@ export default function ProfileDashboardComponent() {
             );
 
             if (response.status === 400) {
-                // Correct way to check for bad request
                 console.log("User not found");
                 return;
             }
 
             if (response.ok) {
                 console.log("✅ Profile photo deleted successfully");
+                window.location.reload();
             } else {
                 console.error("Failed to delete profile photo");
             }
@@ -94,6 +95,15 @@ export default function ProfileDashboardComponent() {
     const handleUploadPhoto = async (event) => {
         const file = event.target.files[0];
         if (!file) return;
+
+        // Check file size (5MB max)
+        const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+        if (file.size > maxSize) {
+            setUploadError(
+                "File size exceeds 5MB. Please upload a smaller file.",
+            );
+            return;
+        }
 
         const formData = new FormData();
         formData.append("file", file);
@@ -112,11 +122,16 @@ export default function ProfileDashboardComponent() {
                 const updatedUser = await response.json();
                 console.log("✅ Photo uploaded, updated user:", updatedUser);
                 setUser(updatedUser);
+                setUploadError(""); // Clear any previous errors
+                window.location.reload();
+            } else if (response.status === 413) {
+                setUploadError("❌ File size too large. Max allowed is 5MB.");
             } else {
-                console.error("❌ Upload failed");
+                setUploadError("❌ Upload failed. Please try again.");
             }
         } catch (error) {
             console.error("❌ Error uploading photo:", error);
+            setUploadError("❌ Error uploading photo. Please try again.");
         }
     };
 
@@ -436,71 +451,94 @@ export default function ProfileDashboardComponent() {
 
                                 <div
                                     className={
-                                        styles.settingsChangePhotoButtons
+                                        styles.settingsChangeProfilePhoto
                                     }
                                 >
-                                    <input
-                                        type="file"
-                                        accept=".png, .jpg, .jpeg"
-                                        onChange={handleUploadPhoto}
-                                        style={{ display: "none" }}
-                                        id="upload-photo"
-                                    />
-                                    <Button
-                                        variant="contained"
-                                        onClick={() =>
-                                            document
-                                                .getElementById("upload-photo")
-                                                .click()
+                                    <div
+                                        className={
+                                            styles.settingsChangePhotoButtons
                                         }
                                     >
-                                        Upload Photo
-                                    </Button>
-                                    <Button
-                                        type="submit"
-                                        variant="outlined"
-                                        color="error"
-                                        disabled={!user?.profilePhoto}
-                                        onClick={handleOpen}
-                                    >
-                                        Delete Photo
-                                    </Button>
-                                    <Modal
-                                        open={open}
-                                        onClose={handleClose}
-                                        aria-labelledby="modal-modal-title"
-                                        aria-describedby="modal-modal-description"
-                                    >
-                                        <Box sx={style}>
-                                            <Typography
-                                                id="modal-modal-title"
-                                                variant="h6"
-                                                component="h2"
-                                            >
-                                                Are you sure you want to delete
-                                                your profile photo?
-                                            </Typography>
-                                            <Typography
-                                                id="modal-modal-description"
-                                                sx={{ mt: 2 }}
-                                            >
-                                                The photo will be permanently
-                                                deleted and cannot be recovered.
-                                            </Typography>
-                                            <Button
-                                                type="submit"
-                                                variant="outlined"
-                                                color="error"
-                                                sx="margin-top: 20px"
-                                                onClick={() => {
-                                                    handleDeletePhoto();
-                                                    handleClose();
+                                        <input
+                                            type="file"
+                                            accept=".png, .jpg, .jpeg"
+                                            onChange={handleUploadPhoto}
+                                            style={{ display: "none" }}
+                                            id="upload-photo"
+                                        />
+                                        <Button
+                                            variant="contained"
+                                            onClick={() =>
+                                                document
+                                                    .getElementById(
+                                                        "upload-photo",
+                                                    )
+                                                    .click()
+                                            }
+                                        >
+                                            Upload Photo
+                                        </Button>
+                                        <Button
+                                            type="submit"
+                                            variant="outlined"
+                                            color="error"
+                                            disabled={!user?.profilePhoto}
+                                            onClick={handleOpen}
+                                        >
+                                            Delete Photo
+                                        </Button>
+                                        <Modal
+                                            open={open}
+                                            onClose={handleClose}
+                                            aria-labelledby="modal-modal-title"
+                                            aria-describedby="modal-modal-description"
+                                        >
+                                            <Box sx={style}>
+                                                <Typography
+                                                    id="modal-modal-title"
+                                                    variant="h6"
+                                                    component="h2"
+                                                >
+                                                    Are you sure you want to
+                                                    delete your profile photo?
+                                                </Typography>
+                                                <Typography
+                                                    id="modal-modal-description"
+                                                    sx={{ mt: 2 }}
+                                                >
+                                                    The photo will be
+                                                    permanently deleted and
+                                                    cannot be recovered.
+                                                </Typography>
+                                                <Button
+                                                    type="submit"
+                                                    variant="outlined"
+                                                    color="error"
+                                                    sx="margin-top: 20px"
+                                                    onClick={() => {
+                                                        handleDeletePhoto();
+                                                        handleClose();
+                                                    }}
+                                                >
+                                                    Yes, I&apos;m Sure
+                                                </Button>
+                                            </Box>
+                                        </Modal>
+                                    </div>
+
+                                    <div className={styles.settingsUploadError}>
+                                        {uploadError && (
+                                            <p
+                                                style={{
+                                                    color: "red",
+                                                    marginTop: "10px",
+                                                    fontSize: "14px",
                                                 }}
                                             >
-                                                Yes, I&apos;m Sure
-                                            </Button>
-                                        </Box>
-                                    </Modal>
+                                                {uploadError}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                             <div className={styles.dashboardContent}>
