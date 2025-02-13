@@ -1,7 +1,5 @@
 package petadoption.api.controllers;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import petadoption.api.DTO.LoginRequestsDTO;
 import petadoption.api.DTO.UserDTO;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +16,6 @@ import petadoption.api.services.UserService;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
