@@ -3,6 +3,7 @@ package petadoption.api.userTesting;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import petadoption.api.DTO.UserDTO;
+import petadoption.api.controllers.UsersController;
 import petadoption.api.models.User;
 import petadoption.api.repository.UserRepository;
 import petadoption.api.services.UserService;
@@ -13,26 +14,27 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import petadoption.api.models.User;
-import petadoption.api.repository.UserRepository;
-import petadoption.api.services.UserService;
-
-class UserServiceTest {
+class UserControllerTest {
 
     @Mock
     private UserRepository userRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @InjectMocks
+    private UsersController userController;
 
     @InjectMocks
     private UserService userService;
@@ -50,6 +52,9 @@ class UserServiceTest {
         userDTO.setLastName("R");
         userDTO.setPassword("password");
         userDTO.setRole(User.Role.ADOPTER);
+        userDTO.setEmail("newemail@example.com");
+        userDTO.setFirstName("NewFirstName");
+        userDTO.setLastName("NewLastName");
 
         testUser = new User();
         testUser.setId(1L);
@@ -106,7 +111,7 @@ class UserServiceTest {
         ResponseEntity<?> response = userService.registerUser(userDTO);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertTrue(response.getBody().toString().contains("User: testuser@example.com created successfully"));
+        assertEquals("User: newemail@example.com created successfully", response.getBody().toString());
         verify(userRepository, times(1)).save(any(User.class));
     }
 
@@ -132,5 +137,112 @@ class UserServiceTest {
 
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
         assertEquals("Email not verified. Please verify your email before logging in.", response.getBody());
+    }
+
+    //User controller testing
+
+    //Test First Name Update
+    @Test
+    void testChangeFirstNameSuccess() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
+        when(userRepository.save(any(User.class))).thenReturn(testUser);
+
+        ResponseEntity<String> response = userController.changeFirstName(1L, userDTO);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("First name updated to: " + userDTO.getFirstName(), response.getBody());
+        verify(userRepository, times(1)).save(any(User.class));
+    }
+
+    //Test Last Name Update
+    @Test
+    void testChangeLastNameSuccess() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
+        when(userRepository.save(any(User.class))).thenReturn(testUser);
+
+        ResponseEntity<String> response = userController.changeLastName(1L, userDTO);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Last name updated to: " + userDTO.getLastName(), response.getBody());
+        verify(userRepository, times(1)).save(any(User.class));
+    }
+
+    // Test Email Update
+    @Test
+    void testChangeEmailSuccess() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
+        when(userRepository.save(any(User.class))).thenReturn(testUser);
+
+        ResponseEntity<String> response = userController.changeEmail(1L, userDTO);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Email updated to: " + userDTO.getEmail(), response.getBody());
+        verify(userRepository, times(1)).save(any(User.class));
+    }
+
+    //Test User Not Found (First Name)
+    @Test
+    void testChangeFirstNameUserNotFound() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        ResponseEntity<String> response = userController.changeFirstName(1L, userDTO);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("User not found.", response.getBody());
+    }
+
+    //Test User Not Found (Last Name)
+    @Test
+    void testChangeLastNameUserNotFound() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        ResponseEntity<String> response = userController.changeLastName(1L, userDTO);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("User not found.", response.getBody());
+    }
+
+    //Test User Not Found (Email)
+    @Test
+    void testChangeEmailUserNotFound() {
+        when(userRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        ResponseEntity<String> response = userController.changeEmail(1L, userDTO);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("User not found.", response.getBody());
+    }
+
+    //Test Empty First Name
+    @Test
+    void testChangeFirstNameEmpty() {
+        userDTO.setFirstName("");
+
+        ResponseEntity<String> response = userController.changeFirstName(1L, userDTO);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("First name cannot be empty.", response.getBody());
+    }
+
+    //Test Empty Last Name
+    @Test
+    void testChangeLastNameEmpty() {
+        userDTO.setLastName("");
+
+        ResponseEntity<String> response = userController.changeLastName(1L, userDTO);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Last name cannot be empty.", response.getBody());
+    }
+
+    //Test Empty Email
+    @Test
+    void testChangeEmailEmpty() {
+        userDTO.setEmail("");
+
+        ResponseEntity<String> response = userController.changeEmail(1L, userDTO);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Email cannot be empty.", response.getBody());
     }
 }
