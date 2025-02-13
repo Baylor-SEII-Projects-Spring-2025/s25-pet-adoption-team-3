@@ -1,13 +1,34 @@
 import React, { useEffect, useState, useRef } from "react";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Modal from "@mui/material/Modal";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import Router from "next/router";
 import styles from "@/styles/ProfileDashboardComponent.module.css";
 
+const style = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    p: 4,
+};
+
 export default function ProfileDashboardComponent() {
     const [selectedNav, setSelectedNav] = useState("Dashboard");
+    const [selectedLikes, setSelectedLikes] = useState("My Likes");
     const [user, setUser] = useState(null);
     const anchorRef = useRef(null);
+
+      const [open, setOpen] = React.useState(false);
+      const handleOpen = () => setOpen(true);
+      const handleClose = () => setOpen(false);
+
 
     const fetchUserSession = async () => {
         try {
@@ -95,75 +116,354 @@ export default function ProfileDashboardComponent() {
                 <div className={styles.profileNavbarRight}>
                     <div className={styles.dashboardHeader}>
                         {selectedNav === "Dashboard" && (
-                            <Avatar
-                                ref={anchorRef}
-                                sx={{
-                                    background: user?.profilePhoto
-                                        ? "transparent"
-                                        : generateGradient(
-                                              user?.firstName +
-                                                  (user?.lastName || ""),
-                                          ),
-                                    cursor: "pointer",
-                                    color: "#fff",
-                                    width: 100,
-                                    height: 100,
-                                    border: "1px solid black",
-                                }}
-                                src={user?.profilePhoto || undefined}
-                            >
-                                {!user?.profilePhoto && (
-                                    <>
-                                        {user?.firstName?.charAt(0)}
-                                        {user?.lastName
-                                            ? user?.lastName.charAt(0)
-                                            : ""}
-                                    </>
-                                )}
-                            </Avatar>
+                            <div className={styles.dashboard}>
+                                <div className={styles.dashboardHeaderContent}>
+                                    <div className={styles.dashboardWrapper}>
+                                        <div
+                                            className={
+                                                styles.dashboardWrapperHeader
+                                            }
+                                        >
+                                            <Avatar
+                                                ref={anchorRef}
+                                                sx={{
+                                                    background:
+                                                        user?.profilePhoto
+                                                            ? "transparent"
+                                                            : generateGradient(
+                                                                  user?.firstName +
+                                                                      (user?.lastName ||
+                                                                          ""),
+                                                              ),
+                                                    cursor: "pointer",
+                                                    color: "#fff",
+                                                    width: 100,
+                                                    height: 100,
+                                                    border: "1px solid black",
+                                                }}
+                                                src={
+                                                    user?.profilePhoto ||
+                                                    undefined
+                                                }
+                                            >
+                                                {!user?.profilePhoto && (
+                                                    <>
+                                                        {user?.firstName?.charAt(
+                                                            0,
+                                                        )}
+                                                        {user?.lastName
+                                                            ? user?.lastName.charAt(
+                                                                  0,
+                                                              )
+                                                            : ""}
+                                                    </>
+                                                )}
+                                            </Avatar>
+                                            <h1>
+                                                Welcome Back,{" "}
+                                                {user?.firstName || ""}
+                                            </h1>
+                                        </div>
+                                        <div
+                                            className={styles.dashboardContent}
+                                        >
+                                            <div
+                                                className={
+                                                    styles.dashboardContentTop
+                                                }
+                                            >
+                                                <TextField
+                                                    disabled
+                                                    label="First Name"
+                                                    value={
+                                                        user?.firstName || ""
+                                                    }
+                                                    id="firstName"
+                                                    size="small"
+                                                    InputLabelProps={{
+                                                        shrink: true,
+                                                    }}
+                                                />
+                                                <TextField
+                                                    disabled
+                                                    label="Last Name"
+                                                    value={user?.lastName || ""}
+                                                    id="lastName"
+                                                    size="small"
+                                                    InputLabelProps={{
+                                                        shrink: true,
+                                                    }}
+                                                />
+                                            </div>
+
+                                            <TextField
+                                                disabled
+                                                label="Email"
+                                                value={user?.email || ""}
+                                                id="email"
+                                                size="small"
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                            />
+                                            <TextField
+                                                disabled
+                                                label="Password"
+                                                value="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
+                                                id="password"
+                                                size="small"
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className={styles.profileMessaging}>
+                                        <p>My Messages</p>
+
+                                        {user?.messages?.length === 0 ||
+                                        !user?.messages ? (
+                                            <div className={styles.noMessages}>
+                                                <img
+                                                    src="/icons/no_messages.png"
+                                                    alt="No messages"
+                                                />
+                                                <p>
+                                                    No messages found, check
+                                                    back later.
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            <ul>
+                                                {user?.messages?.map(
+                                                    (message, index) => (
+                                                        <li key={index}>
+                                                            {message}
+                                                        </li>
+                                                    ),
+                                                )}
+                                            </ul>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className={styles.profileMatches}>
+                                    <p>My Matches</p>
+
+                                    {user?.matches?.length === 0 ||
+                                    !user?.matches ? (
+                                        <div className={styles.noMatches}>
+                                            <img
+                                                src="/icons/no_matches.png"
+                                                alt="No matches"
+                                            />
+                                            <p>
+                                                No matches found, keep swiping!
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <ul>
+                                            {user?.matches?.map(
+                                                (matches, index) => (
+                                                    <li key={index}>
+                                                        {matches}
+                                                    </li>
+                                                ),
+                                            )}
+                                        </ul>
+                                    )}
+                                </div>
+                            </div>
                         )}
-                        <h1>Welcome Back, {user?.firstName || ""}</h1>
                     </div>
-                    <div className={styles.dashboardContent}>
-                        <div className={styles.dashboardContentTop}>
-                            <TextField
-                                disabled
-                                label="First Name"
-                                value={user?.firstName || ""}
-                                id="firstName"
-                                size="small"
-                                InputLabelProps={{ shrink: true }}
-                            />
-                            <TextField
-                                disabled
-                                label="Last Name"
-                                value={user?.lastName || ""}
-                                id="lastName"
-                                size="small"
-                                InputLabelProps={{ shrink: true }}
-                            />
+
+                    {selectedNav === "My Likes" && (
+                        <div className={styles.likesContent}>
+                            <div className={styles.likesNavbar}>
+                                <p
+                                    onClick={() => setSelectedLikes("My Likes")}
+                                    className={
+                                        selectedLikes === "My Likes"
+                                            ? styles.likesActive
+                                            : ""
+                                    }
+                                >
+                                    My Likes
+                                </p>
+
+                                <div
+                                    className={styles.likesNavbarDivider}
+                                ></div>
+
+                                <p
+                                    onClick={() =>
+                                        setSelectedLikes("Super Likes")
+                                    }
+                                    className={
+                                        selectedLikes === "Super Likes"
+                                            ? styles.likesActive
+                                            : ""
+                                    }
+                                >
+                                    Super Likes
+                                </p>
+                            </div>
+                            <div className={styles.likesContent}>
+                                {selectedLikes === "My Likes" && (
+                                    <div>
+                                        {user?.likes?.length > 0 ? (
+                                            <ul>
+                                                {user.likes.map(
+                                                    (like, index) => (
+                                                        <li key={index}>
+                                                            {like}
+                                                        </li>
+                                                    ),
+                                                )}
+                                            </ul>
+                                        ) : (
+                                            <p>No likes found.</p>
+                                        )}
+                                    </div>
+                                )}
+
+                                {selectedLikes === "Super Likes" && (
+                                    <div>
+                                        {user?.superLikes?.length > 0 ? (
+                                            <ul>
+                                                {user.superLikes.map(
+                                                    (superLike, index) => (
+                                                        <li key={index}>
+                                                            {superLike}
+                                                        </li>
+                                                    ),
+                                                )}
+                                            </ul>
+                                        ) : (
+                                            <p>No super likes found.</p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
+                    )}
 
-                        <TextField
-                            disabled
-                            label="Email"
-                            value={user?.email || ""}
-                            id="email"
-                            size="small"
-                            InputLabelProps={{ shrink: true }}
-                        />
-                        <TextField
-                            disabled
-                            label="Password"
-                            value="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
-                            id="password"
-                            size="small"
-                            InputLabelProps={{ shrink: true }}
-                        />
-                    </div>
+                    {selectedNav === "Settings" && (
+                        <div className={styles.settingsWrapper}>
+                            <div className={styles.dashboardWrapperHeader}>
+                                <Avatar
+                                    ref={anchorRef}
+                                    sx={{
+                                        background: user?.profilePhoto
+                                            ? "transparent"
+                                            : generateGradient(
+                                                  user?.firstName +
+                                                      (user?.lastName || ""),
+                                              ),
+                                        cursor: "pointer",
+                                        color: "#fff",
+                                        width: 100,
+                                        height: 100,
+                                        border: "1px solid black",
+                                    }}
+                                    src={user?.profilePhoto || undefined}
+                                >
+                                    {!user?.profilePhoto && (
+                                        <>
+                                            {user?.firstName?.charAt(0)}
+                                            {user?.lastName
+                                                ? user?.lastName.charAt(0)
+                                                : ""}
+                                        </>
+                                    )}
+                                </Avatar>
 
-                    {selectedNav === "My Likes" && <h1>My Likes</h1>}
-                    {selectedNav === "Settings" && <h1>Settings</h1>}
+                                <div
+                                    className={
+                                        styles.settingsChangePhotoButtons
+                                    }
+                                >
+                                    <Button type="submit" variant="contained">
+                                        Upload Photo
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        variant="outlined"
+                                        color="error"
+                                        disabled={!user?.profilePhoto}
+                                        onClick={handleOpen}
+                                    >
+                                        Delete Photo
+                                    </Button>
+                                    <Modal
+                                        open={open}
+                                        onClose={handleClose}
+                                        aria-labelledby="modal-modal-title"
+                                        aria-describedby="modal-modal-description"
+                                    >
+                                        <Box sx={style}>
+                                            <Typography
+                                                id="modal-modal-title"
+                                                variant="h6"
+                                                component="h2"
+                                            >
+                                                Are you sure you want to delete
+                                                your profile photo?
+                                            </Typography>
+                                            <Typography
+                                                id="modal-modal-description"
+                                                sx={{ mt: 2 }}
+                                            >
+                                                The photo will be permanently
+                                                deleted and cannot be recovered.
+                                            </Typography>
+                                            <Button
+                                                type="submit"
+                                                variant="outlined"
+                                                color="error"
+                                                sx="margin-top: 20px"
+                                            >
+                                                Yes, I&apos;m Sure
+                                            </Button>
+                                        </Box>
+                                    </Modal>
+                                </div>
+                            </div>
+                            <div className={styles.dashboardContent}>
+                                <div className={styles.dashboardContentTop}>
+                                    <TextField
+                                        label="First Name"
+                                        value={user?.firstName || ""}
+                                        id="firstName"
+                                        size="small"
+                                    />
+                                    <TextField
+                                        label="Last Name"
+                                        value={user?.lastName || ""}
+                                        id="lastName"
+                                        size="small"
+                                    />
+                                </div>
+
+                                <TextField
+                                    label="Email"
+                                    value={user?.email || ""}
+                                    id="email"
+                                    size="small"
+                                />
+                                <TextField
+                                    disabled
+                                    label="Password"
+                                    value="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
+                                    id="password"
+                                    size="small"
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
