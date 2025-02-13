@@ -8,11 +8,14 @@ import Paper from "@mui/material/Paper";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import MenuList from "@mui/material/MenuList";
 import MenuItem from "@mui/material/MenuItem";
+import { useRouter } from "next/router";
 
 export default function ProfileNavbar() {
     const [user, setUser] = useState(null);
     const [open, setOpen] = useState(false);
     const anchorRef = useRef(null);
+    const Router = useRouter();
+
 
     const fetchUserSession = async () => {
         try {
@@ -25,6 +28,7 @@ export default function ProfileNavbar() {
             });
 
             if (response.status === 401) {
+                Router.push("/login");
                 console.warn("No active session.");
                 return;
             }
@@ -71,6 +75,7 @@ export default function ProfileNavbar() {
             }
 
             console.log("✅ Logged out");
+            Router.push("/");
             setUser(null);
             setOpen(false);
         } catch (error) {

@@ -172,7 +172,7 @@ export default function Navbar() {
                                             <MenuList autoFocusItem={open}>
                                                 <MenuItem onClick={handleClose}>
                                                     <Link
-                                                        href="/profile/dashboard"
+                                                        href="/profile"
                                                         className={
                                                             styles.navbarLink
                                                         }
@@ -182,7 +182,7 @@ export default function Navbar() {
                                                 </MenuItem>
                                                 <MenuItem onClick={handleClose}>
                                                     <Link
-                                                        href="/profile/my-likes"
+                                                        href="/profile"
                                                         className={
                                                             styles.navbarLink
                                                         }
@@ -192,7 +192,7 @@ export default function Navbar() {
                                                 </MenuItem>
                                                 <MenuItem onClick={handleClose}>
                                                     <Link
-                                                        href="/profile/settings"
+                                                        href="/profile"
                                                         className={
                                                             styles.navbarLink
                                                         }
