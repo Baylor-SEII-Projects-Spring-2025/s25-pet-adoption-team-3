@@ -54,3 +54,22 @@
     margin-left: 100px;
     width: 800px;
 }
+
+.dashboardHeader{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 50px;
+}
+
+.dashboardContent > * {
+    margin-top: 20px;
+}
+
+.dashboardContentTop{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    margin-top: 40px;
+}

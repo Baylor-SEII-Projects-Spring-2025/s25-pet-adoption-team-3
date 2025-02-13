@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import Avatar from "@mui/material/Avatar";
+import TextField from "@mui/material/TextField";
 import Router from "next/router";
 import styles from "@/styles/ProfileDashboardComponent.module.css";
 
@@ -92,31 +93,74 @@ export default function ProfileDashboardComponent() {
 
             <div className={styles.profileRightSection}>
                 <div className={styles.profileNavbarRight}>
-                    {selectedNav === "Dashboard" && (
-                        <Avatar
-                            ref={anchorRef}
-                            sx={{
-                                background: user?.profilePhoto
-                                    ? "transparent"
-                                    : generateGradient( user?.firstName + (user?.lastName || ""), ),
-                                cursor: "pointer",
-                                color: "#fff",
-                                width: 100,
-                                height: 100,
-                                border: "1px solid black"
-                            }}
-                            src={user?.profilePhoto || undefined}
-                        >
-                            {!user?.profilePhoto && (
-                                <>
-                                    {user?.firstName?.charAt(0)}
-                                    {user?.lastName
-                                        ? user?.lastName.charAt(0)
-                                        : ""}
-                                </>
-                            )}
-                        </Avatar>
-                    )}
+                    <div className={styles.dashboardHeader}>
+                        {selectedNav === "Dashboard" && (
+                            <Avatar
+                                ref={anchorRef}
+                                sx={{
+                                    background: user?.profilePhoto
+                                        ? "transparent"
+                                        : generateGradient(
+                                              user?.firstName +
+                                                  (user?.lastName || ""),
+                                          ),
+                                    cursor: "pointer",
+                                    color: "#fff",
+                                    width: 100,
+                                    height: 100,
+                                    border: "1px solid black",
+                                }}
+                                src={user?.profilePhoto || undefined}
+                            >
+                                {!user?.profilePhoto && (
+                                    <>
+                                        {user?.firstName?.charAt(0)}
+                                        {user?.lastName
+                                            ? user?.lastName.charAt(0)
+                                            : ""}
+                                    </>
+                                )}
+                            </Avatar>
+                        )}
+                        <h1>Welcome Back, {user?.firstName || ""}</h1>
+                    </div>
+                    <div className={styles.dashboardContent}>
+                        <div className={styles.dashboardContentTop}>
+                            <TextField
+                                disabled
+                                label="First Name"
+                                value={user?.firstName || ""}
+                                id="firstName"
+                                size="small"
+                                InputLabelProps={{ shrink: true }}
+                            />
+                            <TextField
+                                disabled
+                                label="Last Name"
+                                value={user?.lastName || ""}
+                                id="lastName"
+                                size="small"
+                                InputLabelProps={{ shrink: true }}
+                            />
+                        </div>
+
+                        <TextField
+                            disabled
+                            label="Email"
+                            value={user?.email || ""}
+                            id="email"
+                            size="small"
+                            InputLabelProps={{ shrink: true }}
+                        />
+                        <TextField
+                            disabled
+                            label="Password"
+                            value="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
+                            id="password"
+                            size="small"
+                            InputLabelProps={{ shrink: true }}
+                        />
+                    </div>
 
                     {selectedNav === "My Likes" && <h1>My Likes</h1>}
                     {selectedNav === "Settings" && <h1>Settings</h1>}
