@@ -34,7 +34,8 @@ services:
       sh -c "
         docker-entrypoint.sh mysqld & 
         sleep 10 && 
-        mysql -u root -p$${MYSQL_ROOT_PASSWORD} petadoption < /docker-entrypoint-initdb.d/init.sql
+        mysql -u root -p$${MYSQL_ROOT_PASSWORD} -e 'CREATE DATABASE IF NOT EXISTS petadoption;' &&
+        mysql -u root -p$${MYSQL_ROOT_PASSWORD} petadoption < /docker-entrypoint-initdb.d/init.sql &&
         wait
       "
 
