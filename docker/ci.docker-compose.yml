@@ -20,7 +20,7 @@ services:
       MYSQL_HOST: db
       GOOGLE_APPLICATION_CREDENTIALS: /secrets/gcp-key.json
     volumes:
-      - ./adopt-dont-shop-450021-353d283bffc9.json:/secrets/gcp-key.json
+      - /home/adoptdontshopinfo/etc/secrets/adopt-dont-shop-450021-353d283bffc9.json:/secrets/gcp-key.json
   db:
     image: mysql:8.4.2
     command: --mysql-native-password=ON
