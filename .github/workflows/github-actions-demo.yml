@@ -17,6 +17,12 @@ jobs:
         run: |
           echo "Spring Profile: $SPRING_PROFILES_ACTIVE"
 
+      - name: Test SSH Connection
+        run: |
+          echo "${{ secrets.GCP_SSH_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+          ssh -vvv -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.GCP_USER }}@${{ secrets.GCP_INSTANCE_IP }} "echo 'SSH Connection Success'"
+
       - name: Setup SSH Key
         run: |
           echo "${{ secrets.GCP_SSH_PRIVATE_KEY }}" > private_key.pem
