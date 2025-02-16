@@ -21,6 +21,18 @@ jobs:
         run: |
           echo "Spring Profile: $SPRING_PROFILES_ACTIVE"
 
+                - name: Setup SSH Key
+        run: |
+          echo "${{ secrets.GCP_SSH_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+
+      - name: Create .env.production on GCP
+        run: |
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.GCP_USER }}@${{ secrets.GCP_INSTANCE_IP }} << 'EOF'
+          echo "${{ secrets.GCP_ENV_PRODUCTION }}" > /home/${{ secrets.GCP_USER }}/your-project-folder/.env.production
+          chmod 600 /home/${{ secrets.GCP_USER }}/your-project-folder/.env.production
+          EOF
+
         
 
       - name: Cleanup
@@ -64,3 +76,7 @@ jobs:
         run: |
           docker compose -f docker/ci.docker-compose.yml down
           docker compose -f docker/ci.docker-compose.yml up -d --build
+
+
+      - name: Cleanup SSH Key
+        run: rm -f private_key.pem
