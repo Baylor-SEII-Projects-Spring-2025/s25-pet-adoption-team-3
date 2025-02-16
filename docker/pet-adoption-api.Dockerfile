@@ -1,5 +1,5 @@
 # Create a build of the project
-FROM gradle:8.9.0-jdk23 AS build
+FROM gradle:8.12.1-jdk23 AS build
 WORKDIR /build
 COPY . .
 
