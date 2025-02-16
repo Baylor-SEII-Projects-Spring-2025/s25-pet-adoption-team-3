@@ -9,7 +9,7 @@ jobs:
   build-and-deploy:
     runs-on: self-hosted
     env:
-      SPRING_PROFILES_ACTIVE: testdb
+      SPRING_PROFILES_ACTIVE: prod
     steps:
       - uses: actions/checkout@v3
 
