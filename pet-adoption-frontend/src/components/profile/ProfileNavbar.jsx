@@ -16,10 +16,11 @@ export default function ProfileNavbar() {
     const anchorRef = useRef(null);
     const Router = useRouter();
 
+    const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
     const fetchUserSession = async () => {
         try {
-            const response = await fetch("http://localhost:8080/auth/session", {
+            const response = await fetch(`${API_URL}/auth/session`, {
                 method: "GET",
                 credentials: "include",
                 headers: {
@@ -62,7 +63,7 @@ export default function ProfileNavbar() {
 
     const handleLogout = async () => {
         try {
-            const response = await fetch("http://localhost:8080/auth/logout", {
+            const response = await fetch(`${API_URL}/auth/logout`, {
                 method: "POST",
                 credentials: "include",
                 headers: {
@@ -127,7 +128,10 @@ export default function ProfileNavbar() {
                                 sx={{
                                     background: user.profilePhoto
                                         ? "transparent"
-                                        : generateGradient( user.firstName + (user.lastName || "") ),
+                                        : generateGradient(
+                                              user.firstName +
+                                                  (user.lastName || ""),
+                                          ),
                                     cursor: "pointer",
                                     color: "#fff",
                                 }}

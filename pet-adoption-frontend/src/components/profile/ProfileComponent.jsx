@@ -19,6 +19,8 @@ const style = {
     p: 4,
 };
 
+const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 export default function ProfileDashboardComponent() {
     const [selectedNav, setSelectedNav] = useState("Dashboard");
     const [selectedLikes, setSelectedLikes] = useState("My Likes");
@@ -32,7 +34,7 @@ export default function ProfileDashboardComponent() {
 
     const fetchUserSession = async () => {
         try {
-            const response = await fetch("http://localhost:8080/auth/session", {
+            const response = await fetch(`${API_URL}/auth/session`, {
                 method: "GET",
                 credentials: "include",
                 headers: {
@@ -66,7 +68,7 @@ export default function ProfileDashboardComponent() {
     const handleDeletePhoto = async () => {
         try {
             const response = await fetch(
-                `http://localhost:8080/api/users/deleteProfilePhoto/${user.id}`,
+                `${API_URL}/api/users/deleteProfilePhoto/${user.id}`,
                 {
                     method: "PUT",
                     credentials: "include",
@@ -110,7 +112,7 @@ export default function ProfileDashboardComponent() {
 
         try {
             const response = await fetch(
-                `http://localhost:8080/api/users/${user.id}/uploadProfilePhoto`,
+                `${API_URL}/api/users/${user.id}/uploadProfilePhoto`,
                 {
                     method: "POST",
                     body: formData,

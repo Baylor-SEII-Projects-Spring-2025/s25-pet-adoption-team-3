@@ -1,8 +1,18 @@
-import type { NextConfig } from "next";
+const isProd = process.env.NODE_ENV === "production";
 
-const nextConfig: NextConfig = {
-  /* config options here */
-  reactStrictMode: true,
+// Load .env only in development
+if (!isProd) {
+    require("dotenv").config();
+}
+
+console.log(
+    "🔍 Loaded NEXT_PUBLIC_API_BASE_URL:",
+    process.env.NEXT_PUBLIC_API_BASE_URL,
+);
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+    reactStrictMode: true,
 };
 
-export default nextConfig;
+module.exports = nextConfig;

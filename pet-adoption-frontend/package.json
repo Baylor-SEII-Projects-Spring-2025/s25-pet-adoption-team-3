@@ -19,6 +19,7 @@
     "@reduxjs/toolkit": "^2.5.0",
     "appwrite": "^17.0.0",
     "axios": "^1.7.9",
+    "dotenv": "^16.4.7",
     "next": "^15.1.6",
     "node": "^23.7.0",
     "pet-adoption-frontend": "file:",

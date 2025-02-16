@@ -1233,6 +1233,11 @@ dom-helpers@^5.0.1:
     "@babel/runtime" "^7.8.7"
     csstype "^3.0.2"
 
+dotenv@^16.4.7:
+  version "16.4.7"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.4.7.tgz#0e20c5b82950140aa99be360a8a5f52335f53c26"
+  integrity sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==
+
 dunder-proto@^1.0.0, dunder-proto@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npmjs.org/dunder-proto/-/dunder-proto-1.0.1.tgz"
@@ -2528,7 +2533,7 @@ path-type@^4.0.0:
     axios "^1.7.9"
     next "^15.1.6"
     node "^23.7.0"
-    pet-adoption-frontend "file:../../../AppData/Local/Yarn/Cache/v6/npm-pet-adoption-frontend-1.0.0-5d5570d9-5a36-407b-aed9-3fe9d1b383ec-1739565524871/node_modules/pet-adoption-frontend"
+    pet-adoption-frontend "file:../../../../Library/Caches/Yarn/v6/npm-pet-adoption-frontend-1.0.0-8d76050b-1831-4ddc-8800-686cc4a9a2c9-1739697204820/node_modules/pet-adoption-frontend"
     react "^19.0.0"
     react-dom "^19.0.0"
     react-password-strength-bar "^0.4.1"

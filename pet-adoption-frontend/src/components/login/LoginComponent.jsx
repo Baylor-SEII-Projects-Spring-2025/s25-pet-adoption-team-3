@@ -12,10 +12,12 @@ export default function LoginComponent() {
     const [password, setPassword] = useState("");
     const router = useRouter();
 
+    const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
     const handleEmailLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch("http://localhost:8080/auth/login", {
+            const response = await fetch(`${API_URL}/auth/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -45,7 +47,7 @@ export default function LoginComponent() {
 
     const fetchUserSession = async () => {
         try {
-            const response = await fetch("http://localhost:8080/auth/session", {
+            const response = await fetch(`${API_URL}/auth/session`, {
                 method: "GET",
                 credentials: "include",
                 headers: {

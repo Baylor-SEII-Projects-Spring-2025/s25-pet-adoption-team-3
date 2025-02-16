@@ -18,9 +18,11 @@ export default function RegisterComponent() {
     const [isPasswordSame, setIsPasswordSame] = useState(false);
     const router = useRouter();
 
+    const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
     const fetchUserSession = async () => {
         try {
-            const response = await fetch("http://localhost:8080/auth/session", {
+            const response = await fetch(`${API_URL}/auth/session`, {
                 method: "GET",
                 credentials: "include",
                 headers: {
@@ -62,16 +64,13 @@ export default function RegisterComponent() {
         };
 
         try {
-            const response = await fetch(
-                "http://localhost:8080/auth/register",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(userData),
+            const response = await fetch(`${API_URL}/auth/register`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
                 },
-            );
+                body: JSON.stringify(userData),
+            });
 
             if (!response.ok) {
                 const errorMessage = await response.text();

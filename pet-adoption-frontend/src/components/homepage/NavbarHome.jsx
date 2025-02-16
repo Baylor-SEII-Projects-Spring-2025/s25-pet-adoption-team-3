@@ -13,10 +13,11 @@ export default function Navbar() {
     const [user, setUser] = useState(null);
     const [open, setOpen] = useState(false);
     const anchorRef = useRef(null);
+    const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
     const fetchUserSession = async () => {
         try {
-            const response = await fetch("http://localhost:8080/auth/session", {
+            const response = await fetch(`${API_URL}/auth/session`, {
                 method: "GET",
                 credentials: "include",
                 headers: {
@@ -42,6 +43,7 @@ export default function Navbar() {
     };
 
     useEffect(() => {
+        console.log("api url", API_URL);
         fetchUserSession();
     }, []);
 
@@ -58,7 +60,7 @@ export default function Navbar() {
 
     const handleLogout = async () => {
         try {
-            const response = await fetch("http://localhost:8080/auth/logout", {
+            const response = await fetch(`${API_URL}:8080/auth/logout`, {
                 method: "POST",
                 credentials: "include",
                 headers: {
@@ -122,7 +124,10 @@ export default function Navbar() {
                                 sx={{
                                     background: user.profilePhoto
                                         ? "transparent"
-                                        : generateGradient( user.firstName + (user.lastName || "") ),
+                                        : generateGradient(
+                                              user.firstName +
+                                                  (user.lastName || ""),
+                                          ),
                                     cursor: "pointer",
                                     color: "#fff",
                                 }}

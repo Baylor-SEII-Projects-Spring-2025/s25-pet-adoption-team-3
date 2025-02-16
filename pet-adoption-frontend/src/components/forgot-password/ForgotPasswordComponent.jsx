@@ -6,14 +6,15 @@ import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "@/utils/theme";
 import { useRouter } from "next/router";
 
-
 export default function ForgotPasswordComponent() {
     const [email, setEmail] = useState("");
     const router = useRouter();
 
+    const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
     const fetchUserSession = async () => {
         try {
-            const response = await fetch("http://localhost:8080/auth/session", {
+            const response = await fetch(`${API_URL}/auth/session`, {
                 method: "GET",
                 credentials: "include",
                 headers: {

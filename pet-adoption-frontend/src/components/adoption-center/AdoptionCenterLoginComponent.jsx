@@ -10,18 +10,22 @@ export default function AdoptionCenterLoginComponent() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const router = useRouter();
+    const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
     const handleEmailLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch("http://localhost:8080/auth/adoption-center-login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
+            const response = await fetch(
+                `${API_URL}/auth/adoption-center-login`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ email, password }),
+                    credentials: "include",
                 },
-                body: JSON.stringify({ email, password }),
-                credentials: "include",
-            });
+            );
 
             const contentType = response.headers.get("content-type");
 
@@ -44,7 +48,7 @@ export default function AdoptionCenterLoginComponent() {
 
     const fetchUserSession = async () => {
         try {
-            const response = await fetch("http://localhost:8080/auth/session", {
+            const response = await fetch(`${API_URL}/auth/session`, {
                 method: "GET",
                 credentials: "include",
                 headers: {
@@ -103,7 +107,9 @@ export default function AdoptionCenterLoginComponent() {
                             />
                         </section>
 
-                        <a href="/adoption-center-forgot-password">Forgot Password?</a>
+                        <a href="/adoption-center-forgot-password">
+                            Forgot Password?
+                        </a>
                         <section className={styles.loginButton}>
                             <Button type="submit" variant="contained">
                                 Sign in
