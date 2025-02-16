@@ -30,7 +30,7 @@ services:
       MYSQL_DATABASE: petadoption
     volumes:
       - mysql-data:/var/lib/mysql
-      - ./actions-runner/adopt-dont-shop/s25-pet-adoption-team-3/s25-pet-adoption-team-3/docker/sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 volumes:
   mysql-data:
 
