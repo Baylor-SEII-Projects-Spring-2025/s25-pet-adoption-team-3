@@ -10,5 +10,6 @@ services:
       MYSQL_DATABASE: petadoption
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 volumes:
   mysql-data:
