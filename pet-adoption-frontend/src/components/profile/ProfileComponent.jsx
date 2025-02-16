@@ -558,6 +558,7 @@ export default function ProfileDashboardComponent() {
                                 </div>
 
                                 <TextField
+                                    disabled
                                     label="Email"
                                     value={user?.email || ""}
                                     id="email"
