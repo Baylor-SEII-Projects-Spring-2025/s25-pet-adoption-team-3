@@ -47,7 +47,9 @@ export default function ProfileNavbar() {
     };
 
     useEffect(() => {
-        fetchUserSession();
+        if (!user) {
+            fetchUserSession();
+        }
     }, []);
 
     const handleToggle = () => {

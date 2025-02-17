@@ -43,8 +43,9 @@ export default function Navbar() {
     };
 
     useEffect(() => {
-        console.log("api url", API_URL);
-        fetchUserSession();
+        if (!user) {
+            fetchUserSession();
+        }
     }, []);
 
     const handleToggle = () => {

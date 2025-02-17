@@ -62,7 +62,9 @@ export default function ProfileDashboardComponent() {
     };
 
     useEffect(() => {
-        fetchUserSession();
+        if (!user) {
+            fetchUserSession();
+        }
     }, []);
 
     const handleDeletePhoto = async () => {

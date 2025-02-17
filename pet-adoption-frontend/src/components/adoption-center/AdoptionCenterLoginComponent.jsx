@@ -75,7 +75,9 @@ export default function AdoptionCenterLoginComponent() {
     };
 
     useEffect(() => {
-        fetchUserSession();
+        if (!user) {
+            fetchUserSession();
+        }
     }, []);
 
     return (

@@ -49,7 +49,9 @@ export default function RegisterComponent() {
     };
 
     useEffect(() => {
-        fetchUserSession();
+        if (!user) {
+            fetchUserSession();
+        }
     }, []);
 
     const handleRegister = async (e) => {

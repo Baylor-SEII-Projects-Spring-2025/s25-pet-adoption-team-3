@@ -74,7 +74,9 @@ export default function LoginComponent() {
     };
 
     useEffect(() => {
-        fetchUserSession();
+        if (!user) {
+            fetchUserSession();
+        }
     }, []);
 
     return (

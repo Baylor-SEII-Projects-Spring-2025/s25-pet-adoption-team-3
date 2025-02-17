@@ -41,7 +41,9 @@ export default function ForgotPasswordComponent() {
     };
 
     useEffect(() => {
-        fetchUserSession();
+        if (!user) {
+            fetchUserSession();
+        }
     }, []);
 
     const handleforgotPassword = (e) => {
