@@ -9,7 +9,7 @@ RUN ./gradlew build --no-daemon -p .
 FROM openjdk:23
 WORKDIR /app
 
-ENV SPRING_PROFILES_ACTIVE=docker
+ENV SPRING_PROFILES_ACTIVE=docker,prod
 
 
 COPY --from=build /build/build/libs/pet-adoption-api-1.0.0-SNAPSHOT.jar app.jar
