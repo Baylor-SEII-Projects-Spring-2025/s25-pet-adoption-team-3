@@ -44,7 +44,7 @@ public class SecurityConfig {
                         .failureUrl("/login?error=true"))
 
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS));
 
         return http.build();
     }

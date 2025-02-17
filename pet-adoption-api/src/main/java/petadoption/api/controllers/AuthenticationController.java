@@ -44,6 +44,7 @@ public class AuthenticationController {
         User user = (User) authResponse.getBody();
 
         HttpSession session = request.getSession();
+        System.out.println("Session ID: " + session.getId());
         session.setAttribute("user", user);
 
         Map<String, Object> response = new HashMap<>();
