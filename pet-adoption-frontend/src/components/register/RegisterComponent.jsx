@@ -16,6 +16,7 @@ export default function RegisterComponent() {
     const [passwordScore, setPasswordScore] = useState(0);
     const [passwordFocused, setPasswordFocused] = useState(false);
     const [isPasswordSame, setIsPasswordSame] = useState(false);
+    const [user, setUser] = useState(null);
     const router = useRouter();
 
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -41,6 +42,7 @@ export default function RegisterComponent() {
 
             const data = await response.json();
             console.log("✅ Session found:", data);
+            setUser(data.user);
 
             router.push("/");
         } catch (error) {

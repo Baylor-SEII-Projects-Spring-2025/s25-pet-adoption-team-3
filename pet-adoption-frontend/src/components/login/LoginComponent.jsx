@@ -10,6 +10,7 @@ import { loginWithGoogle } from "@/utils/auth";
 export default function LoginComponent() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [user, setUser] = useState(null);
     const router = useRouter();
 
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -38,6 +39,7 @@ export default function LoginComponent() {
 
             const data = await response.json();
             console.log("Login successful:", data);
+            setUser(data.user);
 
             router.push("/profile");
         } catch (error) {
@@ -66,6 +68,7 @@ export default function LoginComponent() {
 
             const data = await response.json();
             console.log("✅ Session found:", data);
+            setUser(data.user);
 
             router.push("/");
         } catch (error) {

@@ -9,6 +9,7 @@ import { theme } from "@/utils/theme";
 export default function AdoptionCenterLoginComponent() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [user, setUser] = useState(null);
     const router = useRouter();
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -40,6 +41,8 @@ export default function AdoptionCenterLoginComponent() {
             const data = await response.json();
             console.log("Login successful:", data);
 
+            setUser(data.user);
+
             router.push("/adoption-center-dashboard");
         } catch (error) {
             alert(error.message);
@@ -67,6 +70,7 @@ export default function AdoptionCenterLoginComponent() {
 
             const data = await response.json();
             console.log("✅ Session found:", data);
+            setUser(data.user);
 
             router.push("/");
         } catch (error) {
