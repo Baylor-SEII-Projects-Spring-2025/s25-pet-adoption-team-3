@@ -61,7 +61,7 @@ export default function Navbar() {
 
     const handleLogout = async () => {
         try {
-            const response = await fetch(`${API_URL}:8080/auth/logout`, {
+            const response = await fetch(`${API_URL}/auth/logout`, {
                 method: "POST",
                 credentials: "include",
                 headers: {
