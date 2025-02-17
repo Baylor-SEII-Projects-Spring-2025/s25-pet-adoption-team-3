@@ -31,6 +31,7 @@ public class SecurityConfig {
                             "http://adopdontshop.duckdns.org"));
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "FETCH", "OPTIONS"));
                     config.setAllowedHeaders(List.of("*"));
+                    config.setExposedHeaders(List.of("Set-Cookie"));
                     config.setAllowCredentials(true);
                     return config;
                 }))
@@ -44,7 +45,7 @@ public class SecurityConfig {
                         .failureUrl("/login?error=true"))
 
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS));
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
 
         return http.build();
     }
