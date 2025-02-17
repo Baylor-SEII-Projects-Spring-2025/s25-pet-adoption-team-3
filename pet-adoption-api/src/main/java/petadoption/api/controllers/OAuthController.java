@@ -23,7 +23,7 @@ import petadoption.api.repository.UserRepository;
 @RequestMapping("/oauth")
 public class OAuthController {
 
-    @Value("${FRONTEND_URL}")
+    @Value("${frontend.url}")
     private String frontendUrl;
 
     private final UserRepository userRepository;
