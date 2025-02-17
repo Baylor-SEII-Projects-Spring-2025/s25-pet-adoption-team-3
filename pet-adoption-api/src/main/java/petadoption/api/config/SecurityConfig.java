@@ -28,7 +28,7 @@ public class SecurityConfig {
                     config.setAllowedOrigins(List.of(
                             "http://localhost:3000",
                             "http://35.226.72.131:3000",
-                            "http://adopdontshop.duckdns.org"));
+                            "https://adopdontshop.duckdns.org"));
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "FETCH", "OPTIONS"));
                     config.setAllowedHeaders(List.of("*", "Set-Cookie"));
                     config.setExposedHeaders(List.of("Set-Cookie"));
