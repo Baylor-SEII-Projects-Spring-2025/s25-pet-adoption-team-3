@@ -43,9 +43,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() { // <-- FIXED THIS
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("https://adoptdontshop.duckdns.org")); // Only allow your frontend domain
+        config.setAllowedOrigins(List.of("https://adoptdontshop.duckdns.org", "http://localhost:3000")); // Only allow your frontend domain
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Set-Cookie"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Set-Cookie", "Cache-Control"));
         config.setExposedHeaders(List.of("Authorization", "Content-Type", "Set-Cookie"));
         config.setAllowCredentials(true);
 
