@@ -41,7 +41,7 @@ public class OAuthController {
         System.out.println("✅ OAuth Success Route Hit!");
 
         if (token == null) {
-            response.sendRedirect("http://localhost:3000/login?error=true");
+            response.sendRedirect(frontendUrl + "/login?error=true");
             return;
         }
 
