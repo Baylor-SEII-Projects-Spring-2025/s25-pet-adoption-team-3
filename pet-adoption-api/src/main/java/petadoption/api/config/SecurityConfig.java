@@ -1,6 +1,7 @@
 package petadoption.api.config;
 
 import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,6 +12,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 public class SecurityConfig {
@@ -22,19 +25,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(_ -> {
-                    CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of(
-                            "https://adopdontshop.duckdns.org",
-                            "http://localhost:3000"
-                    ));
-                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "FETCH", "OPTIONS"));
-                    config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Set-Cookie"));
-                    config.setExposedHeaders(List.of("Authorization", "Content-Type", "Set-Cookie"));
-                    config.setAllowCredentials(true);
-                    return config;
-                }))
-                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Ensure global CORS is applied
+                .csrf(csrf -> csrf.disable()) // Disable CSRF for API endpoints
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/", "/oauth2/**", "/login/oauth2/**").permitAll()
                         .requestMatchers("/api/users/**").permitAll()
@@ -46,6 +38,20 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.ALWAYS));
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("https://adopdontshop.duckdns.org", "http://localhost:3000"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With"));
+        config.setExposedHeaders(List.of("Set-Cookie"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     @Bean
