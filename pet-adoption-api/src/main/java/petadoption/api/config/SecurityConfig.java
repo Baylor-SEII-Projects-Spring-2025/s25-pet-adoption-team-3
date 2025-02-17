@@ -1,7 +1,6 @@
 package petadoption.api.config;
 
 import java.util.List;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -25,13 +24,10 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(_ -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of(
-                            "http://localhost:3000",
-                            "http://35.226.72.131:3000",
-                            "https://adopdontshop.duckdns.org"));
+                    config.setAllowedOrigins(List.of("https://adopdontshop.duckdns.org"));
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "FETCH", "OPTIONS"));
-                    config.setAllowedHeaders(List.of("*", "Set-Cookie"));
-                    config.setExposedHeaders(List.of("Set-Cookie"));
+                    config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Set-Cookie"));
+                    config.setExposedHeaders(List.of("Authorization", "Content-Type", "Set-Cookie"));
                     config.setAllowCredentials(true);
                     return config;
                 }))
@@ -43,7 +39,6 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
                         .defaultSuccessUrl("/oauth/google/success", true)
                         .failureUrl("/login?error=true"))
-
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.ALWAYS));
 
@@ -51,7 +46,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public HttpFirewall allowSemicoloHttpFirewall() {
+    public HttpFirewall allowSemicolonHttpFirewall() {
         StrictHttpFirewall firewall = new StrictHttpFirewall();
         firewall.setAllowSemicolon(true);
         return firewall;
