@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +20,8 @@ import jakarta.transaction.Transactional;
 import petadoption.api.models.User;
 import petadoption.api.repository.UserRepository;
 
+
+@CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org" })
 @RestController
 @RequestMapping("/oauth")
 public class OAuthController {
