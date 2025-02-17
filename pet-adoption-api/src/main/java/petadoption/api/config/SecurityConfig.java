@@ -24,7 +24,10 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(_ -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of("https://adopdontshop.duckdns.org"));
+                    config.setAllowedOrigins(List.of(
+                            "https://adopdontshop.duckdns.org",
+                            "http://localhost:3000"
+                    ));
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "FETCH", "OPTIONS"));
                     config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Set-Cookie"));
                     config.setExposedHeaders(List.of("Authorization", "Content-Type", "Set-Cookie"));
