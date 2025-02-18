@@ -26,7 +26,7 @@ import petadoption.api.services.UserService;
 
 //Usages: View User profile, edit user Profile, and Maybe Delete Account.
 
-@CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org" })@RestController
+@CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000" })@RestController
 @RequestMapping("/api/users")
 public class UsersController {
     private final UserService userService;

@@ -21,7 +21,7 @@ import petadoption.api.models.User;
 import petadoption.api.repository.UserRepository;
 
 
-@CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org" })
+@CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000" })
 @RestController
 @RequestMapping("/oauth")
 public class OAuthController {
