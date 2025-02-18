@@ -68,7 +68,7 @@ cd pet-adoption-api
 #### **Prerequisites**
 
 - Install **Node.js 23+**
-- Install **yarn**
+- Install **Yarn 1.22+**
 
 #### **Environment Variables**
 
