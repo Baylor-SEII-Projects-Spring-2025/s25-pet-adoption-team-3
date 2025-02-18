@@ -10,7 +10,7 @@ jobs:
     runs-on: self-hosted
     env:
       SPRING_PROFILES_ACTIVE: prod
-      frontend.url: http://35.226.72.131:3000
+      frontend.url: https://adoptdontshop.duckdns.org
     steps:
       - uses: actions/checkout@v3
 
