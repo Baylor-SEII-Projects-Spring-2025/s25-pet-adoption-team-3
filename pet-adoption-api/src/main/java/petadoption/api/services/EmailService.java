@@ -1,21 +1,27 @@
 package petadoption.api.services;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
+import org.springframework.beans.factory.annotation.Value;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import petadoption.api.models.User;
 import petadoption.api.models.VerificationToken;
 import petadoption.api.repository.VerificationTokenRepository;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 public class EmailService {
     private final JavaMailSender mailSender;
     private final VerificationTokenRepository tokenRepository;
+
+    @Value("${backend.url}")
+    private String backendUrl;
 
     public EmailService(JavaMailSender mailSender, VerificationTokenRepository tokenRepository) {
         this.mailSender = mailSender;
@@ -24,7 +30,7 @@ public class EmailService {
 
     public void sendVerificationEmail(User user){
         String token = generateToken(user);
-        String verificationLink = "https://adoptdontshop.duckdns.org/api/users/verify-email?token=" + token;
+        String verificationLink = backendUrl + "/api/users/verify-email?token=" + token;
 
         try{
             MimeMessage message = mailSender.createMimeMessage();
