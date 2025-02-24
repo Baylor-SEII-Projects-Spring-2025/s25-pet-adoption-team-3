@@ -1,28 +1,25 @@
 package petadoption.api.userTesting;
-import org.springframework.http.HttpStatus;
-import petadoption.api.DTO.LoginRequestsDTO;
-import petadoption.api.DTO.UserDTO;
-
-import java.util.HashMap;
 import java.util.Map;
 
-import petadoption.api.DTO.LoginRequestsDTO;
-import petadoption.api.DTO.UserDTO;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import petadoption.api.DTO.LoginRequestsDTO;
+import petadoption.api.DTO.UserDTO;
 import petadoption.api.controllers.AuthenticationController;
 import petadoption.api.models.User;
 import petadoption.api.services.UserService;
