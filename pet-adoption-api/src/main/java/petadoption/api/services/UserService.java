@@ -14,10 +14,12 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder){
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     public ResponseEntity<?>registerUser(UserDTO userDTO) {
@@ -37,6 +39,7 @@ public class UserService {
         user.setProfilePhoto(null);
 
         user = userRepository.save(user);
+        emailService.sendVerificationEmail(user);
         return ResponseEntity.status(HttpStatus.CREATED).body("User: " + user.getEmail() + " created successfully");
     }
 

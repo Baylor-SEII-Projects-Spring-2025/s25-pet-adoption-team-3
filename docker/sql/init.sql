@@ -12,6 +12,59 @@ CREATE TABLE IF NOT EXISTS users (
     profile_photo     VARCHAR(255)
 );
 
+CREATE TABLE IF NOT EXISTS verification_token (
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    token       VARCHAR(255) NOT NULL UNIQUE,
+    user_id     BIGINT NOT NULL UNIQUE,
+    expiry_date DATETIME(6) NOT NULL,
+    CONSTRAINT fk_verification_token_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+--Ensure the token column exists and is unique
+SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'verification_token' AND COLUMN_NAME = 'token'
+    INTO @column_exists;
+
+SET @query = IF(@column_exists IS NULL,
+    'ALTER TABLE verification_token ADD COLUMN token VARCHAR(255) NOT NULL UNIQUE;', 'SELECT 1;');
+PREPARE stmt FROM @query;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+--Ensure the user_id column exists and is unique
+SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'verification_token' AND COLUMN_NAME = 'user_id'
+    INTO @column_exists;
+
+SET @query = IF(@column_exists IS NULL,
+    'ALTER TABLE verification_token ADD COLUMN user_id BIGINT NOT NULL UNIQUE;', 'SELECT 1;');
+PREPARE stmt FROM @query;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+--Ensure expiry_date column exists
+SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'verification_token' AND COLUMN_NAME = 'expiry_date'
+    INTO @column_exists;
+
+SET @query = IF(@column_exists IS NULL,
+    'ALTER TABLE verification_token ADD COLUMN expiry_date DATETIME(6) NOT NULL;', 'SELECT 1;');
+PREPARE stmt FROM @query;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+--Ensure foreign key constraint exists to enforce ON DELETE CASCADE
+SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+WHERE TABLE_NAME = 'verification_token' AND COLUMN_NAME = 'user_id'
+    INTO @fk_exists;
+
+SET @query = IF(@fk_exists IS NULL,
+    'ALTER TABLE verification_token ADD CONSTRAINT fk_verification_token_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;',
+    'SELECT 1;');
+PREPARE stmt FROM @query;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
 -- Ensure all columns exist (without IF NOT EXISTS)
 -- Check if the column exists before altering
 SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
@@ -81,7 +134,7 @@ CREATE TABLE IF NOT EXISTS users_sequence (
     next_val BIGINT
 );
 
-SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_NAME = 'users_sequence' AND COLUMN_NAME = 'next_val'
 INTO @column_exists;
 
