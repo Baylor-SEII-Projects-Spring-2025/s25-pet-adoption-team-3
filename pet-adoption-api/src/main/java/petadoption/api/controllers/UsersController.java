@@ -1,9 +1,11 @@
 package petadoption.api.controllers;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +22,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import petadoption.api.DTO.UserDTO;
 import petadoption.api.models.User;
+import petadoption.api.models.VerificationToken;
 import petadoption.api.repository.UserRepository;
+import petadoption.api.repository.VerificationTokenRepository;
 import petadoption.api.services.GCSStorageService;
 import petadoption.api.services.UserService;
 
@@ -32,11 +36,13 @@ public class UsersController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final GCSStorageService gcsStorageService;
+    private final VerificationTokenRepository verificationTokenRepository;
 
-    public UsersController(UserService userService, UserRepository userRepository) {
+    public UsersController(UserService userService, UserRepository userRepository, VerificationTokenRepository verificationTokenRepository) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.gcsStorageService = new GCSStorageService();
+        this.verificationTokenRepository = verificationTokenRepository;
     }
 
     @GetMapping("/{userId}")
@@ -69,19 +75,28 @@ public class UsersController {
         return ResponseEntity.ok("Profile photo updated successfully!");
     }
 
-    @PutMapping("/{userId}/verify-email")
-    public ResponseEntity<String> verifyUserEmail(@PathVariable Long userId) {
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.badRequest().body("User not found");
+    @GetMapping("/verify-email")
+    public void verifyUserEmail(@RequestParam String token, HttpServletResponse response) throws IOException {
+        Optional<VerificationToken> verificationTokenOptional = verificationTokenRepository.findByToken(token);
+        if (verificationTokenOptional.isEmpty()) {
+            response.sendRedirect("/verification-failed");
+            return;
         }
 
-        User user = userOptional.get();
+        VerificationToken verificationToken = verificationTokenOptional.get();
+        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            response.sendRedirect("/verification-expired");
+            return;
+        }
+
+        User user = verificationToken.getUser();
         user.setEmailVerified(true);
         userRepository.save(user);
+        verificationTokenRepository.delete(verificationToken);
 
-        return ResponseEntity.ok("Email verified successfully!");
+        response.sendRedirect("/email-verified");
     }
+
 
     @PutMapping("/changeFirstName/{userId}")
     public ResponseEntity<String> changeFirstName(@PathVariable Long userId, @RequestBody UserDTO userDTO) {
