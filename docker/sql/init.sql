@@ -12,63 +12,62 @@ CREATE TABLE IF NOT EXISTS users (
     profile_photo     VARCHAR(255)
 );
 
-CREATE TABLE IF NOT EXISTS verification_token (
+CREATE TABLE IF NOT EXISTS token (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
     token       VARCHAR(255) NOT NULL UNIQUE,
     user_id     BIGINT NOT NULL UNIQUE,
     expiry_date DATETIME(6) NOT NULL,
-    CONSTRAINT fk_verification_token_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    token_type  ENUM('EMAIL_VERIFICATION', 'PASSWORD_RESET') NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
-WHERE TABLE_NAME = 'verification_token' AND COLUMN_NAME = 'token'
-LIMIT 1
-INTO @column_exists;
+WHERE TABLE_NAME = 'token' AND COLUMN_NAME = 'token_type'
+LIMIT 1 INTO @column_exists;
 
 SET @query = IF(@column_exists IS NULL,
-    'ALTER TABLE verification_token ADD COLUMN token VARCHAR(255) NOT NULL UNIQUE;', 'SELECT 1;');
-PREPARE stmt FROM @query;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
-
-SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
-WHERE TABLE_NAME = 'verification_token' AND COLUMN_NAME = 'user_id'
-LIMIT 1
-INTO @column_exists;
-
-SET @query = IF(@column_exists IS NULL,
-    'ALTER TABLE verification_token ADD COLUMN user_id BIGINT NOT NULL UNIQUE;', 'SELECT 1;');
-PREPARE stmt FROM @query;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
-
-SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
-WHERE TABLE_NAME = 'verification_token' AND COLUMN_NAME = 'expiry_date'
-LIMIT 1
-INTO @column_exists;
-
-SET @query = IF(@column_exists IS NULL,
-    'ALTER TABLE verification_token ADD COLUMN expiry_date DATETIME(6) NOT NULL;', 'SELECT 1;');
-PREPARE stmt FROM @query;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
-
-SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
-WHERE TABLE_NAME = 'verification_token' AND COLUMN_NAME = 'user_id'
-LIMIT 1
-INTO @fk_exists;
-
-SET @query = IF(@fk_exists IS NULL,
-    'ALTER TABLE verification_token ADD CONSTRAINT fk_verification_token_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;',
+    'ALTER TABLE token ADD COLUMN token_type ENUM("EMAIL_VERIFICATION", "PASSWORD_RESET") NOT NULL;',
     'SELECT 1;');
 PREPARE stmt FROM @query;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
-SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'token' AND COLUMN_NAME = 'user_id'
+LIMIT 1 INTO @column_exists;
+
+SET @query = IF(@column_exists IS NULL,
+    'ALTER TABLE token ADD COLUMN user_id BIGINT NOT NULL UNIQUE;',
+    'SELECT 1;');
+PREPARE stmt FROM @query;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'token' AND COLUMN_NAME = 'expiry_date'
+LIMIT 1 INTO @column_exists;
+
+SET @query = IF(@column_exists IS NULL,
+    'ALTER TABLE token ADD COLUMN expiry_date DATETIME(6) NOT NULL;',
+    'SELECT 1;');
+PREPARE stmt FROM @query;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+WHERE TABLE_NAME = 'token' AND COLUMN_NAME = 'user_id'
+LIMIT 1 INTO @fk_exists;
+
+SET @query = IF(@fk_exists IS NULL,
+    'ALTER TABLE token ADD CONSTRAINT fk_token_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;',
+    'SELECT 1;');
+PREPARE stmt FROM @query;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_NAME = 'users' AND COLUMN_NAME = 'password'
-LIMIT 1
-INTO @column_exists;
+LIMIT 1 INTO @column_exists;
 
 SET @query = IF(@column_exists IS NULL, 'ALTER TABLE users ADD COLUMN password VARCHAR(255);', 'SELECT 1;');
 PREPARE stmt FROM @query;
