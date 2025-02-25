@@ -30,8 +30,7 @@ public class EmailService {
 
     public void sendVerificationEmail(User user){
         String token = generateToken(user, Token.TokenType.EMAIL_VERIFICATION);
-//        String verificationLink = backendUrl + "/api/users/verify-email?token=" + token;
-        String verificationLink = "http://localhost:8080/api/users/verify-email?token=" + token;
+        String verificationLink = backendUrl + "/api/users/verify-email?token=" + token;
 
 
         try{
