@@ -20,7 +20,6 @@ CREATE TABLE IF NOT EXISTS verification_token (
     CONSTRAINT fk_verification_token_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
---Ensure the token column exists and is unique
 SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_NAME = 'verification_token' AND COLUMN_NAME = 'token'
     INTO @column_exists;
@@ -31,7 +30,6 @@ PREPARE stmt FROM @query;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
---Ensure the user_id column exists and is unique
 SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_NAME = 'verification_token' AND COLUMN_NAME = 'user_id'
     INTO @column_exists;
@@ -42,7 +40,6 @@ PREPARE stmt FROM @query;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
---Ensure expiry_date column exists
 SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_NAME = 'verification_token' AND COLUMN_NAME = 'expiry_date'
     INTO @column_exists;
@@ -53,7 +50,6 @@ PREPARE stmt FROM @query;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
---Ensure foreign key constraint exists to enforce ON DELETE CASCADE
 SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
 WHERE TABLE_NAME = 'verification_token' AND COLUMN_NAME = 'user_id'
     INTO @fk_exists;
@@ -65,8 +61,6 @@ PREPARE stmt FROM @query;
 EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
--- Ensure all columns exist (without IF NOT EXISTS)
--- Check if the column exists before altering
 SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
 WHERE TABLE_NAME = 'users' AND COLUMN_NAME = 'password'
 INTO @column_exists;
