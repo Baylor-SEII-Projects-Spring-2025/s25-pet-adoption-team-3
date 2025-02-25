@@ -6,6 +6,7 @@ import petadoption.api.DTO.UserDTO;
 import petadoption.api.controllers.UsersController;
 import petadoption.api.models.User;
 import petadoption.api.repository.UserRepository;
+import petadoption.api.services.EmailService;
 import petadoption.api.services.UserService;
 import java.util.Optional;
 
@@ -19,9 +20,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -32,6 +32,9 @@ class UserControllerTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private EmailService emailService;
 
     @InjectMocks
     private UsersController userController;
@@ -77,6 +80,8 @@ class UserControllerTest {
             return savedUser;
         });
 
+        doNothing().when(emailService).sendVerificationEmail(any(User.class));
+
         ResponseEntity<?> response = userService.registerUser(userDTO);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -107,6 +112,8 @@ class UserControllerTest {
             savedUser.setId(1L);
             return savedUser;
         });
+
+        doNothing().when(emailService).sendVerificationEmail(any(User.class));
 
         ResponseEntity<?> response = userService.registerUser(userDTO);
 
