@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-public class VerificationToken {
+public class Token {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,4 +23,12 @@ public class VerificationToken {
 
     @Column(nullable = false)
     private LocalDateTime expiryDate;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TokenType tokenType;
+
+    public enum TokenType{
+        EMAIL_VERIFICATION, PASSWORD_RESET
+    }
 }
