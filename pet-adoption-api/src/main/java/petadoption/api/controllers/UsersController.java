@@ -2,6 +2,7 @@ package petadoption.api.controllers;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -204,5 +205,17 @@ public class UsersController {
         }
     }
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPasswordLink(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        return userService.forgotPasswordLink(email);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        String newPassword = request.get("newPassword");
+        return userService.resetPassword(token, newPassword);
+    }
 
 }

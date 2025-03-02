@@ -32,7 +32,6 @@ public class EmailService {
         String token = generateToken(user, Token.TokenType.EMAIL_VERIFICATION);
         String verificationLink = backendUrl + "/api/users/verify-email?token=" + token;
 
-
         try{
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -46,6 +45,25 @@ public class EmailService {
             throw new RuntimeException("Failed to send email.");
         }
     }
+
+    public void sendPasswordResetEmail(User user) {
+        String token = generateToken(user, Token.TokenType.PASSWORD_RESET);
+        String resetLink = backendUrl + "/api/users/reset-password?token=" + token;
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom("adoptdontshopinfo@gmail.com");
+            helper.setTo(user.getEmail());
+            helper.setSubject("Reset Your Password");
+            helper.setText("<p>Click the link below to reset your password:</p>"
+                    + "<a href=\"" + resetLink + "\">Reset Password</a>", true);
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send password reset email.");
+        }
+    }
+
     private String generateToken(User user, Token.TokenType tokenType) {
         String token = UUID.randomUUID().toString();
         Token tokenEntity = new Token();
