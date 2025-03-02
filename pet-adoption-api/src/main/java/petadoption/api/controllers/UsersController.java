@@ -2,6 +2,7 @@ package petadoption.api.controllers;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,9 +23,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import petadoption.api.DTO.UserDTO;
 import petadoption.api.models.User;
-import petadoption.api.models.VerificationToken;
+import petadoption.api.models.Token;
 import petadoption.api.repository.UserRepository;
-import petadoption.api.repository.VerificationTokenRepository;
+import petadoption.api.repository.TokenRepository;
 import petadoption.api.services.GCSStorageService;
 import petadoption.api.services.UserService;
 
@@ -36,13 +37,13 @@ public class UsersController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final GCSStorageService gcsStorageService;
-    private final VerificationTokenRepository verificationTokenRepository;
+    private final TokenRepository tokenRepository;
 
-    public UsersController(UserService userService, UserRepository userRepository, VerificationTokenRepository verificationTokenRepository) {
+    public UsersController(UserService userService, UserRepository userRepository, TokenRepository tokenRepository) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.gcsStorageService = new GCSStorageService();
-        this.verificationTokenRepository = verificationTokenRepository;
+        this.tokenRepository = tokenRepository;
     }
 
     @GetMapping("/{userId}")
@@ -77,13 +78,13 @@ public class UsersController {
 
     @GetMapping("/verify-email")
     public void verifyUserEmail(@RequestParam String token, HttpServletResponse response) throws IOException {
-        Optional<VerificationToken> verificationTokenOptional = verificationTokenRepository.findByToken(token);
+        Optional<Token> verificationTokenOptional = tokenRepository.findByTokenAndTokenType(token, Token.TokenType.EMAIL_VERIFICATION);
         if (verificationTokenOptional.isEmpty()) {
             response.sendRedirect("/verification-failed");
             return;
         }
 
-        VerificationToken verificationToken = verificationTokenOptional.get();
+        Token verificationToken = verificationTokenOptional.get();
         if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             response.sendRedirect("/verification-expired");
             return;
@@ -92,7 +93,7 @@ public class UsersController {
         User user = verificationToken.getUser();
         user.setEmailVerified(true);
         userRepository.save(user);
-        verificationTokenRepository.delete(verificationToken);
+        tokenRepository.delete(verificationToken);
 
         response.sendRedirect("/email-verified");
     }
@@ -204,5 +205,17 @@ public class UsersController {
         }
     }
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPasswordLink(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        return userService.forgotPasswordLink(email);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        String newPassword = request.get("newPassword");
+        return userService.resetPassword(token, newPassword);
+    }
 
 }

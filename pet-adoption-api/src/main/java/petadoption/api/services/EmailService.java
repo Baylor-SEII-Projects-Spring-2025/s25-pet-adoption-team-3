@@ -11,25 +11,25 @@ import org.springframework.beans.factory.annotation.Value;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import petadoption.api.models.Token;
 import petadoption.api.models.User;
-import petadoption.api.models.VerificationToken;
-import petadoption.api.repository.VerificationTokenRepository;
+import petadoption.api.repository.TokenRepository;
 
 @Service
 public class EmailService {
     private final JavaMailSender mailSender;
-    private final VerificationTokenRepository tokenRepository;
+    private final TokenRepository tokenRepository;
 
     @Value("${backend.url}")
     private String backendUrl;
 
-    public EmailService(JavaMailSender mailSender, VerificationTokenRepository tokenRepository) {
+    public EmailService(JavaMailSender mailSender, TokenRepository tokenRepository) {
         this.mailSender = mailSender;
         this.tokenRepository = tokenRepository;
     }
 
     public void sendVerificationEmail(User user){
-        String token = generateToken(user);
+        String token = generateToken(user, Token.TokenType.EMAIL_VERIFICATION);
         String verificationLink = backendUrl + "/api/users/verify-email?token=" + token;
 
         try{
@@ -45,13 +45,35 @@ public class EmailService {
             throw new RuntimeException("Failed to send email.");
         }
     }
-    private String generateToken(User user) {
+
+    public void sendPasswordResetEmail(User user) {
+        String token = generateToken(user, Token.TokenType.PASSWORD_RESET);
+        String resetLink = backendUrl + "/api/users/reset-password?token=" + token;
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setFrom("adoptdontshopinfo@gmail.com");
+            helper.setTo(user.getEmail());
+            helper.setSubject("Reset Your Password");
+            helper.setText("<p>Click the link below to reset your password:</p>"
+                    + "<a href=\"" + resetLink + "\">Reset Password</a>", true);
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send password reset email.");
+        }
+    }
+
+    private String generateToken(User user, Token.TokenType tokenType) {
         String token = UUID.randomUUID().toString();
-        VerificationToken verificationToken = new VerificationToken();
-        verificationToken.setToken(token);
-        verificationToken.setUser(user);
-        verificationToken.setExpiryDate(LocalDateTime.now().plusHours(1));
-        tokenRepository.save(verificationToken);
+        Token tokenEntity = new Token();
+        tokenEntity.setToken(token);
+        tokenEntity.setUser(user);
+        tokenEntity.setExpiryDate(LocalDateTime.now().plusHours(24));
+        tokenEntity.setTokenType(tokenType);
+        tokenRepository.save(tokenEntity);
         return token;
     }
+
+
 }
