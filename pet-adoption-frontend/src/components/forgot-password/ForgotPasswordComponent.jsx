@@ -50,7 +50,36 @@ export default function ForgotPasswordComponent() {
 
     const handleforgotPassword = (e) => {
         e.preventDefault();
-        console.log(email);
+        if (!email) {
+            alert("Please enter your email");
+            return;
+        }
+
+        const data = {
+            email: email,
+        };
+
+        fetch(`${API_URL}/api/users/forgot-password`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Error sending email");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log("✅ Email sent:", data);
+                alert("Email sent successfully");
+            })
+            .catch((error) => {
+                console.error("Error sending email:", error);
+                alert("Error sending email");
+            });
     };
 
     return (
