@@ -23,6 +23,9 @@ public class EmailService {
     @Value("${backend.url}")
     private String backendUrl;
 
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
     public EmailService(JavaMailSender mailSender, TokenRepository tokenRepository) {
         this.mailSender = mailSender;
         this.tokenRepository = tokenRepository;
@@ -48,7 +51,7 @@ public class EmailService {
 
     public void sendPasswordResetEmail(User user) {
         String token = generateToken(user, Token.TokenType.PASSWORD_RESET);
-        String resetLink = backendUrl + "/api/users/reset-password?token=" + token;
+        String resetLink = frontendUrl + "/reset-password?token=" + token;
 
         try {
             MimeMessage message = mailSender.createMimeMessage();

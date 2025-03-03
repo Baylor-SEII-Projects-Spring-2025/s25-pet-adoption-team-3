@@ -55,9 +55,7 @@ export default function ForgotPasswordComponent() {
             return;
         }
 
-        const data = {
-            email: email,
-        };
+        const data = { email };
 
         fetch(`${API_URL}/api/users/forgot-password`, {
             method: "POST",
@@ -70,11 +68,11 @@ export default function ForgotPasswordComponent() {
                 if (!response.ok) {
                     throw new Error("Error sending email");
                 }
-                return response.json();
+                return response.text(); // Handle plain text response
             })
-            .then((data) => {
-                console.log("✅ Email sent:", data);
-                alert("Email sent successfully");
+            .then((message) => {
+                console.log("✅ Email sent:", message);
+                alert(message); // Display the actual response message
             })
             .catch((error) => {
                 console.error("Error sending email:", error);
