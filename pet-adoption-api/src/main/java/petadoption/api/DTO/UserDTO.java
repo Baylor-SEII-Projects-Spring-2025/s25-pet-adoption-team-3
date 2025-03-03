@@ -11,5 +11,4 @@ public class UserDTO {
     private String firstName;
     private String lastName;
     private String password;
-    private User.Role role; // ADOPTER or ADOPTION_CENTER
 }
