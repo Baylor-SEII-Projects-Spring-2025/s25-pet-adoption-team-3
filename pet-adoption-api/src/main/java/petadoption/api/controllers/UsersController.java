@@ -48,14 +48,12 @@ public class UsersController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<User> getUserProfile(@PathVariable Long userId, HttpServletRequest request) {
-        // Fetch the user from the database instead of relying on session data
         User user = userRepository.findById(userId).orElse(null);
 
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
 
-        // Refresh the session with the latest user data
         request.getSession().setAttribute("user", user);
 
         return ResponseEntity.ok(user);
