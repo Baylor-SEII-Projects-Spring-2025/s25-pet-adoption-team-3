@@ -23,14 +23,14 @@ CREATE TABLE IF NOT EXISTS token (
 
 CREATE TABLE IF NOT EXISTS adoption_centers (
     id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
-    adoptionCenterName  VARCHAR(255) NOT NULL UNIQUE,
+    adoption_center_name VARCHAR(255) NOT NULL UNIQUE,
     email               VARCHAR(255) NOT NULL UNIQUE,
     password            VARCHAR(255) NOT NULL,
     phone               VARCHAR(50) NOT NULL,
     website             VARCHAR(255),
     bio                 TEXT,
     photo               VARCHAR(255)
-    );
+);
 
 SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_NAME = 'token' AND COLUMN_NAME = 'token_type'
