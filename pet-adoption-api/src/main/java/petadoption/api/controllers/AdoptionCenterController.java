@@ -29,6 +29,7 @@ public class AdoptionCenterController {
         this.adoptionCenterService = adoptionCenterService;
         this.adoptionCenterRepository = adoptionCenterRepository;
         this.gcsStorageService = new GCSStorageService();
+
     }
 
     @PostMapping("/register")
@@ -66,5 +67,4 @@ public class AdoptionCenterController {
             return ResponseEntity.status(500).body(null);
         }
     }
-
 }
