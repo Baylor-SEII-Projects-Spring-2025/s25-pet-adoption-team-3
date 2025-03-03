@@ -27,9 +27,9 @@ CREATE TABLE IF NOT EXISTS adoption_centers (
     email               VARCHAR(255) NOT NULL UNIQUE,
     password            VARCHAR(255) NOT NULL,
     phone               VARCHAR(50) NOT NULL,
-    website             VARCHAR(255),
-    bio                 TEXT,
-    photo               VARCHAR(255)
+    website             VARCHAR(255) NOT NULL,
+    bio                 TEXT NOT NULL,
+    photo               VARCHAR(255) NOT NULL
 );
 
 SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
