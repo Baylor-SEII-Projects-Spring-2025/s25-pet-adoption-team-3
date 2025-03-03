@@ -45,7 +45,7 @@ public class AdoptionCenterController {
         }
 
         try {
-            String fileName = "profile_photo_user-" + userId + "-" + UUID.randomUUID().toString();
+            String fileName = "profile_photo_adoption_center-" + userId + "-" + UUID.randomUUID().toString();
 
             String uploadedFileUrl = gcsStorageService.uploadFile(file, fileName);
 
