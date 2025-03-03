@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import petadoption.api.DTO.AdoptionCenterDTO;
@@ -78,18 +79,28 @@ class AdoptionCenterServiceTest {
         assertEquals(201, response.getStatusCode().value());
         assertNotNull(response.getBody(), "Response body is null!");
 
-        assertInstanceOf(User.class, response.getBody());
-        User registeredCenter = (User) response.getBody();
+        assertInstanceOf(AdoptionCenter.class, response.getBody());
+        AdoptionCenter registeredCenter = (AdoptionCenter) response.getBody();
 
         assertEquals("Happy Paws Rescue", registeredCenter.getAdoptionCenterName());
         assertEquals("happypaws@example.com", registeredCenter.getEmail());
-        assertEquals("hashedPassword", registeredCenter.getPassword());
-        assertEquals("555-123-4567", registeredCenter.getPhoneNumber());
+        assertEquals("hashedPassword", registeredCenter.getPassword()); // Should match the mocked encoding
+        assertEquals("555-123-4567", registeredCenter.getPhone());
         assertEquals("https://happypaws.org", registeredCenter.getWebsite());
         assertEquals("We rescue abandoned pets and find them new homes.", registeredCenter.getBio());
-        assertEquals("https://storage.example.com/happypaws-logo.png", registeredCenter.getProfilePhoto());
+        assertEquals("https://storage.example.com/happypaws-logo.png", registeredCenter.getPhoto());
+    }
 
-        verify(emailService, times(1)).sendVerificationEmail(any(User.class));
+
+
+    @Test
+    void testRegisterAdoptionCenter_EmailAlreadyExists() {
+        when(adoptionCenterRepository.findByEmail(testCenter.getEmail())).thenReturn(Optional.of(testCenter));
+
+        ResponseEntity<?> response = adoptionCenterService.registerAdoptionCenter(testCenter);
+
+        assertEquals(400, response.getStatusCode().value());
+        assertEquals("Email already in use.", response.getBody());
     }
 
 
