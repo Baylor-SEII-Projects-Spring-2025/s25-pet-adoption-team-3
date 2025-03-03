@@ -61,7 +61,6 @@ class AuthControllerTesting {
         userDTO.setFirstName("David");
         userDTO.setLastName("R");
         userDTO.setPassword("password");
-        userDTO.setRole(User.Role.ADOPTER);
 
         loginRequest = new LoginRequestsDTO();
         loginRequest.setEmail("testuser@example.com");
