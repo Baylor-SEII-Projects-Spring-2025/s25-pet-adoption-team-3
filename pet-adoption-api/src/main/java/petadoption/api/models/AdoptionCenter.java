@@ -28,9 +28,10 @@ public class AdoptionCenter {
     @Column(name = "website", nullable = false)
     private String website;
 
-    @Column(name = "bio", columnDefinition = "TEXT")
+    @Column(name = "bio", columnDefinition = "TEXT", nullable = false)
     private String bio;
 
+    @Column(name = "photo", nullable = false)
     private String photo;
 
 }
