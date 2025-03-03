@@ -26,17 +26,6 @@ CREATE TABLE IF NOT EXISTS token (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS adoption_centers (
-    id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
-    adoption_center_name VARCHAR(255) NOT NULL UNIQUE,
-    email               VARCHAR(255) NOT NULL UNIQUE,
-    password            VARCHAR(255) NOT NULL,
-    phone               VARCHAR(50) NOT NULL,
-    website             VARCHAR(255) NOT NULL,
-    bio                 TEXT NOT NULL,
-    photo               VARCHAR(255) NOT NULL
-);
-
 SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_NAME = 'token' AND COLUMN_NAME = 'token_type'
 LIMIT 1 INTO @column_exists;
