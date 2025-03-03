@@ -22,24 +22,16 @@ public class AdoptionCenterService {
         this.emailService = emailService;
     }
 
-    public ResponseEntity<?> registerAdoptionCenter(AdoptionCenterDTO adoptionCenterDTO) {
-        User user = new User();
-        user.setEmail(adoptionCenterDTO.getEmail());
-        user.setPassword(passwordEncoder.encode(adoptionCenterDTO.getPassword()));
-        user.setRole(User.Role.ADOPTION_CENTER);
-        user.setAdoptionCenterName(adoptionCenterDTO.getAdoptionCenterName());
-        user.setBio(adoptionCenterDTO.getBio());
-        user.setPhoneNumber(adoptionCenterDTO.getPhoneNumber());
-        user.setWebsite(adoptionCenterDTO.getWebsite());
-        user.setProfilePhoto(adoptionCenterDTO.getProfilePhoto());
+    public ResponseEntity<?> registerAdoptionCenter(AdoptionCenter adoptionCenter) {
+        Optional<AdoptionCenter> existingCenter = adoptionCenterRepository.findByEmail(adoptionCenter.getEmail());
+        if(existingCenter.isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email already in use.");
+        }
+        adoptionCenter.setPassword(passwordEncoder.encode(adoptionCenter.getPassword()));
+        adoptionCenterRepository.save(adoptionCenter);
 
-        user.setEmailVerified(false);
-        user.setProfilePhoto(null);
-
-
-        user = userRepository.save(user);
-        emailService.sendVerificationEmail(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+        AdoptionCenter savedAdoptionCenter = adoptionCenterRepository.save(adoptionCenter);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedAdoptionCenter);
     }
 
 }
