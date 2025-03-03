@@ -45,20 +45,67 @@ export default function AdoptionCenterRegisterComponent() {
 
     const handleRegister = async (e) => {
         e.preventDefault();
-        const userData = new FormData();
-        Object.entries(formData).forEach(([key, value]) => {
-            userData.append(key, value);
-        });
+
+        const placeholderPhotoUrl = "https://example.com/default-profile.png"; // Placeholder photo
+
+        // Create user data as JSON (not FormData)
+        const userData = {
+            adoptionCenterName: formData.adoptionCenterName,
+            email: formData.email,
+            password: formData.password,
+            phone: formData.phone,
+            website: formData.website,
+            bio: formData.bio,
+            photo: placeholderPhotoUrl, // Send placeholder initially
+        };
 
         try {
-            const response = await fetch(`${API_URL}/auth/register`, {
-                method: "POST",
-                body: userData,
-            });
+            // Step 1: Register the user with JSON
+            const registerResponse = await fetch(
+                `${API_URL}/api/adoption-center/register`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(userData),
+                },
+            );
 
-            if (!response.ok) throw new Error(await response.text());
+            if (!registerResponse.ok)
+                throw new Error(await registerResponse.text());
 
-            window.location.href = "/login";
+            // ✅ Check if response is JSON
+            const contentType = registerResponse.headers.get("content-type");
+            let registeredUser;
+            if (contentType && contentType.includes("application/json")) {
+                registeredUser = await registerResponse.json(); // Parse JSON response
+            } else {
+                registeredUser = { id: null }; // Backend returned plain text
+            }
+
+            const userId = registeredUser.id; // Extract user ID if available
+            alert("Registration successful! User ID: " + userId + " 🎉" + formData.photo);
+
+
+            // Step 2: Upload the actual profile photo (if provided)
+            if (formData.photo && userId) {
+                const photoFormData = new FormData();
+                photoFormData.append("file", formData.photo);
+
+                const uploadResponse = await fetch(
+                    `${API_URL}/api/adoption-center/${userId}/uploadProfilePhoto`,
+                    {
+                        method: "POST",
+                        body: photoFormData,
+                        credentials: "include",
+                    },
+                );
+
+                if (!uploadResponse.ok) {
+                    throw new Error("Photo upload failed");
+                }
+            }
+
+            window.location.href = "/login"; // Redirect after successful registration
         } catch (error) {
             console.error("Registration failed:", error.message);
             alert("Registration failed: " + error.message);
@@ -230,7 +277,11 @@ export default function AdoptionCenterRegisterComponent() {
                                     >
                                         Back
                                     </Button>
-                                    <Button type="submit" variant="contained" disabled={!isStep3Valid}>
+                                    <Button
+                                        type="submit"
+                                        variant="contained"
+                                        disabled={!isStep3Valid}
+                                    >
                                         Sign Up
                                     </Button>
                                 </section>
@@ -240,7 +291,7 @@ export default function AdoptionCenterRegisterComponent() {
                 </section>
                 <section className={styles.registerRightSection}>
                     <img
-                        src="/images/register_image_right.png"
+                        src="/images/adoption-center_register_image_right.png"
                         alt="Register"
                         className={styles.registerImage}
                     />
