@@ -54,7 +54,6 @@ class UserControllerTest {
         userDTO.setFirstName("Dan");
         userDTO.setLastName("R");
         userDTO.setPassword("password");
-        userDTO.setRole(User.Role.ADOPTER);
         userDTO.setEmail("newemail@example.com");
         userDTO.setFirstName("NewFirstName");
         userDTO.setLastName("NewLastName");

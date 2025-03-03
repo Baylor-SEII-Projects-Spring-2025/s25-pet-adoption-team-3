@@ -2,14 +2,19 @@ CREATE DATABASE IF NOT EXISTS petadoption;
 USE petadoption;
 
 CREATE TABLE IF NOT EXISTS users (
-    user_id           BIGINT AUTO_INCREMENT PRIMARY KEY,
-    password          VARCHAR(255),
-    email             VARCHAR(255)                        NOT NULL UNIQUE,
-    first_name        VARCHAR(255)                        NOT NULL,
-    last_name         VARCHAR(255),
-    role              ENUM ('ADOPTER', 'ADOPTION_CENTER') NOT NULL,
-    is_email_verified BIT(1)                              NOT NULL,
-    profile_photo     VARCHAR(255)
+    user_id              BIGINT AUTO_INCREMENT PRIMARY KEY,
+    password             VARCHAR(255)                        NOT NULL,
+    email                VARCHAR(255)                        NOT NULL UNIQUE,
+    first_name           VARCHAR(255),
+    last_name            VARCHAR(255),
+    role                 ENUM ('ADOPTER', 'ADOPTION_CENTER') NOT NULL,
+    is_email_verified    BIT(1)                              NOT NULL,
+    profile_photo        VARCHAR(255),
+    adoption_center_name VARCHAR(255),
+    bio                  TEXT,
+    phone_number         VARCHAR(255),
+    website              VARCHAR(255)
+
 );
 
 CREATE TABLE IF NOT EXISTS token (
@@ -19,17 +24,6 @@ CREATE TABLE IF NOT EXISTS token (
     expiry_date DATETIME(6) NOT NULL,
     token_type  ENUM('EMAIL_VERIFICATION', 'PASSWORD_RESET') NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS adoption_centers (
-    id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
-    adoption_center_name VARCHAR(255) NOT NULL UNIQUE,
-    email               VARCHAR(255) NOT NULL UNIQUE,
-    password            VARCHAR(255) NOT NULL,
-    phone               VARCHAR(50) NOT NULL,
-    website             VARCHAR(255) NOT NULL,
-    bio                 TEXT NOT NULL,
-    photo               VARCHAR(255) NOT NULL
 );
 
 SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
