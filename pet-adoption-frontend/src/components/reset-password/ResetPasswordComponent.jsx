@@ -4,6 +4,7 @@ import { TextField, Button } from "@mui/material";
 import styles from "@/styles/ResetPasswordComponent.module.css";
 import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "@/utils/theme";
+import PasswordStrengthBar from "react-password-strength-bar";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -13,14 +14,17 @@ export default function ResetPasswordComponent() {
     const [token, setToken] = useState(null);
     const [message, setMessage] = useState("");
     const searchParams = useSearchParams();
+    const [passwordScore, setPasswordScore] = useState(0);
+    const [passwordFocused, setPasswordFocused] = useState(false);
+    const [isPasswordSame, setIsPasswordSame] = useState(false);
 
     useEffect(() => {
         const tokenFromUrl = searchParams.get("token");
 
         if (tokenFromUrl) {
             setToken(tokenFromUrl);
-        } 
-    }, [searchParams]); // Remove `token` dependency to prevent unnecessary re-renders
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         console.log("Token:", token);
@@ -40,13 +44,16 @@ export default function ResetPasswordComponent() {
         }
 
         try {
-            const response = await fetch(`${API_URL}/api/users/reset-password`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
+            const response = await fetch(
+                `${API_URL}/api/users/reset-password`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ token, newPassword: password }),
                 },
-                body: JSON.stringify({ token, newPassword: password }),
-            });
+            );
 
             if (!response.ok) {
                 throw new Error("Failed to reset password");
@@ -60,6 +67,18 @@ export default function ResetPasswordComponent() {
             setMessage("Failed to reset password.");
         }
     };
+
+    const handleConfirmPasswordChange = (e) => {
+        const value = e.target.value;
+        setConfirmPassword(value);
+        setIsPasswordSame(value === password);
+    };
+
+    const isFormValid =
+        password.trim() &&
+        confirmPassword.trim() &&
+        passwordScore >= 2 &&
+        isPasswordSame;
 
     return (
         <ThemeProvider theme={theme}>
@@ -79,10 +98,26 @@ export default function ResetPasswordComponent() {
                                 id="password"
                                 type="password"
                                 size="small"
+                                className={styles.passwordInput}
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
+                                onChange={(e) => {
+                                    setPassword(e.target.value);
+                                    setIsPasswordSame(
+                                        e.target.value === confirmPassword,
+                                    );
+                                }}
+                                onFocus={() => setPasswordFocused(true)}
+                                onBlur={() => setPasswordFocused(false)}
                             />
+
+                            {passwordFocused && (
+                                <PasswordStrengthBar
+                                    password={password}
+                                    onChangeScore={(score) =>
+                                        setPasswordScore(score)
+                                    }
+                                />
+                            )}
 
                             <TextField
                                 label="Confirm Password"
@@ -90,10 +125,17 @@ export default function ResetPasswordComponent() {
                                 type="password"
                                 size="small"
                                 value={confirmPassword}
-                                onChange={(e) =>
-                                    setConfirmPassword(e.target.value)
+                                onChange={handleConfirmPasswordChange}
+                                error={
+                                    confirmPassword.length > 0 &&
+                                    !isPasswordSame
                                 }
-                                required
+                                helperText={
+                                    confirmPassword.length > 0 &&
+                                    !isPasswordSame
+                                        ? "Passwords do not match"
+                                        : ""
+                                }
                             />
                         </section>
 
@@ -101,7 +143,7 @@ export default function ResetPasswordComponent() {
                             <Button
                                 type="submit"
                                 variant="contained"
-                                disabled={!token}
+                                disabled={!token || !isFormValid}
                             >
                                 Reset Password
                             </Button>
