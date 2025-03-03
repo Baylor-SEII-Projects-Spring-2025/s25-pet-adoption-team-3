@@ -56,7 +56,6 @@ public class AuthenticationController {
         return ResponseEntity.ok(response);
     }
 
-
     // Check if user has an active session
     @GetMapping("/session")
     public ResponseEntity<?> getSession(HttpSession session) {

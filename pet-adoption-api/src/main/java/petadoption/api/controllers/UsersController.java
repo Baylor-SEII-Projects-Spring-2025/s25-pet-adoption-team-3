@@ -155,10 +155,8 @@ public class UsersController {
         user.setProfilePhoto(null);
         userRepository.save(user);
 
-        // Force a fresh retrieval of the updated user
         User updatedUser = userRepository.findById(userId).orElse(user);
 
-        // Invalidate the old session and create a new one
         request.getSession().invalidate();
         HttpSession newSession = request.getSession(true);
         System.out.println("User DELETE PHOTO: " + updatedUser);
@@ -174,28 +172,22 @@ public class UsersController {
         }
 
         try {
-            // Generate a unique filename
             String fileName = "profile_photo_user-" + userId + "-" + UUID.randomUUID().toString();
 
-            // Upload the file to GCS and get the public URL
             String uploadedFileUrl = gcsStorageService.uploadFile(file, fileName);
 
-            // Update the user's profile with the new URL
             User user = userOptional.get();
             user.setProfilePhoto(uploadedFileUrl);
 
-            // Ensure transaction commits before fetching
             userRepository.saveAndFlush(user);
 
-            // Force Hibernate to reload the user from DB
             User updatedUser = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found after update"));
 
-            // Invalidate the old session and create a new one
             request.getSession().invalidate();
             HttpSession newSession = request.getSession(true);
             newSession.setAttribute("user", updatedUser);
 
-            System.out.println("User AFTER UPLOAD: " + updatedUser.getProfilePhoto()); // Debugging
+            System.out.println("User AFTER UPLOAD: " + updatedUser.getProfilePhoto());
 
             return ResponseEntity.ok(updatedUser);
         } catch (IOException e) {
@@ -211,6 +203,7 @@ public class UsersController {
 
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> request) {
+
         String token = request.get("token");
         String newPassword = request.get("newPassword");
         return userService.resetPassword(token, newPassword);
