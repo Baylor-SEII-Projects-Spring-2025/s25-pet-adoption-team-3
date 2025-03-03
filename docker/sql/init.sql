@@ -26,33 +26,16 @@ CREATE TABLE IF NOT EXISTS token (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS pet (
+CREATE TABLE IF NOT EXISTS adoption_centers (
     id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name                VARCHAR(255) NOT NULL,
-    adoption_center_id  BIGINT       NOT NULL,
-    breed               VARCHAR(255) NOT NULL,
-    spayed_status       VARCHAR(255) NOT NULL,
-    birthdate           DATE         NOT NULL,
-    about_me            TEXT,
-    extra1              VARCHAR(255) NOT NULL,
-    extra2              VARCHAR(255) NOT NULL,
-    extra3              VARCHAR(255) NOT NULL,
-    image_url            VARCHAR(255),
-    availability_status   ENUM('AVAILABLE', 'ARCHIVED') NOT NULL DEFAULT 'AVAILABLE',
-    FOREIGN KEY (adoption_center_id) REFERENCES users(user_id) ON DELETE CASCADE
+    adoption_center_name VARCHAR(255) NOT NULL UNIQUE,
+    email               VARCHAR(255) NOT NULL UNIQUE,
+    password            VARCHAR(255) NOT NULL,
+    phone               VARCHAR(50) NOT NULL,
+    website             VARCHAR(255) NOT NULL,
+    bio                 TEXT NOT NULL,
+    photo               VARCHAR(255) NOT NULL
 );
-
-CREATE TABLE IF NOT EXISTS event (
-    id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
-    adoption_center_id  BIGINT       NOT NULL,
-    image               VARCHAR(255) NOT NULL,
-    title               VARCHAR(255) NOT NULL,
-    description         TEXT         NOT NULL,
-    start_date          DATE         NOT NULL,
-    end_date            DATE         NOT NULL,
-    FOREIGN KEY (adoption_center_id) REFERENCES users(user_id) ON DELETE CASCADE
-    );
-
 
 SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
 WHERE TABLE_NAME = 'token' AND COLUMN_NAME = 'token_type'
