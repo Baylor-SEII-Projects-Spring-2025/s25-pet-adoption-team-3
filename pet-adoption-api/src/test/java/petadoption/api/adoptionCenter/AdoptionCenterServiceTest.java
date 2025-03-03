@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import petadoption.api.models.AdoptionCenter;
@@ -55,8 +56,19 @@ class AdoptionCenterServiceTest {
 
         assertEquals(201, response.getStatusCode().value());
         assertNotNull(response.getBody(), "Response body is null!");
-        assertTrue(response.getBody().toString().contains("Adoption Center: Happy Paws Rescue registered successfully"));
+
+        assertInstanceOf(AdoptionCenter.class, response.getBody());
+        AdoptionCenter registeredCenter = (AdoptionCenter) response.getBody();
+
+        assertEquals("Happy Paws Rescue", registeredCenter.getAdoptionCenterName());
+        assertEquals("happypaws@example.com", registeredCenter.getEmail());
+        assertEquals("hashedPassword", registeredCenter.getPassword()); // Should match the mocked encoding
+        assertEquals("555-123-4567", registeredCenter.getPhone());
+        assertEquals("https://happypaws.org", registeredCenter.getWebsite());
+        assertEquals("We rescue abandoned pets and find them new homes.", registeredCenter.getBio());
+        assertEquals("https://storage.example.com/happypaws-logo.png", registeredCenter.getPhoto());
     }
+
 
 
     @Test

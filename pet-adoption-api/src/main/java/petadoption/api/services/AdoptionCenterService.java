@@ -27,6 +27,8 @@ public class AdoptionCenterService {
         }
         adoptionCenter.setPassword(passwordEncoder.encode(adoptionCenter.getPassword()));
         adoptionCenterRepository.save(adoptionCenter);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Adoption Center: " + adoptionCenter.getAdoptionCenterName() + " registered successfully.");
+
+        AdoptionCenter savedAdoptionCenter = adoptionCenterRepository.save(adoptionCenter);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedAdoptionCenter);
     }
 }
