@@ -23,6 +23,7 @@
     "next": "^15.1.6",
     "node": "^23.7.0",
     "pet-adoption-frontend": "file:",
+    "prop-types": "^15.8.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-password-strength-bar": "^0.4.1",

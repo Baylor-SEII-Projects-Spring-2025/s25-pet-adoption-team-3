@@ -41,6 +41,10 @@ export default function ProfileNavbar() {
             const data = await response.json();
             console.log("✅ Session found:", data);
             setUser(data.user);
+
+            if (data.user.role == "ADOPTION_CENTER") {
+                Router.push("/adoption-center/dashboard");
+            }
         } catch (error) {
             console.error("Error fetching session:", error);
         }
@@ -140,7 +144,7 @@ export default function ProfileNavbar() {
                                 src={user.profilePhoto || undefined}
                                 onClick={handleToggle}
                             >
-                                {!user.picture && (
+                                {!user.picture && user.role != "ADOPTION_CENTER" && (
                                     <>
                                         {user.firstName.charAt(0)}
                                         {user.lastName

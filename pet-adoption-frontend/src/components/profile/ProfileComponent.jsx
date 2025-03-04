@@ -67,6 +67,12 @@ export default function ProfileDashboardComponent() {
         }
     }, []);
 
+    useEffect(() => {
+        if (user && user.role === "ADOPTION_CENTER") {
+            Router.push("/adoption-center/dashboard");
+        }
+    }, [user]);
+
     const handleDeletePhoto = async () => {
         try {
             const response = await fetch(

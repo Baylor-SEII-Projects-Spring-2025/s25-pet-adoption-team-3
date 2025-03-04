@@ -5,10 +5,12 @@ import styles from "@/styles/ForgotPasswordComponent.module.css";
 import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "@/utils/theme";
 import { useRouter } from "next/router";
+import { CircularProgress } from "@mui/material";
 
 export default function ForgotPasswordComponent() {
     const [email, setEmail] = useState("");
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
 
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -48,8 +50,11 @@ export default function ForgotPasswordComponent() {
         }
     }, []);
 
+    const isFormValid = email.trim();
+
     const handleforgotPassword = (e) => {
         e.preventDefault();
+        setLoading(true);
         if (!email) {
             alert("Please enter your email");
             return;
@@ -78,6 +83,7 @@ export default function ForgotPasswordComponent() {
                 console.error("Error sending email:", error);
                 alert("Error sending email");
             });
+        setLoading(false);
     };
 
     return (
@@ -101,8 +107,20 @@ export default function ForgotPasswordComponent() {
                         </section>
 
                         <section className={styles.forgotPasswordButton}>
-                            <Button type="submit" variant="contained">
-                                Send email link
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                disabled={loading || !isFormValid}
+                                startIcon={
+                                    loading ? (
+                                        <CircularProgress
+                                            size={20}
+                                            color="inherit"
+                                        />
+                                    ) : null
+                                }
+                            >
+                                {loading ? "Sending link..." : "Send email link"}
                             </Button>
                         </section>
                         <p>

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +39,9 @@ public class UsersController {
     private final UserRepository userRepository;
     private final GCSStorageService gcsStorageService;
     private final TokenRepository tokenRepository;
+
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     public UsersController(UserService userService, UserRepository userRepository, TokenRepository tokenRepository) {
         this.userService = userService;
@@ -93,7 +97,7 @@ public class UsersController {
         userRepository.save(user);
         tokenRepository.delete(verificationToken);
 
-        response.sendRedirect("/email-verified");
+        response.sendRedirect(frontendUrl + "/email-verified");
     }
 
 

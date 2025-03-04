@@ -6,17 +6,22 @@ import styles from "@/styles/LoginComponent.module.css";
 import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "@/utils/theme";
 import { loginWithGoogle } from "@/utils/auth";
+import { CircularProgress } from "@mui/material";
 
 export default function LoginComponent() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [user, setUser] = useState(null);
     const router = useRouter();
+    const [loading, setLoading] = useState(false);
 
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+    const isFormValid = email.trim() && password.trim();
+
     const handleEmailLogin = async (e) => {
         e.preventDefault();
+        setLoading(true);
         try {
             const response = await fetch(`${API_URL}/auth/login`, {
                 method: "POST",
@@ -44,6 +49,8 @@ export default function LoginComponent() {
             router.push("/profile");
         } catch (error) {
             alert(error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -112,9 +119,22 @@ export default function LoginComponent() {
                         </section>
 
                         <a href="/forgot-password">Forgot Password?</a>
+
                         <section className={styles.loginButton}>
-                            <Button type="submit" variant="contained">
-                                Sign in
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                disabled={!isFormValid || loading}
+                                startIcon={
+                                    loading ? (
+                                        <CircularProgress
+                                            size={20}
+                                            color="inherit"
+                                        />
+                                    ) : null
+                                }
+                            >
+                                {loading ? "Logging in..." : "Login"}
                             </Button>
 
                             <Button
