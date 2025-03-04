@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Router from "next/router";
 import { TextField, Button, Input } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import PasswordStrengthBar from "react-password-strength-bar";
@@ -108,7 +109,7 @@ export default function AdoptionCenterRegisterComponent() {
                 }
             }
 
-            window.location.href = "/login";
+            Router.push(`/email-sent?email=${encodeURIComponent(formData.email)}`);
         } catch (error) {
             console.error("Registration failed:", error.message);
             alert("Registration failed: " + error.message);
