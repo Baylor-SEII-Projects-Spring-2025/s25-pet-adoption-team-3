@@ -28,7 +28,7 @@ public class UserService {
         this.tokenRepository = tokenRepository;
     }
 
-    public ResponseEntity<?>registerUser(UserDTO userDTO) {
+    public ResponseEntity<?> registerUser(UserDTO userDTO) {
         if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email already exists");
         }
@@ -49,16 +49,16 @@ public class UserService {
         return ResponseEntity.status(HttpStatus.CREATED).body("User: " + user.getEmail() + " created successfully");
     }
 
-    public ResponseEntity<?>authenticateUser(String email, String password) {
+    public ResponseEntity<?> authenticateUser(String email, String password) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
-        if(optionalUser.isEmpty()){
+        if (optionalUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Email or Password");
         }
         User user = optionalUser.get();
-        if(!user.isEmailVerified()){
+        if (!user.isEmailVerified()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Email not verified. Please verify your email before logging in.");
         }
-        if(!passwordEncoder.matches(password, user.getPassword())){
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Password");
         }
         return ResponseEntity.status(HttpStatus.OK).body(user);
@@ -76,13 +76,13 @@ public class UserService {
         return ResponseEntity.ok("Password reset link sent to your email.");
     }
 
-    public ResponseEntity<String> resetPassword(String token, String newPassword){
+    public ResponseEntity<String> resetPassword(String token, String newPassword) {
         Optional<Token> originalToken = tokenRepository.findByTokenAndTokenType(token, Token.TokenType.PASSWORD_RESET);
-        if(originalToken.isEmpty()){
+        if (originalToken.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or Expired Token");
         }
         Token resetToken = originalToken.get();
-        if(resetToken.getExpiryDate().isBefore(LocalDateTime.now())){
+        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             tokenRepository.delete(resetToken);
             return ResponseEntity.badRequest().body("Token expired");
         }
@@ -93,4 +93,26 @@ public class UserService {
         return ResponseEntity.ok("Password reset successful.");
 
     }
+
+    public ResponseEntity<String> resendVerificationEmail(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found.");
+        }
+
+        User user = optionalUser.get();
+
+        if (user.isEmailVerified()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email is already verified.");
+        }
+
+        Optional<Token> existingToken = tokenRepository.findByUserAndTokenType(user, Token.TokenType.EMAIL_VERIFICATION);
+        existingToken.ifPresent(tokenRepository::delete);
+
+        emailService.sendVerificationEmail(user);
+
+        return ResponseEntity.ok("Verification email resent successfully.");
+    }
+
+
 }
