@@ -5,6 +5,7 @@ import styles from "@/styles/ResetPasswordComponent.module.css";
 import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "@/utils/theme";
 import PasswordStrengthBar from "react-password-strength-bar";
+import { CircularProgress } from "@mui/material";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -17,6 +18,7 @@ export default function ResetPasswordComponent() {
     const [passwordScore, setPasswordScore] = useState(0);
     const [passwordFocused, setPasswordFocused] = useState(false);
     const [isPasswordSame, setIsPasswordSame] = useState(false);
+    const [loading, setloading] = useState(false);
 
     useEffect(() => {
         const tokenFromUrl = searchParams.get("token");
@@ -32,6 +34,7 @@ export default function ResetPasswordComponent() {
 
     const handleResetPassword = async (e) => {
         e.preventDefault();
+        setloading(true);
 
         if (!password || !confirmPassword) {
             alert("Please fill in both fields.");
@@ -65,7 +68,10 @@ export default function ResetPasswordComponent() {
         } catch (error) {
             console.error("Error resetting password:", error);
             setMessage("Failed to reset password.");
+        } finally {
+            setloading(false);
         }
+
     };
 
     const handleConfirmPasswordChange = (e) => {
@@ -143,9 +149,17 @@ export default function ResetPasswordComponent() {
                             <Button
                                 type="submit"
                                 variant="contained"
-                                disabled={!token || !isFormValid}
+                                disabled={!token || !isFormValid || loading}
+                                startIcon={
+                                    loading ? (
+                                        <CircularProgress
+                                            size={20}
+                                            color="inherit"
+                                        />
+                                    ) : null
+                                }
                             >
-                                Reset Password
+                                {loading ? "Updating password..." : "Reset Password"}
                             </Button>
                         </section>
                     </form>

@@ -6,6 +6,7 @@ import PasswordStrengthBar from "react-password-strength-bar";
 import { theme } from "@/utils/theme";
 import { loginWithGoogle } from "@/utils/auth";
 import styles from "@/styles/RegisterComponent.module.css";
+import { CircularProgress } from "@mui/material";
 
 export default function RegisterComponent() {
     const [firstName, setFirstName] = useState("");
@@ -18,6 +19,7 @@ export default function RegisterComponent() {
     const [isPasswordSame, setIsPasswordSame] = useState(false);
     const [user, setUser] = useState(null);
     const router = useRouter();
+    const [loading, setLoading] = useState(false);
 
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -58,6 +60,7 @@ export default function RegisterComponent() {
 
     const handleRegister = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
         const userData = {
             firstName,
@@ -81,10 +84,13 @@ export default function RegisterComponent() {
                 throw new Error(errorMessage);
             }
 
-            window.location.href = "/login";
+            router.push(`/email-sent?email=${encodeURIComponent(email)}`);
         } catch (error) {
             console.error("Registration failed:", error.message);
             alert("Registration failed: " + error.message);
+        } finally {
+            setLoading(false);
+
         }
     };
 
@@ -194,9 +200,17 @@ export default function RegisterComponent() {
                             <Button
                                 type="submit"
                                 variant="contained"
-                                disabled={!isFormValid}
+                                disabled={!isFormValid || loading}
+                                startIcon={
+                                    loading ? (
+                                        <CircularProgress
+                                            size={20}
+                                            color="inherit"
+                                        />
+                                    ) : null
+                                }
                             >
-                                Sign up
+                                {loading ? "Creating account..." : "Register"}
                             </Button>
 
                             <Button

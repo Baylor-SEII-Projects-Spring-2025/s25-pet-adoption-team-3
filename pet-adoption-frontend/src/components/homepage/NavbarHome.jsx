@@ -135,7 +135,7 @@ export default function Navbar() {
                                 src={user.profilePhoto || undefined}
                                 onClick={handleToggle}
                             >
-                                {!user.profilePhoto && (
+                                {!user.profilePhoto && user.role != "ADOPTION_CENTER" && (
                                     <>
                                         {user.firstName.charAt(0)}
                                         {user.lastName

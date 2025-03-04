@@ -4,6 +4,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import PasswordStrengthBar from "react-password-strength-bar";
 import { theme } from "@/utils/theme";
 import styles from "@/styles/AdoptionCenterRegisterComponent.module.css";
+import { CircularProgress } from "@mui/material";
 
 export default function AdoptionCenterRegisterComponent() {
     const [step, setStep] = useState(1);
@@ -22,6 +23,7 @@ export default function AdoptionCenterRegisterComponent() {
     const [passwordFocused, setPasswordFocused] = useState(false);
     const [isPasswordSame, setIsPasswordSame] = useState(false);
     const [previewImage, setPreviewImage] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -45,10 +47,10 @@ export default function AdoptionCenterRegisterComponent() {
 
     const handleRegister = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
-        const placeholderPhotoUrl = "https://example.com/default-profile.png"; // Placeholder photo
+        const placeholderPhotoUrl = "https://example.com/default-profile.png";
 
-        // Create user data as JSON (not FormData)
         const userData = {
             adoptionCenterName: formData.adoptionCenterName,
             email: formData.email,
@@ -56,11 +58,10 @@ export default function AdoptionCenterRegisterComponent() {
             phone: formData.phone,
             website: formData.website,
             bio: formData.bio,
-            photo: placeholderPhotoUrl, // Send placeholder initially
+            photo: placeholderPhotoUrl,
         };
 
         try {
-            // Step 1: Register the user with JSON
             const registerResponse = await fetch(
                 `${API_URL}/api/adoption-center/register`,
                 {
@@ -73,26 +74,28 @@ export default function AdoptionCenterRegisterComponent() {
             if (!registerResponse.ok)
                 throw new Error(await registerResponse.text());
 
-            // ✅ Check if response is JSON
             const contentType = registerResponse.headers.get("content-type");
             let registeredUser;
             if (contentType && contentType.includes("application/json")) {
-                registeredUser = await registerResponse.json(); // Parse JSON response
+                registeredUser = await registerResponse.json();
             } else {
-                registeredUser = { id: null }; // Backend returned plain text
+                registeredUser = { id: null };
             }
 
-            const userId = registeredUser.id; // Extract user ID if available
-            alert("Registration successful! User ID: " + userId + " 🎉" + formData.photo);
+            const userId = registeredUser.id;
+            alert(
+                "Registration successful! User ID: " +
+                    userId +
+                    " 🎉" +
+                    formData.photo,
+            );
 
-
-            // Step 2: Upload the actual profile photo (if provided)
             if (formData.photo && userId) {
                 const photoFormData = new FormData();
                 photoFormData.append("file", formData.photo);
 
                 const uploadResponse = await fetch(
-                    `${API_URL}/api/adoption-center/${userId}/uploadProfilePhoto`,
+                    `${API_URL}/api/users/${userId}/uploadProfilePhoto`,
                     {
                         method: "POST",
                         body: photoFormData,
@@ -105,10 +108,12 @@ export default function AdoptionCenterRegisterComponent() {
                 }
             }
 
-            window.location.href = "/login"; // Redirect after successful registration
+            window.location.href = "/login";
         } catch (error) {
             console.error("Registration failed:", error.message);
             alert("Registration failed: " + error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -280,9 +285,17 @@ export default function AdoptionCenterRegisterComponent() {
                                     <Button
                                         type="submit"
                                         variant="contained"
-                                        disabled={!isStep3Valid}
+                                        disabled={!isStep3Valid || loading}
+                                        startIcon={
+                                            loading ? (
+                                                <CircularProgress
+                                                    size={20}
+                                                    color="inherit"
+                                                />
+                                            ) : null
+                                        }
                                     >
-                                        Sign Up
+                                        {loading ? "Creating account..." : "Sign Up"}
                                     </Button>
                                 </section>
                             </>
