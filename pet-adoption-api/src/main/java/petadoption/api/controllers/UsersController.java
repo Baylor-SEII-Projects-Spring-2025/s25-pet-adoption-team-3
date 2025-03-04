@@ -100,6 +100,10 @@ public class UsersController {
         response.sendRedirect(frontendUrl + "/email-verified");
     }
 
+    @PutMapping("/resend-verification")
+    public ResponseEntity<String> resendVerificationEmail(@RequestParam String email) {
+        return userService.resendVerificationEmail(email);
+    }
 
     @PutMapping("/changeFirstName/{userId}")
     public ResponseEntity<String> changeFirstName(@PathVariable Long userId, @RequestBody UserDTO userDTO) {

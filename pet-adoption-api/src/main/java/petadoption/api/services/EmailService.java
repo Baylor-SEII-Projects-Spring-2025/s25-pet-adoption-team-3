@@ -67,7 +67,7 @@ public class EmailService {
         }
     }
 
-    private String generateToken(User user, Token.TokenType tokenType) {
+    public String generateToken(User user, Token.TokenType tokenType) {
         String token = UUID.randomUUID().toString();
         Token tokenEntity = new Token();
         tokenEntity.setToken(token);
