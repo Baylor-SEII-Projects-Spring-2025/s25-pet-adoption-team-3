@@ -99,8 +99,7 @@ export default function AdoptionCenterRegisterComponent() {
                     `${API_URL}/api/users/${userId}/uploadProfilePhoto`,
                     {
                         method: "POST",
-                        body: photoFormData,
-                        credentials: "include",
+                        body: photoFormData
                     },
                 );
 
