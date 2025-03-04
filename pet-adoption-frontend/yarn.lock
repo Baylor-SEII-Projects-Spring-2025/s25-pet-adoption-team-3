@@ -1030,9 +1030,9 @@ callsites@^3.0.0:
   integrity sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==
 
 caniuse-lite@^1.0.30001579:
-  version "1.0.30001701"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001701.tgz#ad9c90301f7153cf6b3314d16cc30757285bf9e7"
-  integrity sha512-faRs/AW3jA9nTwmJBSO1PQ6L/EOgsB5HMQQq4iCu5zhPgVVgO/pZRHlmatwijZKetFw8/Pr4q6dEN8sJuq8qTw==
+  version "1.0.30001702"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001702.tgz#cde16fa8adaa066c04aec2967b6cde46354644c4"
+  integrity sha512-LoPe/D7zioC0REI5W73PeR1e1MLCipRGq/VkovJnd6Df+QVqT+vT33OXCp8QUd7kA7RZrHWxb1B36OQKI/0gOA==
 
 chalk@^4.0.0:
   version "4.1.2"
@@ -2528,7 +2528,8 @@ path-type@^4.0.0:
     dotenv "^16.4.7"
     next "^15.1.6"
     node "^23.7.0"
-    pet-adoption-frontend "file:../../../../Library/Caches/Yarn/v6/npm-pet-adoption-frontend-1.0.0-98788dbd-719b-4f95-9296-d78b87ad0ce6-1741044735475/node_modules/pet-adoption-frontend"
+    pet-adoption-frontend "file:../../../../Library/Caches/Yarn/v6/npm-pet-adoption-frontend-1.0.0-566d3a2a-6ddc-4b69-a5c9-e92fa5b2758a-1741067273668/node_modules/pet-adoption-frontend"
+    prop-types "^15.8.1"
     react "^19.0.0"
     react-dom "^19.0.0"
     react-password-strength-bar "^0.4.1"
