@@ -62,7 +62,6 @@
     align-items: left;
     margin-left: 30;
     width: 100%;
-    min-width: fit-content;
 }
 
 .dashboardWrapper {
@@ -190,15 +189,15 @@
     display: flex;
     flex-direction: column;
     align-items: left;
+    width: 100%;
+    margin-right: 30px;
     gap: 20px;
-    width: fit-content;
     padding-bottom: 100px;
 }
 
 .likesContent {
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 20px;
     width: 100%;
 }
@@ -206,10 +205,11 @@
 .likesNavbar {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: right;
     gap: 20px;
     width: 100%;
     margin: 0 auto;
+    margin-left: 20px;
     cursor: pointer;
     justify-content: center;
 }
@@ -267,15 +267,38 @@
     margin: 0 auto;
 }
 
+.petsHeader{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+}
 
+.addPetButton{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    margin-left: auto;
+    width: 100%;
+    margin-left: auto;
+    justify-content: flex-end !important;
+    max-width: 120px;
+}
 
-@media (max-width: 1270px) {
-    .dashboardHeaderContent {
-        flex-direction: column;
-        margin: 0 auto;
-    }
+.addPetButton img{
+    width: 12px;
+    height: 12px;
+    margin-right: 10px;
+}
 
-    .profileMessaging {
-        max-width: 100%;
-    }
+.petsText{
+    display: flex;
+    justify-content: center;
+}
+
+.archivedPets{
+    display: flex;
+    justify-content: center;
 }

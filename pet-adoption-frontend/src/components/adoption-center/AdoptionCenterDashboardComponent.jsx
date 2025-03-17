@@ -23,7 +23,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function ProfileDashboardComponent() {
     const [selectedNav, setSelectedNav] = useState("Dashboard");
-    const [selectedLikes, setSelectedLikes] = useState("My Likes");
+    const [selectedPets, setSelectedPets] = useState("My Pets");
     const [user, setUser] = useState(null);
     const [uploadError, setUploadError] = useState("");
     const anchorRef = useRef(null);
@@ -31,6 +31,15 @@ export default function ProfileDashboardComponent() {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+
+    const [openModal, setOpenModal] = React.useState(false);
+
+    const handleModalOpen = () => {
+        setOpenModal(true);
+    };
+    const handleModalClose = () => {
+        setOpenModal(false);
+    };
 
     const fetchUserSession = async () => {
         try {
@@ -52,7 +61,6 @@ export default function ProfileDashboardComponent() {
             if (!response.ok) {
                 throw new Error("Error fetching session");
             }
-
 
             const data = await response.json();
 
@@ -177,12 +185,12 @@ export default function ProfileDashboardComponent() {
                         Dashboard
                     </p>
                     <p
-                        onClick={() => setSelectedNav("My Likes")}
+                        onClick={() => setSelectedNav("My Pets")}
                         className={
-                            selectedNav === "My Likes" ? styles.active : ""
+                            selectedNav === "My Pets" ? styles.active : ""
                         }
                     >
-                        My Likes
+                        My Pets
                     </p>
                     <p
                         onClick={() => setSelectedNav("Settings")}
@@ -208,9 +216,8 @@ export default function ProfileDashboardComponent() {
                                             className={
                                                 styles.dashboardWrapperHeader
                                             }
-                                        >   
+                                        >
                                             <h1>
-                                                Welcome Back,{" "}
                                                 {user?.adoptionCenterName || ""}
                                             </h1>
                                         </div>
@@ -245,7 +252,7 @@ export default function ProfileDashboardComponent() {
                                     </div>
                                 </div>
                                 <div className={styles.profileMatches}>
-                                    <p>Potential Matches</p>
+                                    <p>My Pets</p>
 
                                     {user?.matches?.length === 0 ||
                                     !user?.matches ? (
@@ -254,9 +261,7 @@ export default function ProfileDashboardComponent() {
                                                 src="/icons/no_matches.png"
                                                 alt="No matches"
                                             />
-                                            <p>
-                                                No matches found, keep swiping!
-                                            </p>
+                                            <p>No pets found, add some pets!</p>
                                         </div>
                                     ) : (
                                         <ul>
@@ -274,58 +279,107 @@ export default function ProfileDashboardComponent() {
                         )}
                     </div>
 
-                    {selectedNav === "My Likes" && (
+                    {selectedNav === "My Pets" && (
                         <div className={styles.likesContent}>
-                            <div className={styles.likesNavbar}>
-                                <p
-                                    onClick={() => setSelectedLikes("My Likes")}
-                                    className={
-                                        selectedLikes === "My Likes"
-                                            ? styles.likesActive
-                                            : ""
-                                    }
-                                >
-                                    My Likes
-                                </p>
+                            <div className={styles.petsHeader}>
+                                <div className={styles.likesNavbar}>
+                                    <p
+                                        onClick={() =>
+                                            setSelectedPets("My Pets")
+                                        }
+                                        className={
+                                            selectedPets === "My Pets"
+                                                ? styles.likesActive
+                                                : ""
+                                        }
+                                    >
+                                        My Pets
+                                    </p>
 
-                                <div
-                                    className={styles.likesNavbarDivider}
-                                ></div>
+                                    <div
+                                        className={styles.likesNavbarDivider}
+                                    ></div>
 
-                                <p
-                                    onClick={() =>
-                                        setSelectedLikes("Super Likes")
-                                    }
-                                    className={
-                                        selectedLikes === "Super Likes"
-                                            ? styles.likesActive
-                                            : ""
-                                    }
-                                >
-                                    Super Likes
-                                </p>
+                                    <p
+                                        onClick={() =>
+                                            setSelectedPets("Archived Pets")
+                                        }
+                                        className={
+                                            selectedPets === "Archived Pets"
+                                                ? styles.likesActive
+                                                : ""
+                                        }
+                                    >
+                                        Archived Pets
+                                    </p>
+                                </div>
                             </div>
                             <div className={styles.likesContent}>
-                                {selectedLikes === "My Likes" && (
+                                {selectedPets === "My Pets" && (
                                     <div>
-                                        {user?.likes?.length > 0 ? (
-                                            <ul>
-                                                {user.likes.map(
-                                                    (like, index) => (
-                                                        <li key={index}>
-                                                            {like}
-                                                        </li>
-                                                    ),
-                                                )}
-                                            </ul>
-                                        ) : (
-                                            <p>No likes found.</p>
-                                        )}
+                                        <div className={styles.addPetButton}>
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                onClick={handleModalOpen}
+                                            >
+                                                <img
+                                                    src="/icons/plus_icon.png"
+                                                    alt="Add"
+                                                />
+                                                Add Pet
+                                            </Button>
+                                            <Modal
+                                                open={openModal}
+                                                onClose={handleModalClose}
+                                                aria-labelledby="child-modal-title"
+                                                aria-describedby="child-modal-description"
+                                            >
+                                                <Box
+                                                    sx={{
+                                                        ...style,
+                                                        width: 700,
+                                                        height: "auto",
+                                                    }}
+                                                >
+                                                    <h2 id="child-modal-title">
+                                                        Add New Pet
+                                                    </h2>
+                                                    <p id="child-modal-description">
+                                                        Lorem ipsum, dolor sit
+                                                        amet consectetur
+                                                        adipisicing elit.
+                                                    </p>
+                                                    <Button
+                                                        onClick={
+                                                            handleModalClose
+                                                        }
+                                                    >
+                                                        Close Child Modal
+                                                    </Button>
+                                                </Box>
+                                            </Modal>
+                                        </div>
+                                        <div className={styles.petsText}>
+                                            {user?.likes?.length > 0 ? (
+                                                <ul>
+                                                    {user.likes.map(
+                                                        (like, index) => (
+                                                            <li key={index}>
+                                                                {like}
+                                                            </li>
+                                                        ),
+                                                    )}
+                                                </ul>
+                                            ) : (
+                                                <p>No pets found.</p>
+                                            )}
+                                        </div>
                                     </div>
                                 )}
 
-                                {selectedLikes === "Super Likes" && (
-                                    <div>
+                                {selectedPets === "Archived Pets" && (
+                                    <div className={styles.archivedPets}>
                                         {user?.superLikes?.length > 0 ? (
                                             <ul>
                                                 {user.superLikes.map(
@@ -337,7 +391,7 @@ export default function ProfileDashboardComponent() {
                                                 )}
                                             </ul>
                                         ) : (
-                                            <p>No super likes found.</p>
+                                            <p>No archived pets found.</p>
                                         )}
                                     </div>
                                 )}
@@ -470,15 +524,9 @@ export default function ProfileDashboardComponent() {
                             <div className={styles.dashboardContent}>
                                 <div className={styles.dashboardContentTop}>
                                     <TextField
-                                        label="First Name"
-                                        value={user?.firstName || ""}
+                                        label="Adoption Center Name"
+                                        value={user?.adoptionCenterName || ""}
                                         id="firstName"
-                                        size="small"
-                                    />
-                                    <TextField
-                                        label="Last Name"
-                                        value={user?.lastName || ""}
-                                        id="lastName"
                                         size="small"
                                     />
                                 </div>

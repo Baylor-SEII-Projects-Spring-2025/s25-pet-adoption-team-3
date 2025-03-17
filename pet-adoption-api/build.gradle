@@ -54,11 +54,9 @@ dependencies {
 	implementation 'com.google.protobuf:protobuf-java:3.25.1'
 	implementation group: 'com.google.cloud', name: 'google-cloud-storage', version: '2.48.2'
 
-
-
-
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
+

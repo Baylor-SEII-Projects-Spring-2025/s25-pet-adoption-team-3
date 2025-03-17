@@ -99,7 +99,7 @@ class UserControllerTest {
         ResponseEntity<?> response = userService.registerUser(userDTO);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Email already exists", response.getBody());
+        assertEquals("An account already exists with this email.", response.getBody());
     }
 
     @Test

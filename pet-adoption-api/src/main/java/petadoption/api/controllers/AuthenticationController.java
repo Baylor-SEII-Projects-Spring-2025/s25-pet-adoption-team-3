@@ -52,6 +52,7 @@ public class AuthenticationController {
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Login successful");
         response.put("user", user.getFirstName());
+        response.put("role", user.getRole());
 
         return ResponseEntity.ok(response);
     }
