@@ -20,6 +20,7 @@ export default function RegisterComponent() {
     const [user, setUser] = useState(null);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -61,6 +62,7 @@ export default function RegisterComponent() {
     const handleRegister = async (e) => {
         e.preventDefault();
         setLoading(true);
+        setErrorMessage("");
 
         const userData = {
             firstName,
@@ -87,10 +89,9 @@ export default function RegisterComponent() {
             router.push(`/email-sent?email=${encodeURIComponent(email)}`);
         } catch (error) {
             console.error("Registration failed:", error.message);
-            alert("Registration failed: " + error.message);
+            setErrorMessage(error.message);
         } finally {
             setLoading(false);
-
         }
     };
 
@@ -118,6 +119,17 @@ export default function RegisterComponent() {
                         onSubmit={handleRegister}
                     >
                         <h2>Connect with us!</h2>
+                        {errorMessage && (
+                            <p
+                                style={{
+                                    color: "red",
+                                    textAlign: "center",
+                                    marginTop: "10px",
+                                }}
+                            >
+                                {errorMessage}
+                            </p>
+                        )}
 
                         <section className={styles.registerInput}>
                             <section className={styles.registerName}>

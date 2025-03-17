@@ -30,7 +30,7 @@ public class UserService {
 
     public ResponseEntity<?> registerUser(UserDTO userDTO) {
         if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email already exists");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An account already exists with this email.");
         }
 
         User user = new User();
