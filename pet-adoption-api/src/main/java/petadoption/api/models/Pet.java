@@ -19,7 +19,7 @@ public class Pet {
     private List<String> images; // Stores the image URLs
 
     @Column(nullable = false)
-    private String name; // ✅ Changed from "firstName" to "name" (matches JSON)
+    private String name;
 
     @ManyToOne
     @JoinColumn(name = "adoption_center_id", nullable = false)
@@ -29,7 +29,7 @@ public class Pet {
     private String breed;
 
     @Column(nullable = false)
-    private String status; // ✅ Stores "Spayed Female", "Unspayed Female", etc.
+    private String status; //"Spayed Female", "Unspayed Female", etc.
 
     @Column(nullable = false)
     private LocalDate birthday;
