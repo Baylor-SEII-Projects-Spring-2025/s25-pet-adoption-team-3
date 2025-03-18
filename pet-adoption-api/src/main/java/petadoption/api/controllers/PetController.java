@@ -47,4 +47,16 @@ public class PetController {
         return updated ? ResponseEntity.ok("Pet details updated successfully. ") : ResponseEntity.status(404).body("Pet not found or unauthorized.");
     }
 
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deletePet(HttpSession session, @PathVariable Long id) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) return ResponseEntity.status(401).body("No active session.");
+        if(user.getRole() != User.Role.ADOPTION_CENTER){
+            return ResponseEntity.status(403).body("Unauthorized action.");
+        }
+        boolean deleted = petService.deletePet(user, id);
+
+        return deleted ? ResponseEntity.ok("Pet successfully deleted.") : ResponseEntity.status(404).body("Pet not found or unauthorized.");
+    }
+
 }

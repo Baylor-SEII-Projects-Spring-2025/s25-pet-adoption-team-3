@@ -47,4 +47,13 @@ public class PetService {
         return true;
     }
 
+    public boolean deletePet(User user, Long petId) {
+        Optional<Pet> petOptional = petRepository.findById(user.getId());
+        if (petOptional.isEmpty() || !petOptional.get().getId().equals(user.getId())) {
+            return false;
+        }
+        petRepository.deleteById(petId);
+        return true;
+    }
+
 }
