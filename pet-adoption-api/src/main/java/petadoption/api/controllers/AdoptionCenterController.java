@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
-@CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000" })
+@CrossOrigin(origins = {"http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000"})
 @RestController
 @RequestMapping("/api/adoption-center")
 public class AdoptionCenterController {
@@ -37,8 +37,7 @@ public class AdoptionCenterController {
     }
 
     @PutMapping("/change-name")
-    public ResponseEntity<String> changeAdoptionCenterName(HttpSession session,
-                                                           @RequestParam String newName) {
+    public ResponseEntity<String> changeAdoptionCenterName(HttpSession session, @RequestParam String newName) {
         User user = (User) session.getAttribute("user");
         if (user == null) return ResponseEntity.status(401).body("No active session.");
         if (user.getRole() != User.Role.ADOPTION_CENTER) return ResponseEntity.status(403).body("Unauthorized action.");

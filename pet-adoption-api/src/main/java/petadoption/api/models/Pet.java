@@ -15,8 +15,8 @@ public class Pet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ElementCollection
-    private List<String> images; // Stores the image URLs
+    @Column(nullable = false)
+    private String imageUrl; // Stores the image URLs
 
     @Column(nullable = false)
     private String name;

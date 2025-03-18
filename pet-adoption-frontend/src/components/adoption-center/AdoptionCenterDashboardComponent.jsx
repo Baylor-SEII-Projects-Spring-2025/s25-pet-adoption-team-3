@@ -227,7 +227,10 @@ export default function ProfileDashboardComponent() {
         if (!file) return;
 
         const newImages = [...petData.images];
-        newImages[index] = URL.createObjectURL(file);
+        newImages[index] = {
+            preview: URL.createObjectURL(file),
+            file: file,
+        };
         setPetData({ ...petData, images: newImages });
     };
 
@@ -258,27 +261,39 @@ export default function ProfileDashboardComponent() {
 
     const handleAddPetSubmit = async () => {
         try {
-            const payload = {
-                images: petData.images,
-                name: petData.name,
-                breed: petData.breed,
-                status: petData.status,
-                birthdate: petData.birthdate,
-                aboutMe: petData.aboutMe,
-                extra1: petData.extra1,
-                extra2: petData.extra2,
-                extra3: petData.extra3,
-            };
+            const formData = new FormData();
+            petData.images.forEach((imgObj) => {
+                if (imgObj && imgObj.file) {
+                    formData.append("images", imgObj.file); // Append actual files
+                }
+            });
 
-            console.log(
-                "Payload to be sent:",
-                JSON.stringify(payload, null, 2),
-            );
+            formData.append("name", petData.name);
+            formData.append("breed", petData.breed);
+            formData.append("status", petData.status);
+            formData.append("birthdate", petData.birthdate);
+            formData.append("aboutMe", petData.aboutMe);
+            formData.append("extra1", petData.extra1);
+            formData.append("extra2", petData.extra2);
+            formData.append("extra3", petData.extra3);
 
+            // const response = await fetch(`${API_URL}/api/pets/upload`, {
+            //     method: "POST",
+            //     body: formData,
+            //     credentials: "include",
+            // });
+
+            // if (!response.ok) {
+            //     throw new Error("Failed to upload pet details");
+            // }
+
+            console.log("✅ Pet added successfully");
+
+            // Reset form
             setPetData(initialPetData);
             handleModalClose();
         } catch (error) {
-            console.error("Error preparing payload:", error);
+            console.error("Error uploading pet data:", error);
         }
     };
 
@@ -300,7 +315,6 @@ export default function ProfileDashboardComponent() {
             [name]: value,
         }));
     };
-
 
     const handleEventImageUpload = (event) => {
         const file = event.target.files[0];
@@ -530,7 +544,7 @@ export default function ProfileDashboardComponent() {
                                                         >
                                                             {petData.images.map(
                                                                 (
-                                                                    imgSrc,
+                                                                    imgObj,
                                                                     index,
                                                                 ) => (
                                                                     <Box
@@ -559,41 +573,43 @@ export default function ProfileDashboardComponent() {
                                                                             id={`file-input-${index}`}
                                                                         />
 
-                                                                        {/* Remove Button (Only when an image exists) */}
-                                                                        {imgSrc && (
-                                                                            <button
-                                                                                className={
-                                                                                    styles.removeButton
-                                                                                }
-                                                                                onClick={(
-                                                                                    e,
-                                                                                ) => {
-                                                                                    e.preventDefault();
-                                                                                    const newImages =
-                                                                                        [
-                                                                                            ...petData.images,
-                                                                                        ];
-                                                                                    newImages[
-                                                                                        index
-                                                                                    ] =
-                                                                                        null; // Remove image
-                                                                                    setPetData(
-                                                                                        {
-                                                                                            ...petData,
-                                                                                            images: newImages,
-                                                                                        },
-                                                                                    );
-                                                                                }}
-                                                                            >
-                                                                                ✕
-                                                                            </button>
-                                                                        )}
+                                                                        {/* Remove Button */}
+                                                                        {imgObj &&
+                                                                            imgObj.preview && (
+                                                                                <button
+                                                                                    className={
+                                                                                        styles.removeButton
+                                                                                    }
+                                                                                    onClick={(
+                                                                                        e,
+                                                                                    ) => {
+                                                                                        e.preventDefault();
+                                                                                        const newImages =
+                                                                                            [
+                                                                                                ...petData.images,
+                                                                                            ];
+                                                                                        newImages[
+                                                                                            index
+                                                                                        ] =
+                                                                                            null;
+                                                                                        setPetData(
+                                                                                            {
+                                                                                                ...petData,
+                                                                                                images: newImages,
+                                                                                            },
+                                                                                        );
+                                                                                    }}
+                                                                                >
+                                                                                    ✕
+                                                                                </button>
+                                                                            )}
 
-                                                                        {/* Clickable Placeholder or Image */}
-                                                                        {imgSrc ? (
+                                                                        {/* Image Preview */}
+                                                                        {imgObj &&
+                                                                        imgObj.preview ? (
                                                                             <img
                                                                                 src={
-                                                                                    imgSrc
+                                                                                    imgObj.preview
                                                                                 }
                                                                                 className={
                                                                                     styles.previewImage

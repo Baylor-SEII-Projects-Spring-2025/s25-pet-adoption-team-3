@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 public class PetRequestDTO {
     @NotNull
-    private List<String> images;
+    private String imageUrl; // Stores the image URLs
 
     @NotNull
     private String name;

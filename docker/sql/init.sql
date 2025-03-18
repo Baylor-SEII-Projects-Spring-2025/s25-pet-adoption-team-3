@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS token (
 
 CREATE TABLE IF NOT EXISTS pet (
     id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
-    first_name          VARCHAR(255) NOT NULL,
+    name                VARCHAR(255) NOT NULL,
     adoption_center_id  BIGINT       NOT NULL,
     breed               VARCHAR(255) NOT NULL,
     spayed_status       VARCHAR(255) NOT NULL,
@@ -37,8 +37,9 @@ CREATE TABLE IF NOT EXISTS pet (
     extra1              VARCHAR(255) NOT NULL,
     extra2              VARCHAR(255) NOT NULL,
     extra3              VARCHAR(255) NOT NULL,
-    status              ENUM('AVAILABLE', 'ARCHIVED') NOT NULL,
-    FOREIGN KEY (adoption_center_id) REFERENCES user(id) ON DELETE CASCADE
+    image_url            VARCHAR(255),
+    availability_status   ENUM('AVAILABLE', 'ARCHIVED') NOT NULL DEFAULT 'AVAILABLE',
+    FOREIGN KEY (adoption_center_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 

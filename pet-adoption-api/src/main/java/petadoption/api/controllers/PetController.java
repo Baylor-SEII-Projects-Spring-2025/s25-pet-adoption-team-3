@@ -1,15 +1,23 @@
 package petadoption.api.controllers;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import petadoption.api.DTO.PetRequestDTO;
 import petadoption.api.models.Pet;
 import petadoption.api.models.User;
+import petadoption.api.repository.PetRepository;
+import petadoption.api.services.GCSStorageServicePets;
 import petadoption.api.services.PetService;
 import jakarta.validation.Valid;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 
 @CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000" })
@@ -17,9 +25,40 @@ import java.util.List;
 @RequestMapping("/api/pet")
 public class PetController {
     private final PetService petService;
+    private final GCSStorageServicePets gcsStorageServicePets;
+    private final PetRepository petRepository;
 
-    public PetController(PetService petService) {
+    public PetController(PetService petService, PetRepository petRepository) {
+        this.gcsStorageServicePets = new GCSStorageServicePets();
         this.petService = petService;
+        this.petRepository = petRepository;
+    }
+
+    @PostMapping("/{petId}/uploadPetPhoto")
+    public ResponseEntity<Pet> uploadPetPhoto(@PathVariable Long petId, @RequestParam("file") MultipartFile file, HttpServletRequest request) {
+        Optional<Pet> petOptional = petRepository.findById(petId);
+        if (petOptional.isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        try {
+            String fileName = "pet_photo_" + petId + "_" + UUID.randomUUID();
+            String uploadFileUrl = gcsStorageServicePets.uploadFile(file, fileName);
+
+            Pet pet = petOptional.get();
+            pet.setImageUrl(uploadFileUrl);
+
+            petRepository.saveAndFlush(pet);
+
+            Pet updatedPet = petRepository.findById(petId).orElseThrow(() -> new RuntimeException("Pet not found after update"));
+
+            System.out.println("Pet AFTER UPLOAD: " + updatedPet.getImageUrl());
+
+            return ResponseEntity.ok(updatedPet);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(null);
+        }
     }
 
     @PostMapping("/add-pet")
@@ -64,5 +103,7 @@ public class PetController {
         List<Pet> pets = petService.getAllPets(adoptionCenterID);
         return pets.isEmpty() ? ResponseEntity.status(404).body(null) : ResponseEntity.ok(pets);
     }
+
+
 
 }
