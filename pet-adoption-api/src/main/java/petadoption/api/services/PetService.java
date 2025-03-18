@@ -56,4 +56,8 @@ public class PetService {
         return true;
     }
 
+    public List<Pet> getAllPets(Long adoptionCenterId){
+        return petRepository.findByAdoptionCenterId(adoptionCenterId);
+    }
+
 }
