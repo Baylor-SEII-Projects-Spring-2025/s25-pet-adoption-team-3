@@ -78,4 +78,17 @@ public class AdoptionCenterController {
         return ResponseEntity.ok("Bio updated successfully.");
     }
 
+    @PutMapping("/update-phone-number")
+    public ResponseEntity<String> updatePhoneNumber(HttpSession session, @RequestBody AdoptionCenterDTO adoptionCenterDTO) {
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
+        }
+        User adoptionCenter = (User) validationResponse.getBody();
+        adoptionCenter.setPhoneNumber(adoptionCenterDTO.getPhoneNumber());
+        userRepository.save(adoptionCenter);
+
+        return ResponseEntity.ok("Phone number updated successfully.");
+    }
+
 }
