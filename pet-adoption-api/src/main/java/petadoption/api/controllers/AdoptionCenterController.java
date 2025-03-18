@@ -2,10 +2,12 @@ package petadoption.api.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import petadoption.api.DTO.AdoptionCenterDTO;
+import petadoption.api.models.User;
 import petadoption.api.repository.UserRepository;
 import petadoption.api.services.AdoptionCenterService;
 
@@ -33,4 +35,18 @@ public class AdoptionCenterController {
     public ResponseEntity<?> registerAdoptionCenter(@RequestBody AdoptionCenterDTO adoptionCenterDTO) {
         return adoptionCenterService.registerAdoptionCenter(adoptionCenterDTO);
     }
+
+    @PutMapping("/change-name")
+    public ResponseEntity<String> changeAdoptionCenterName(HttpSession session,
+                                                           @RequestParam String newName) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) return ResponseEntity.status(401).body("No active session.");
+        if (user.getRole() != User.Role.ADOPTION_CENTER) return ResponseEntity.status(403).body("Unauthorized action.");
+
+        adoptionCenterService.updateName(user, newName);
+        session.setAttribute("user", user); //Updates the session with the new name
+
+        return ResponseEntity.ok("Adoption center name updated successfully.");
+    }
+
 }
