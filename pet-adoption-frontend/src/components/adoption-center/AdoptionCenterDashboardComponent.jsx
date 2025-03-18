@@ -1,3 +1,4 @@
+import dayjs from "dayjs"
 import React, { useEffect, useState, useRef } from "react";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
@@ -5,8 +6,12 @@ import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import MenuItem from "@mui/material/MenuItem";
 import Router from "next/router";
 import styles from "@/styles/AdoptionCenterDashboardComponent.module.css";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 const style = {
     position: "absolute",
@@ -17,6 +22,25 @@ const style = {
     bgcolor: "background.paper",
     boxShadow: 24,
     p: 4,
+};
+
+const petStatuses = [
+    "Spayed Female",
+    "Unspayed Female",
+    "Neutered Male",
+    "Unneutered Male",
+];
+
+const initialPetData = {
+    images: [null, null, null, null],
+    name: "",
+    breed: "",
+    status: "",
+    birthdate: "",
+    aboutMe: "",
+    extra1: "",
+    extra2: "",
+    extra3: "",
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -169,6 +193,80 @@ export default function ProfileDashboardComponent() {
         const color2 = `hsl(${(hash * 3) % 360}, 70%, 60%)`;
 
         return `linear-gradient(135deg, ${color1}, ${color2})`;
+    };
+
+    // add a pet logic
+    const [petData, setPetData] = useState({
+        images: [null, null, null, null],
+        name: "",
+        breed: "",
+        status: "",
+        birthdate: "",
+        aboutMe: "",
+        extra1: "",
+        extra2: "",
+        extra3: "",
+    });
+
+    const handleChange = (e) => {
+        setPetData({ ...petData, [e.target.name]: e.target.value });
+    };
+
+    const handleImageUpload = (index, event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const newImages = [...petData.images];
+        newImages[index] = URL.createObjectURL(file);
+        setPetData({ ...petData, images: newImages });
+    };
+
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+        if (petData.images.filter((img) => img !== null).length !== 4) {
+            alert("You must upload exactly 4 images.");
+            return;
+        }
+
+        console.log("Submitting pet data:", petData);
+        handleModalClose();
+    };
+
+    const isFormValid = () => {
+        return (
+            petData.images.every((img) => img !== null) && // All 4 images uploaded
+            petData.name.trim() !== "" &&
+            petData.breed.trim() !== "" &&
+            petData.status.trim() !== "" &&
+            petData.birthdate.trim() !== "" &&
+            petData.aboutMe.trim() !== "" &&
+            petData.extra1.trim() !== "" &&
+            petData.extra2.trim() !== "" &&
+            petData.extra3.trim() !== ""
+        );
+    };
+
+    const handleAddPetSubmit = async () => {
+        try {
+            const payload = {
+                images: petData.images,
+                name: petData.name,
+                breed: petData.breed,
+                status: petData.status,
+                birthdate: petData.birthdate,
+                aboutMe: petData.aboutMe,
+                extra1: petData.extra1,
+                extra2: petData.extra2,
+                extra3: petData.extra3,
+            };
+
+            console.log("Payload to be sent:", JSON.stringify(payload, null, 2));
+
+            setPetData(initialPetData);
+            handleModalClose();
+        } catch (error) {
+            console.error("Error preparing payload:", error);
+        }
     };
 
     return (
@@ -332,31 +430,314 @@ export default function ProfileDashboardComponent() {
                                             <Modal
                                                 open={openModal}
                                                 onClose={handleModalClose}
-                                                aria-labelledby="child-modal-title"
-                                                aria-describedby="child-modal-description"
+                                                aria-labelledby="add-pet-modal"
                                             >
-                                                <Box
-                                                    sx={{
-                                                        ...style,
-                                                        width: 700,
-                                                        height: "auto",
-                                                    }}
-                                                >
-                                                    <h2 id="child-modal-title">
-                                                        Add New Pet
-                                                    </h2>
-                                                    <p id="child-modal-description">
-                                                        Lorem ipsum, dolor sit
-                                                        amet consectetur
-                                                        adipisicing elit.
-                                                    </p>
-                                                    <Button
-                                                        onClick={
-                                                            handleModalClose
-                                                        }
+                                                <Box sx={modalStyle}>
+                                                    <Typography
+                                                        variant="h5"
+                                                        sx={{ mb: 2 }}
                                                     >
-                                                        Close Child Modal
-                                                    </Button>
+                                                        Add New Pet
+                                                    </Typography>
+
+                                                    <form
+                                                        onSubmit={
+                                                            handleFormSubmit
+                                                        }
+                                                        className={styles.form}
+                                                    >
+                                                        <h3> Upload photos</h3>
+                                                        {/* Image Upload Grid */}
+                                                        <Box
+                                                            className={
+                                                                styles.imagePreviewContainer
+                                                            }
+                                                        >
+                                                            {petData.images.map(
+                                                                (
+                                                                    imgSrc,
+                                                                    index,
+                                                                ) => (
+                                                                    <Box
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                        className={
+                                                                            styles.imageWrapper
+                                                                        }
+                                                                    >
+                                                                        {/* Hidden File Input */}
+                                                                        <input
+                                                                            type="file"
+                                                                            accept="image/*"
+                                                                            onChange={(
+                                                                                event,
+                                                                            ) =>
+                                                                                handleImageUpload(
+                                                                                    index,
+                                                                                    event,
+                                                                                )
+                                                                            }
+                                                                            className={
+                                                                                styles.fileInput
+                                                                            }
+                                                                            id={`file-input-${index}`}
+                                                                        />
+
+                                                                        {/* Remove Button (Only when an image exists) */}
+                                                                        {imgSrc && (
+                                                                            <button
+                                                                                className={
+                                                                                    styles.removeButton
+                                                                                }
+                                                                                onClick={(
+                                                                                    e,
+                                                                                ) => {
+                                                                                    e.preventDefault();
+                                                                                    const newImages =
+                                                                                        [
+                                                                                            ...petData.images,
+                                                                                        ];
+                                                                                    newImages[
+                                                                                        index
+                                                                                    ] =
+                                                                                        null; // Remove image
+                                                                                    setPetData(
+                                                                                        {
+                                                                                            ...petData,
+                                                                                            images: newImages,
+                                                                                        },
+                                                                                    );
+                                                                                }}
+                                                                            >
+                                                                                ✕
+                                                                            </button>
+                                                                        )}
+
+                                                                        {/* Clickable Placeholder or Image */}
+                                                                        {imgSrc ? (
+                                                                            <img
+                                                                                src={
+                                                                                    imgSrc
+                                                                                }
+                                                                                className={
+                                                                                    styles.previewImage
+                                                                                }
+                                                                                alt={`Uploaded ${index}`}
+                                                                            />
+                                                                        ) : (
+                                                                            <Box
+                                                                                className={
+                                                                                    styles.placeholder
+                                                                                }
+                                                                                onClick={() =>
+                                                                                    document
+                                                                                        .getElementById(
+                                                                                            `file-input-${index}`,
+                                                                                        )
+                                                                                        .click()
+                                                                                }
+                                                                            >
+                                                                                +
+                                                                            </Box>
+                                                                        )}
+                                                                    </Box>
+                                                                ),
+                                                            )}
+                                                        </Box>
+
+                                                        {/* Text Fields */}
+                                                        <TextField
+                                                            label="Name"
+                                                            name="name"
+                                                            value={
+                                                                petData.name
+                                                            }
+                                                            onChange={
+                                                                handleChange
+                                                            }
+                                                            fullWidth
+                                                            required
+                                                            sx={{ mb: 2 }}
+                                                        />
+                                                        <TextField
+                                                            label="Breed"
+                                                            name="breed"
+                                                            value={
+                                                                petData.breed
+                                                            }
+                                                            onChange={
+                                                                handleChange
+                                                            }
+                                                            fullWidth
+                                                            required
+                                                            sx={{ mb: 2 }}
+                                                        />
+                                                        <TextField
+                                                            select
+                                                            label="Spayed/Neutered Status"
+                                                            name="status"
+                                                            value={
+                                                                petData.status
+                                                            }
+                                                            onChange={
+                                                                handleChange
+                                                            }
+                                                            fullWidth
+                                                            required
+                                                            sx={{ mb: 2 }}
+                                                        >
+                                                            {petStatuses.map(
+                                                                (status) => (
+                                                                    <MenuItem
+                                                                        key={
+                                                                            status
+                                                                        }
+                                                                        value={
+                                                                            status
+                                                                        }
+                                                                    >
+                                                                        {status}
+                                                                    </MenuItem>
+                                                                ),
+                                                            )}
+                                                        </TextField>
+                                                        <LocalizationProvider
+                                                            dateAdapter={
+                                                                AdapterDayjs
+                                                            }
+                                                        >
+                                                            <DatePicker
+                                                                label="Birthdate"
+                                                                value={
+                                                                    petData.birthdate
+                                                                        ? dayjs(
+                                                                              petData.birthdate,
+                                                                          )
+                                                                        : null
+                                                                }
+                                                                onChange={(
+                                                                    newValue,
+                                                                ) => {
+                                                                    if (
+                                                                        newValue
+                                                                    ) {
+                                                                        setPetData(
+                                                                            {
+                                                                                ...petData,
+                                                                                birthdate:
+                                                                                    newValue.format(
+                                                                                        "YYYY-MM-DD",
+                                                                                    ),
+                                                                            },
+                                                                        );
+                                                                    }
+                                                                }}
+                                                                format="YYYY-MM-DD"
+                                                                slotProps={{
+                                                                    textField: {
+                                                                        fullWidth: true,
+                                                                        required: true,
+                                                                        sx: {
+                                                                            mb: 2,
+                                                                        },
+                                                                    },
+                                                                }}
+                                                            />
+                                                        </LocalizationProvider>
+                                                        <TextField
+                                                            label="About Me"
+                                                            name="aboutMe"
+                                                            value={
+                                                                petData.aboutMe
+                                                            }
+                                                            onChange={
+                                                                handleChange
+                                                            }
+                                                            fullWidth
+                                                            required
+                                                            multiline
+                                                            rows={3}
+                                                            sx={{ mb: 2 }}
+                                                        />
+
+                                                        {/* Extra Sections */}
+                                                        <Typography
+                                                            variant="subtitle1"
+                                                            sx={{ mt: 2 }}
+                                                        >
+                                                            Additional Info:
+                                                        </Typography>
+                                                        <TextField
+                                                            label="I go crazy for..."
+                                                            name="extra1"
+                                                            value={
+                                                                petData.extra1
+                                                            }
+                                                            onChange={
+                                                                handleChange
+                                                            }
+                                                            fullWidth
+                                                            required
+                                                            sx={{ mb: 2 }}
+                                                        />
+                                                        <TextField
+                                                            label="My favorite toy is..."
+                                                            name="extra2"
+                                                            value={
+                                                                petData.extra2
+                                                            }
+                                                            onChange={
+                                                                handleChange
+                                                            }
+                                                            fullWidth
+                                                            required
+                                                            sx={{ mb: 2 }}
+                                                        />
+                                                        <TextField
+                                                            label="The way to win me over is..."
+                                                            name="extra3"
+                                                            value={
+                                                                petData.extra3
+                                                            }
+                                                            onChange={
+                                                                handleChange
+                                                            }
+                                                            fullWidth
+                                                            required
+                                                            sx={{ mb: 2 }}
+                                                        />
+
+                                                        {/* Buttons */}
+                                                        <Box
+                                                            sx={{
+                                                                display: "flex",
+                                                                justifyContent:
+                                                                    "space-between",
+                                                                mt: 3,
+                                                            }}
+                                                        >
+                                                            <Button
+                                                                onClick={
+                                                                    handleModalClose
+                                                                }
+                                                                variant="outlined"
+                                                            >
+                                                                Cancel
+                                                            </Button>
+                                                            <Button
+                                                                type="submit"
+                                                                variant="contained"
+                                                                color="primary"
+                                                                disabled={
+                                                                    !isFormValid()
+                                                                }
+                                                                onClick={handleAddPetSubmit}
+                                                            >
+                                                                Add Pet
+                                                            </Button>
+                                                        </Box>
+                                                    </form>
                                                 </Box>
                                             </Modal>
                                         </div>
@@ -556,3 +937,18 @@ export default function ProfileDashboardComponent() {
         </div>
     );
 }
+
+const modalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "90%",
+    maxWidth: "600px",
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    p: 4,
+    borderRadius: "10px",
+    maxHeight: "80vh",
+    overflowY: "auto",
+};
