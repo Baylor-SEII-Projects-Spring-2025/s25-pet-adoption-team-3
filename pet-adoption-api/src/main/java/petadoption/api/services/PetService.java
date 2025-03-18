@@ -85,8 +85,16 @@ public class PetService {
         return true;
     }
 
-    public List<Pet> getAllPets(Long adoptionCenterId){
-        return petRepository.findByAdoptionCenterId(adoptionCenterId);
+    public List<Pet> getAllPets(Long adoptionCenterID) {
+        List<Pet> pets = petRepository.findByAdoptionCenterId(adoptionCenterID);
+
+        if (pets.isEmpty()) {
+            logger.info("No pets found for adoption center ID: {}", adoptionCenterID);
+        } else {
+            logger.info("Found {} pets for adoption center ID: {}", pets.size(), adoptionCenterID);
+        }
+
+        return pets;
     }
 
 }
