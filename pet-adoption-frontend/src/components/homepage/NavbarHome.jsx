@@ -95,6 +95,23 @@ export default function Navbar() {
         return `linear-gradient(135deg, ${color1}, ${color2})`;
     };
 
+    const roleLinks = {
+        ADOPTION_CENTER: {
+            dashboard: "/adoption-center/dashboard",
+            profile: "/adoption-center/dashboard",
+            settings: "/adoption-center/dashboard",
+        },
+        ADOPTER: {
+            dashboard: "/profile",
+            profile: "/profile",
+            settings: "/profile",
+        },
+    };
+
+    const links = user
+        ? roleLinks[user.role] || roleLinks["default"]
+        : roleLinks["default"];
+
     return (
         <nav className={styles.navbar}>
             <div className={styles.logo}>
@@ -135,14 +152,15 @@ export default function Navbar() {
                                 src={user.profilePhoto || undefined}
                                 onClick={handleToggle}
                             >
-                                {!user.profilePhoto && user.role != "ADOPTION_CENTER" && (
-                                    <>
-                                        {user.firstName.charAt(0)}
-                                        {user.lastName
-                                            ? user.lastName.charAt(0)
-                                            : ""}
-                                    </>
-                                )}
+                                {!user.profilePhoto &&
+                                    user.role != "ADOPTION_CENTER" && (
+                                        <>
+                                            {user.firstName.charAt(0)}
+                                            {user.lastName
+                                                ? user.lastName.charAt(0)
+                                                : ""}
+                                        </>
+                                    )}
                             </Avatar>
 
                             <img
@@ -178,7 +196,7 @@ export default function Navbar() {
                                             <MenuList autoFocusItem={open}>
                                                 <MenuItem onClick={handleClose}>
                                                     <Link
-                                                        href="/profile"
+                                                        href={links.profile}
                                                         className={
                                                             styles.navbarLink
                                                         }
@@ -188,7 +206,7 @@ export default function Navbar() {
                                                 </MenuItem>
                                                 <MenuItem onClick={handleClose}>
                                                     <Link
-                                                        href="/profile"
+                                                        href={links.profile}
                                                         className={
                                                             styles.navbarLink
                                                         }
@@ -198,7 +216,7 @@ export default function Navbar() {
                                                 </MenuItem>
                                                 <MenuItem onClick={handleClose}>
                                                     <Link
-                                                        href="/profile"
+                                                        href={links.profile}
                                                         className={
                                                             styles.navbarLink
                                                         }

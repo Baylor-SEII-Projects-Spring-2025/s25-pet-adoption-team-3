@@ -46,7 +46,15 @@ export default function LoginComponent() {
             console.log("Login successful:", data);
             setUser(data.user);
 
-            router.push("/profile");
+            if (data.role === "ADOPTION_CENTER") {
+                router.push("/adoption-center/dashboard");
+            }
+            else if (data.role === "ADOPTER") {
+                router.push("/profile");
+            }
+            else {
+                router.push("/");
+            }
         } catch (error) {
             alert(error.message);
         } finally {

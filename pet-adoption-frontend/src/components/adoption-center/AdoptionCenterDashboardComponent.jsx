@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import React, { useEffect, useState, useRef } from "react";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
@@ -5,8 +6,12 @@ import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import MenuItem from "@mui/material/MenuItem";
 import Router from "next/router";
 import styles from "@/styles/AdoptionCenterDashboardComponent.module.css";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 const style = {
     position: "absolute",
@@ -19,18 +24,56 @@ const style = {
     p: 4,
 };
 
+const petStatuses = [
+    "Spayed Female",
+    "Unspayed Female",
+    "Neutered Male",
+    "Unneutered Male",
+];
+
+const initialPetData = {
+    images: [null, null, null, null],
+    name: "",
+    breed: "",
+    status: "",
+    birthdate: "",
+    aboutMe: "",
+    extra1: "",
+    extra2: "",
+    extra3: "",
+};
+
+const initialEventData = {
+    image: null,
+    title: "",
+    description: "",
+    startDate: "",
+    endDate: "",
+};
+
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function ProfileDashboardComponent() {
     const [selectedNav, setSelectedNav] = useState("Dashboard");
-    const [selectedLikes, setSelectedLikes] = useState("My Likes");
+    const [selectedPets, setSelectedPets] = useState("My Pets");
+    const [selectedEvents, setSelectedEvents] = useState("My Events");
     const [user, setUser] = useState(null);
     const [uploadError, setUploadError] = useState("");
     const anchorRef = useRef(null);
+    const [eventData, setEventData] = useState(initialEventData);
 
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+
+    const [openModal, setOpenModal] = React.useState(false);
+
+    const handleModalOpen = () => {
+        setOpenModal(true);
+    };
+    const handleModalClose = () => {
+        setOpenModal(false);
+    };
 
     const fetchUserSession = async () => {
         try {
@@ -52,7 +95,6 @@ export default function ProfileDashboardComponent() {
             if (!response.ok) {
                 throw new Error("Error fetching session");
             }
-
 
             const data = await response.json();
 
@@ -163,6 +205,137 @@ export default function ProfileDashboardComponent() {
         return `linear-gradient(135deg, ${color1}, ${color2})`;
     };
 
+    // add a pet logic
+    const [petData, setPetData] = useState({
+        images: [null, null, null, null],
+        name: "",
+        breed: "",
+        status: "",
+        birthdate: "",
+        aboutMe: "",
+        extra1: "",
+        extra2: "",
+        extra3: "",
+    });
+
+    const handleChange = (e) => {
+        setPetData({ ...petData, [e.target.name]: e.target.value });
+    };
+
+    const handleImageUpload = (index, event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const newImages = [...petData.images];
+        newImages[index] = URL.createObjectURL(file);
+        setPetData({ ...petData, images: newImages });
+    };
+
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+        if (petData.images.filter((img) => img !== null).length !== 4) {
+            alert("You must upload exactly 4 images.");
+            return;
+        }
+
+        console.log("Submitting pet data:", petData);
+        handleModalClose();
+    };
+
+    const isFormValid = () => {
+        return (
+            petData.images.every((img) => img !== null) && // All 4 images uploaded
+            petData.name.trim() !== "" &&
+            petData.breed.trim() !== "" &&
+            petData.status.trim() !== "" &&
+            petData.birthdate.trim() !== "" &&
+            petData.aboutMe.trim() !== "" &&
+            petData.extra1.trim() !== "" &&
+            petData.extra2.trim() !== "" &&
+            petData.extra3.trim() !== ""
+        );
+    };
+
+    const handleAddPetSubmit = async () => {
+        try {
+            const payload = {
+                images: petData.images,
+                name: petData.name,
+                breed: petData.breed,
+                status: petData.status,
+                birthdate: petData.birthdate,
+                aboutMe: petData.aboutMe,
+                extra1: petData.extra1,
+                extra2: petData.extra2,
+                extra3: petData.extra3,
+            };
+
+            console.log(
+                "Payload to be sent:",
+                JSON.stringify(payload, null, 2),
+            );
+
+            setPetData(initialPetData);
+            handleModalClose();
+        } catch (error) {
+            console.error("Error preparing payload:", error);
+        }
+    };
+
+    // add an event logic
+    // Event Handlers
+    const handleEventDateChange = (field, newValue) => {
+        if (newValue) {
+            setEventData((prev) => ({
+                ...prev,
+                [field]: newValue.format("YYYY-MM-DD"),
+            }));
+        }
+    };
+
+    const handleEventChange = (event) => {
+        const { name, value } = event.target;
+        setEventData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+
+    const handleEventImageUpload = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const imageUrl = URL.createObjectURL(file);
+        setEventData({ ...eventData, image: imageUrl });
+    };
+
+    const isEventFormValid = () => {
+        return (
+            eventData.image !== null &&
+            eventData.title.trim() !== "" &&
+            eventData.description.trim() !== "" &&
+            eventData.startDate.trim() !== "" &&
+            eventData.endDate.trim() !== ""
+        );
+    };
+
+    // Handle form submission
+    const handleEventSubmit = (e) => {
+        e.preventDefault();
+
+        if (!isEventFormValid()) {
+            alert("Please fill out all fields and upload an image.");
+            return;
+        }
+
+        console.log("Submitting event data:", eventData);
+
+        // Reset form
+        setEventData(initialEventData);
+        handleModalClose();
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.profileLeftSection}>
@@ -177,12 +350,20 @@ export default function ProfileDashboardComponent() {
                         Dashboard
                     </p>
                     <p
-                        onClick={() => setSelectedNav("My Likes")}
+                        onClick={() => setSelectedNav("My Pets")}
                         className={
-                            selectedNav === "My Likes" ? styles.active : ""
+                            selectedNav === "My Pets" ? styles.active : ""
                         }
                     >
-                        My Likes
+                        My Pets
+                    </p>
+                    <p
+                        onClick={() => setSelectedNav("My Events")}
+                        className={
+                            selectedNav === "My Events" ? styles.active : ""
+                        }
+                    >
+                        My Events
                     </p>
                     <p
                         onClick={() => setSelectedNav("Settings")}
@@ -208,9 +389,8 @@ export default function ProfileDashboardComponent() {
                                             className={
                                                 styles.dashboardWrapperHeader
                                             }
-                                        >   
+                                        >
                                             <h1>
-                                                Welcome Back,{" "}
                                                 {user?.adoptionCenterName || ""}
                                             </h1>
                                         </div>
@@ -245,7 +425,7 @@ export default function ProfileDashboardComponent() {
                                     </div>
                                 </div>
                                 <div className={styles.profileMatches}>
-                                    <p>Potential Matches</p>
+                                    <p>My Pets</p>
 
                                     {user?.matches?.length === 0 ||
                                     !user?.matches ? (
@@ -254,9 +434,7 @@ export default function ProfileDashboardComponent() {
                                                 src="/icons/no_matches.png"
                                                 alt="No matches"
                                             />
-                                            <p>
-                                                No matches found, keep swiping!
-                                            </p>
+                                            <p>No pets found, add some pets!</p>
                                         </div>
                                     ) : (
                                         <ul>
@@ -274,58 +452,397 @@ export default function ProfileDashboardComponent() {
                         )}
                     </div>
 
-                    {selectedNav === "My Likes" && (
+                    {selectedNav === "My Pets" && (
                         <div className={styles.likesContent}>
-                            <div className={styles.likesNavbar}>
-                                <p
-                                    onClick={() => setSelectedLikes("My Likes")}
-                                    className={
-                                        selectedLikes === "My Likes"
-                                            ? styles.likesActive
-                                            : ""
-                                    }
-                                >
-                                    My Likes
-                                </p>
+                            <div className={styles.petsHeader}>
+                                <div className={styles.likesNavbar}>
+                                    <p
+                                        onClick={() =>
+                                            setSelectedPets("My Pets")
+                                        }
+                                        className={
+                                            selectedPets === "My Pets"
+                                                ? styles.likesActive
+                                                : ""
+                                        }
+                                    >
+                                        My Pets
+                                    </p>
 
-                                <div
-                                    className={styles.likesNavbarDivider}
-                                ></div>
+                                    <div
+                                        className={styles.likesNavbarDivider}
+                                    ></div>
 
-                                <p
-                                    onClick={() =>
-                                        setSelectedLikes("Super Likes")
-                                    }
-                                    className={
-                                        selectedLikes === "Super Likes"
-                                            ? styles.likesActive
-                                            : ""
-                                    }
-                                >
-                                    Super Likes
-                                </p>
+                                    <p
+                                        onClick={() =>
+                                            setSelectedPets("Archived Pets")
+                                        }
+                                        className={
+                                            selectedPets === "Archived Pets"
+                                                ? styles.likesActive
+                                                : ""
+                                        }
+                                    >
+                                        Archived Pets
+                                    </p>
+                                </div>
                             </div>
                             <div className={styles.likesContent}>
-                                {selectedLikes === "My Likes" && (
+                                {selectedPets === "My Pets" && (
                                     <div>
-                                        {user?.likes?.length > 0 ? (
-                                            <ul>
-                                                {user.likes.map(
-                                                    (like, index) => (
-                                                        <li key={index}>
-                                                            {like}
-                                                        </li>
-                                                    ),
-                                                )}
-                                            </ul>
-                                        ) : (
-                                            <p>No likes found.</p>
-                                        )}
+                                        <div className={styles.addPetButton}>
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                onClick={handleModalOpen}
+                                            >
+                                                <img
+                                                    src="/icons/plus_icon.png"
+                                                    alt="Add"
+                                                />
+                                                New Pet
+                                            </Button>
+                                            <Modal
+                                                open={openModal}
+                                                onClose={handleModalClose}
+                                                aria-labelledby="add-pet-modal"
+                                            >
+                                                <Box sx={modalStyle}>
+                                                    <Typography
+                                                        variant="h5"
+                                                        sx={{ mb: 2 }}
+                                                    >
+                                                        Add New Pet
+                                                    </Typography>
+
+                                                    <form
+                                                        onSubmit={
+                                                            handleFormSubmit
+                                                        }
+                                                        className={styles.form}
+                                                    >
+                                                        <h3> Upload photos</h3>
+                                                        {/* Image Upload Grid */}
+                                                        <Box
+                                                            className={
+                                                                styles.imagePreviewContainer
+                                                            }
+                                                        >
+                                                            {petData.images.map(
+                                                                (
+                                                                    imgSrc,
+                                                                    index,
+                                                                ) => (
+                                                                    <Box
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                        className={
+                                                                            styles.imageWrapper
+                                                                        }
+                                                                    >
+                                                                        {/* Hidden File Input */}
+                                                                        <input
+                                                                            type="file"
+                                                                            accept="image/*"
+                                                                            onChange={(
+                                                                                event,
+                                                                            ) =>
+                                                                                handleImageUpload(
+                                                                                    index,
+                                                                                    event,
+                                                                                )
+                                                                            }
+                                                                            className={
+                                                                                styles.fileInput
+                                                                            }
+                                                                            id={`file-input-${index}`}
+                                                                        />
+
+                                                                        {/* Remove Button (Only when an image exists) */}
+                                                                        {imgSrc && (
+                                                                            <button
+                                                                                className={
+                                                                                    styles.removeButton
+                                                                                }
+                                                                                onClick={(
+                                                                                    e,
+                                                                                ) => {
+                                                                                    e.preventDefault();
+                                                                                    const newImages =
+                                                                                        [
+                                                                                            ...petData.images,
+                                                                                        ];
+                                                                                    newImages[
+                                                                                        index
+                                                                                    ] =
+                                                                                        null; // Remove image
+                                                                                    setPetData(
+                                                                                        {
+                                                                                            ...petData,
+                                                                                            images: newImages,
+                                                                                        },
+                                                                                    );
+                                                                                }}
+                                                                            >
+                                                                                ✕
+                                                                            </button>
+                                                                        )}
+
+                                                                        {/* Clickable Placeholder or Image */}
+                                                                        {imgSrc ? (
+                                                                            <img
+                                                                                src={
+                                                                                    imgSrc
+                                                                                }
+                                                                                className={
+                                                                                    styles.previewImage
+                                                                                }
+                                                                                alt={`Uploaded ${index}`}
+                                                                            />
+                                                                        ) : (
+                                                                            <Box
+                                                                                className={
+                                                                                    styles.placeholder
+                                                                                }
+                                                                                onClick={() =>
+                                                                                    document
+                                                                                        .getElementById(
+                                                                                            `file-input-${index}`,
+                                                                                        )
+                                                                                        .click()
+                                                                                }
+                                                                            >
+                                                                                +
+                                                                            </Box>
+                                                                        )}
+                                                                    </Box>
+                                                                ),
+                                                            )}
+                                                        </Box>
+
+                                                        {/* Text Fields */}
+                                                        <TextField
+                                                            label="Name"
+                                                            name="name"
+                                                            value={petData.name}
+                                                            onChange={
+                                                                handleChange
+                                                            }
+                                                            fullWidth
+                                                            required
+                                                            sx={{ mb: 2 }}
+                                                        />
+                                                        <TextField
+                                                            label="Breed"
+                                                            name="breed"
+                                                            value={
+                                                                petData.breed
+                                                            }
+                                                            onChange={
+                                                                handleChange
+                                                            }
+                                                            fullWidth
+                                                            required
+                                                            sx={{ mb: 2 }}
+                                                        />
+                                                        <TextField
+                                                            select
+                                                            label="Spayed/Neutered Status"
+                                                            name="status"
+                                                            value={
+                                                                petData.status
+                                                            }
+                                                            onChange={
+                                                                handleChange
+                                                            }
+                                                            fullWidth
+                                                            required
+                                                            sx={{ mb: 2 }}
+                                                        >
+                                                            {petStatuses.map(
+                                                                (status) => (
+                                                                    <MenuItem
+                                                                        key={
+                                                                            status
+                                                                        }
+                                                                        value={
+                                                                            status
+                                                                        }
+                                                                    >
+                                                                        {status}
+                                                                    </MenuItem>
+                                                                ),
+                                                            )}
+                                                        </TextField>
+                                                        <LocalizationProvider
+                                                            dateAdapter={
+                                                                AdapterDayjs
+                                                            }
+                                                        >
+                                                            <DatePicker
+                                                                label="Birthdate"
+                                                                value={
+                                                                    petData.birthdate
+                                                                        ? dayjs(
+                                                                              petData.birthdate,
+                                                                          )
+                                                                        : null
+                                                                }
+                                                                onChange={(
+                                                                    newValue,
+                                                                ) => {
+                                                                    if (
+                                                                        newValue
+                                                                    ) {
+                                                                        setPetData(
+                                                                            {
+                                                                                ...petData,
+                                                                                birthdate:
+                                                                                    newValue.format(
+                                                                                        "YYYY-MM-DD",
+                                                                                    ),
+                                                                            },
+                                                                        );
+                                                                    }
+                                                                }}
+                                                                format="YYYY-MM-DD"
+                                                                shouldDisableDate={(
+                                                                    date,
+                                                                ) =>
+                                                                    date.isAfter(
+                                                                        dayjs(),
+                                                                    )
+                                                                }
+                                                                slotProps={{
+                                                                    textField: {
+                                                                        fullWidth: true,
+                                                                        required: true,
+                                                                        sx: {
+                                                                            mb: 2,
+                                                                        },
+                                                                    },
+                                                                }}
+                                                            />
+                                                        </LocalizationProvider>
+                                                        <TextField
+                                                            label="About Me"
+                                                            name="aboutMe"
+                                                            value={
+                                                                petData.aboutMe
+                                                            }
+                                                            onChange={
+                                                                handleChange
+                                                            }
+                                                            fullWidth
+                                                            required
+                                                            multiline
+                                                            rows={3}
+                                                            sx={{ mb: 2 }}
+                                                        />
+
+                                                        {/* Extra Sections */}
+                                                        <Typography
+                                                            variant="subtitle1"
+                                                            sx={{ mt: 2 }}
+                                                        >
+                                                            Additional Info:
+                                                        </Typography>
+                                                        <TextField
+                                                            label="I go crazy for..."
+                                                            name="extra1"
+                                                            value={
+                                                                petData.extra1
+                                                            }
+                                                            onChange={
+                                                                handleChange
+                                                            }
+                                                            fullWidth
+                                                            required
+                                                            sx={{ mb: 2 }}
+                                                        />
+                                                        <TextField
+                                                            label="My favorite toy is..."
+                                                            name="extra2"
+                                                            value={
+                                                                petData.extra2
+                                                            }
+                                                            onChange={
+                                                                handleChange
+                                                            }
+                                                            fullWidth
+                                                            required
+                                                            sx={{ mb: 2 }}
+                                                        />
+                                                        <TextField
+                                                            label="The way to win me over is..."
+                                                            name="extra3"
+                                                            value={
+                                                                petData.extra3
+                                                            }
+                                                            onChange={
+                                                                handleChange
+                                                            }
+                                                            fullWidth
+                                                            required
+                                                            sx={{ mb: 2 }}
+                                                        />
+
+                                                        {/* Buttons */}
+                                                        <Box
+                                                            sx={{
+                                                                display: "flex",
+                                                                justifyContent:
+                                                                    "space-between",
+                                                                mt: 3,
+                                                            }}
+                                                        >
+                                                            <Button
+                                                                onClick={
+                                                                    handleModalClose
+                                                                }
+                                                                variant="outlined"
+                                                            >
+                                                                Cancel
+                                                            </Button>
+                                                            <Button
+                                                                type="submit"
+                                                                variant="contained"
+                                                                color="primary"
+                                                                disabled={
+                                                                    !isFormValid()
+                                                                }
+                                                                onClick={
+                                                                    handleAddPetSubmit
+                                                                }
+                                                            >
+                                                                Add Pet
+                                                            </Button>
+                                                        </Box>
+                                                    </form>
+                                                </Box>
+                                            </Modal>
+                                        </div>
+                                        <div className={styles.petsText}>
+                                            {user?.likes?.length > 0 ? (
+                                                <ul>
+                                                    {user.likes.map(
+                                                        (like, index) => (
+                                                            <li key={index}>
+                                                                {like}
+                                                            </li>
+                                                        ),
+                                                    )}
+                                                </ul>
+                                            ) : (
+                                                <p>No pets found.</p>
+                                            )}
+                                        </div>
                                     </div>
                                 )}
 
-                                {selectedLikes === "Super Likes" && (
-                                    <div>
+                                {selectedPets === "Archived Pets" && (
+                                    <div className={styles.archivedPets}>
                                         {user?.superLikes?.length > 0 ? (
                                             <ul>
                                                 {user.superLikes.map(
@@ -337,7 +854,337 @@ export default function ProfileDashboardComponent() {
                                                 )}
                                             </ul>
                                         ) : (
-                                            <p>No super likes found.</p>
+                                            <p>No archived pets found.</p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {selectedNav === "My Events" && (
+                        <div className={styles.likesContent}>
+                            <div className={styles.petsHeader}>
+                                <div className={styles.likesNavbar}>
+                                    <p
+                                        onClick={() =>
+                                            setSelectedEvents("My Events")
+                                        }
+                                        className={
+                                            selectedEvents === "My Events"
+                                                ? styles.likesActive
+                                                : ""
+                                        }
+                                    >
+                                        My Events
+                                    </p>
+
+                                    <div
+                                        className={styles.likesNavbarDivider}
+                                    ></div>
+
+                                    <p
+                                        onClick={() =>
+                                            setSelectedEvents("Archived Events")
+                                        }
+                                        className={
+                                            selectedEvents === "Archived Events"
+                                                ? styles.likesActive
+                                                : ""
+                                        }
+                                    >
+                                        Archived Events
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className={styles.likesContent}>
+                                {selectedEvents === "My Events" && (
+                                    <div>
+                                        <div className={styles.addEventButton}>
+                                            <Button
+                                                variant="contained"
+                                                color="primary"
+                                                onClick={() =>
+                                                    setOpenModal(true)
+                                                }
+                                            >
+                                                <img
+                                                    src="/icons/plus_icon.png"
+                                                    alt="Add"
+                                                />
+                                                New Event
+                                            </Button>
+                                            <Modal
+                                                open={openModal}
+                                                onClose={handleModalClose}
+                                                aria-labelledby="add-event-modal"
+                                            >
+                                                <Box sx={modalStyle}>
+                                                    <Typography
+                                                        variant="h5"
+                                                        sx={{ mb: 2 }}
+                                                    >
+                                                        Add New Event
+                                                    </Typography>
+
+                                                    <form
+                                                        onSubmit={
+                                                            handleEventSubmit
+                                                        }
+                                                        className={styles.form}
+                                                    >
+                                                        <h3>Upload Photo</h3>
+
+                                                        {/* Image Upload Box */}
+                                                        <Box
+                                                            className={
+                                                                styles.eventImagePreviewContainer
+                                                            }
+                                                        >
+                                                            <input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                onChange={
+                                                                    handleEventImageUpload
+                                                                }
+                                                                className={
+                                                                    styles.fileInput
+                                                                }
+                                                                id="event-file-input"
+                                                            />
+
+                                                            {eventData.image ? (
+                                                                <div
+                                                                    className={
+                                                                        styles.eventImageWrapper
+                                                                    }
+                                                                >
+                                                                    <img
+                                                                        src={
+                                                                            eventData.image
+                                                                        }
+                                                                        className={
+                                                                            styles.previewImageEvent
+                                                                        }
+                                                                        alt="Uploaded Event"
+                                                                    />
+                                                                    <button
+                                                                        className={
+                                                                            styles.removeButton
+                                                                        }
+                                                                        onClick={(
+                                                                            e,
+                                                                        ) => {
+                                                                            e.preventDefault();
+                                                                            setEventData(
+                                                                                {
+                                                                                    ...eventData,
+                                                                                    image: null,
+                                                                                },
+                                                                            );
+                                                                        }}
+                                                                    >
+                                                                        ✕
+                                                                    </button>
+                                                                </div>
+                                                            ) : (
+                                                                <Box
+                                                                    className={
+                                                                        styles.eventPlaceholder
+                                                                    }
+                                                                    onClick={() =>
+                                                                        document
+                                                                            .getElementById(
+                                                                                "event-file-input",
+                                                                            )
+                                                                            .click()
+                                                                    }
+                                                                >
+                                                                    +
+                                                                </Box>
+                                                            )}
+                                                        </Box>
+
+                                                        {/* Text Fields */}
+                                                        <TextField
+                                                            label="Event Title"
+                                                            name="title"
+                                                            value={
+                                                                eventData.title
+                                                            }
+                                                            onChange={
+                                                                handleEventChange
+                                                            }
+                                                            fullWidth
+                                                            required
+                                                            sx={{ mb: 2 }}
+                                                        />
+                                                        <TextField
+                                                            label="Event Description"
+                                                            name="description"
+                                                            value={
+                                                                eventData.description
+                                                            }
+                                                            onChange={
+                                                                handleEventChange
+                                                            }
+                                                            fullWidth
+                                                            required
+                                                            multiline
+                                                            rows={3}
+                                                            sx={{ mb: 2 }}
+                                                        />
+                                                        <LocalizationProvider
+                                                            dateAdapter={
+                                                                AdapterDayjs
+                                                            }
+                                                        >
+                                                            {/* Start Date Picker */}
+                                                            <DatePicker
+                                                                label="Start Date"
+                                                                value={
+                                                                    eventData.startDate
+                                                                        ? dayjs(
+                                                                              eventData.startDate,
+                                                                          )
+                                                                        : null
+                                                                }
+                                                                onChange={(
+                                                                    newValue,
+                                                                ) =>
+                                                                    handleEventDateChange(
+                                                                        "startDate",
+                                                                        newValue,
+                                                                    )
+                                                                }
+                                                                format="YYYY-MM-DD"
+                                                                shouldDisableDate={(
+                                                                    date,
+                                                                ) =>
+                                                                    date.isBefore(
+                                                                        dayjs(),
+                                                                    )
+                                                                } // Disable past dates
+                                                                slotProps={{
+                                                                    textField: {
+                                                                        fullWidth: true,
+                                                                        required: true,
+                                                                        sx: {
+                                                                            mb: 2,
+                                                                        },
+                                                                    },
+                                                                }}
+                                                            />
+
+                                                            {/* End Date Picker */}
+                                                            <DatePicker
+                                                                label="End Date"
+                                                                value={
+                                                                    eventData.endDate
+                                                                        ? dayjs(
+                                                                              eventData.endDate,
+                                                                          )
+                                                                        : null
+                                                                }
+                                                                onChange={(
+                                                                    newValue,
+                                                                ) =>
+                                                                    handleEventDateChange(
+                                                                        "endDate",
+                                                                        newValue,
+                                                                    )
+                                                                }
+                                                                format="YYYY-MM-DD"
+                                                                shouldDisableDate={
+                                                                    (date) =>
+                                                                        date.isBefore(
+                                                                            dayjs(),
+                                                                        ) || // Prevent selecting past dates
+                                                                        (eventData.startDate &&
+                                                                            date.isBefore(
+                                                                                dayjs(
+                                                                                    eventData.startDate,
+                                                                                ),
+                                                                            )) // Prevent selecting before start date
+                                                                }
+                                                                slotProps={{
+                                                                    textField: {
+                                                                        fullWidth: true,
+                                                                        required: true,
+                                                                        sx: {
+                                                                            mb: 2,
+                                                                        },
+                                                                    },
+                                                                }}
+                                                            />
+                                                        </LocalizationProvider>
+
+                                                        {/* Buttons */}
+                                                        <Box
+                                                            sx={{
+                                                                display: "flex",
+                                                                justifyContent:
+                                                                    "space-between",
+                                                                mt: 3,
+                                                            }}
+                                                        >
+                                                            <Button
+                                                                onClick={
+                                                                    handleModalClose
+                                                                }
+                                                                variant="outlined"
+                                                            >
+                                                                Cancel
+                                                            </Button>
+                                                            <Button
+                                                                type="submit"
+                                                                variant="contained"
+                                                                color="primary"
+                                                                disabled={
+                                                                    !isEventFormValid()
+                                                                }
+                                                            >
+                                                                Create Event
+                                                            </Button>
+                                                        </Box>
+                                                    </form>
+                                                </Box>
+                                            </Modal>
+                                        </div>
+
+                                        <div className={styles.petsText}>
+                                            {user?.events?.length > 0 ? (
+                                                <ul>
+                                                    {user.events.map(
+                                                        (event, index) => (
+                                                            <li key={index}>
+                                                                {event.title}
+                                                            </li>
+                                                        ),
+                                                    )}
+                                                </ul>
+                                            ) : (
+                                                <p>No events found.</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {selectedEvents === "Archived Events" && (
+                                    <div className={styles.archivedPets}>
+                                        {user?.archivedEvents?.length > 0 ? (
+                                            <ul>
+                                                {user.archivedEvents.map(
+                                                    (event, index) => (
+                                                        <li key={index}>
+                                                            {event.title}
+                                                        </li>
+                                                    ),
+                                                )}
+                                            </ul>
+                                        ) : (
+                                            <p>No archived events found.</p>
                                         )}
                                     </div>
                                 )}
@@ -470,15 +1317,9 @@ export default function ProfileDashboardComponent() {
                             <div className={styles.dashboardContent}>
                                 <div className={styles.dashboardContentTop}>
                                     <TextField
-                                        label="First Name"
-                                        value={user?.firstName || ""}
+                                        label="Adoption Center Name"
+                                        value={user?.adoptionCenterName || ""}
                                         id="firstName"
-                                        size="small"
-                                    />
-                                    <TextField
-                                        label="Last Name"
-                                        value={user?.lastName || ""}
-                                        id="lastName"
                                         size="small"
                                     />
                                 </div>
@@ -508,3 +1349,18 @@ export default function ProfileDashboardComponent() {
         </div>
     );
 }
+
+const modalStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "90%",
+    maxWidth: "600px",
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    p: 4,
+    borderRadius: "10px",
+    maxHeight: "80vh",
+    overflowY: "auto",
+};
