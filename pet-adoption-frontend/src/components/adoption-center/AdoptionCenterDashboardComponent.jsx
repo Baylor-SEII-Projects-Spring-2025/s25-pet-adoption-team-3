@@ -227,7 +227,10 @@ export default function ProfileDashboardComponent() {
         if (!file) return;
 
         const newImages = [...petData.images];
-        newImages[index] = file; // Store the File object instead of a blob URL
+        newImages[index] = {
+            preview: URL.createObjectURL(file),
+            file: file,
+        };
         setPetData({ ...petData, images: newImages });
     };
 
@@ -259,9 +262,9 @@ export default function ProfileDashboardComponent() {
     const handleAddPetSubmit = async () => {
         try {
             const formData = new FormData();
-            petData.images.forEach((file) => {
-                if (file) {
-                    formData.append(`images`, file); // Append each image file
+            petData.images.forEach((imgObj) => {
+                if (imgObj && imgObj.file) {
+                    formData.append("images", imgObj.file); // Append actual files
                 }
             });
 
@@ -274,18 +277,19 @@ export default function ProfileDashboardComponent() {
             formData.append("extra2", petData.extra2);
             formData.append("extra3", petData.extra3);
 
-            const response = await fetch(`${API_URL}/api/pets/upload`, {
-                method: "POST",
-                body: formData,
-                credentials: "include",
-            });
+            // const response = await fetch(`${API_URL}/api/pets/upload`, {
+            //     method: "POST",
+            //     body: formData,
+            //     credentials: "include",
+            // });
 
-            if (!response.ok) {
-                throw new Error("Failed to upload pet details");
-            }
+            // if (!response.ok) {
+            //     throw new Error("Failed to upload pet details");
+            // }
 
             console.log("✅ Pet added successfully");
 
+            // Reset form
             setPetData(initialPetData);
             handleModalClose();
         } catch (error) {
@@ -540,7 +544,7 @@ export default function ProfileDashboardComponent() {
                                                         >
                                                             {petData.images.map(
                                                                 (
-                                                                    imgSrc,
+                                                                    imgObj,
                                                                     index,
                                                                 ) => (
                                                                     <Box
@@ -569,41 +573,43 @@ export default function ProfileDashboardComponent() {
                                                                             id={`file-input-${index}`}
                                                                         />
 
-                                                                        {/* Remove Button (Only when an image exists) */}
-                                                                        {imgSrc && (
-                                                                            <button
-                                                                                className={
-                                                                                    styles.removeButton
-                                                                                }
-                                                                                onClick={(
-                                                                                    e,
-                                                                                ) => {
-                                                                                    e.preventDefault();
-                                                                                    const newImages =
-                                                                                        [
-                                                                                            ...petData.images,
-                                                                                        ];
-                                                                                    newImages[
-                                                                                        index
-                                                                                    ] =
-                                                                                        null; // Remove image
-                                                                                    setPetData(
-                                                                                        {
-                                                                                            ...petData,
-                                                                                            images: newImages,
-                                                                                        },
-                                                                                    );
-                                                                                }}
-                                                                            >
-                                                                                ✕
-                                                                            </button>
-                                                                        )}
+                                                                        {/* Remove Button */}
+                                                                        {imgObj &&
+                                                                            imgObj.preview && (
+                                                                                <button
+                                                                                    className={
+                                                                                        styles.removeButton
+                                                                                    }
+                                                                                    onClick={(
+                                                                                        e,
+                                                                                    ) => {
+                                                                                        e.preventDefault();
+                                                                                        const newImages =
+                                                                                            [
+                                                                                                ...petData.images,
+                                                                                            ];
+                                                                                        newImages[
+                                                                                            index
+                                                                                        ] =
+                                                                                            null;
+                                                                                        setPetData(
+                                                                                            {
+                                                                                                ...petData,
+                                                                                                images: newImages,
+                                                                                            },
+                                                                                        );
+                                                                                    }}
+                                                                                >
+                                                                                    ✕
+                                                                                </button>
+                                                                            )}
 
-                                                                        {/* Clickable Placeholder or Image */}
-                                                                        {imgSrc ? (
+                                                                        {/* Image Preview */}
+                                                                        {imgObj &&
+                                                                        imgObj.preview ? (
                                                                             <img
                                                                                 src={
-                                                                                    imgSrc
+                                                                                    imgObj.preview
                                                                                 }
                                                                                 className={
                                                                                     styles.previewImage
