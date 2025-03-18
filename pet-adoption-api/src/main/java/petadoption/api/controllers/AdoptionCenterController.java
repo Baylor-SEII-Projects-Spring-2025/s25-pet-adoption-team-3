@@ -12,6 +12,7 @@ import petadoption.api.repository.UserRepository;
 import petadoption.api.services.AdoptionCenterService;
 
 import petadoption.api.services.GCSStorageService;
+import petadoption.api.services.SessionValidation;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -24,9 +25,11 @@ public class AdoptionCenterController {
     private final AdoptionCenterService adoptionCenterService;
     private final GCSStorageService gcsStorageService;
     private final UserRepository userRepository;
+    private final SessionValidation sessionValidation;
 
 
-    public AdoptionCenterController(AdoptionCenterService adoptionCenterService, UserRepository userRepository) {
+    public AdoptionCenterController(AdoptionCenterService adoptionCenterService, UserRepository userRepository, SessionValidation sessionValidation) {
+        this.sessionValidation = sessionValidation;
         this.adoptionCenterService = adoptionCenterService;
         this.gcsStorageService = new GCSStorageService();
         this.userRepository = userRepository;
@@ -51,16 +54,12 @@ public class AdoptionCenterController {
 
     @PutMapping("/update-website-link")
     public ResponseEntity<String> updateWebsiteLink(HttpSession session, @RequestBody AdoptionCenterDTO adoptionCenterDTO) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) return ResponseEntity.status(401).body("No active session.");
-
-        if(user.getRole() != User.Role.ADOPTION_CENTER) return ResponseEntity.status(403).body("Unauthorized action.");
-
-        Optional<User> userOptional = userRepository.findById(user.getId());
-        if(userOptional.isEmpty()){
-            return ResponseEntity.status(404).body("Adoption center not found.");
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
         }
-        User adoptionCenter = userOptional.get();
+
+        User adoptionCenter = (User) validationResponse.getBody();
         adoptionCenter.setWebsite(adoptionCenterDTO.getWebsite());
         userRepository.save(adoptionCenter);
 
