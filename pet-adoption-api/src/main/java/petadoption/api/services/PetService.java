@@ -25,7 +25,6 @@ public class PetService {
 
     public void addPet(User user, PetRequestDTO petRequestDTO) {
         Pet pet = new Pet();
-        pet.setImages(petRequestDTO.getImages());
         pet.setName(petRequestDTO.getName());
         pet.setAdoptionCenter(user);
         pet.setBreed(petRequestDTO.getBreed());
@@ -35,6 +34,8 @@ public class PetService {
         pet.setExtra1(petRequestDTO.getExtra1());
         pet.setExtra2(petRequestDTO.getExtra2());
         pet.setExtra3(petRequestDTO.getExtra3());
+        pet.setImageUrl(petRequestDTO.getImageUrl());
+
 
         pet.setAvailabilityStatus(Pet.PetStatus.AVAILABLE);
 
