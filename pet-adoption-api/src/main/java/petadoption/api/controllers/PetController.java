@@ -33,4 +33,18 @@ public class PetController {
         return ResponseEntity.status(201).body(petRequestDTO.getName() + " was successfully added.");
     }
 
+    @PutMapping("/edit/{id}")
+    public ResponseEntity<String> editPet(HttpSession session, @PathVariable Long id, @RequestBody @Valid PetRequestDTO petRequestDTO) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) return ResponseEntity.status(401).body("No active session.");
+
+        if(user.getRole() != User.Role.ADOPTION_CENTER){
+            return ResponseEntity.status(403).body("Unauthorized action.");
+        }
+
+        boolean updated = petService.editPet(user, id, petRequestDTO);
+
+        return updated ? ResponseEntity.ok("Pet details updated successfully. ") : ResponseEntity.status(404).body("Pet not found or unauthorized.");
+    }
+
 }
