@@ -23,12 +23,13 @@ import java.util.UUID;
 public class AdoptionCenterController {
     private final AdoptionCenterService adoptionCenterService;
     private final GCSStorageService gcsStorageService;
+    private final UserRepository userRepository;
 
 
-    public AdoptionCenterController(AdoptionCenterService adoptionCenterService) {
+    public AdoptionCenterController(AdoptionCenterService adoptionCenterService, UserRepository userRepository) {
         this.adoptionCenterService = adoptionCenterService;
         this.gcsStorageService = new GCSStorageService();
-
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/register")
@@ -46,6 +47,24 @@ public class AdoptionCenterController {
         session.setAttribute("user", user); //Updates the session with the new name
 
         return ResponseEntity.ok("Adoption center name updated successfully.");
+    }
+
+    @PutMapping("/update-website-link")
+    public ResponseEntity<String> updateWebsiteLink(HttpSession session, @RequestBody AdoptionCenterDTO adoptionCenterDTO) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) return ResponseEntity.status(401).body("No active session.");
+
+        if(user.getRole() != User.Role.ADOPTION_CENTER) return ResponseEntity.status(403).body("Unauthorized action.");
+
+        Optional<User> userOptional = userRepository.findById(user.getId());
+        if(userOptional.isEmpty()){
+            return ResponseEntity.status(404).body("Adoption center not found.");
+        }
+        User adoptionCenter = userOptional.get();
+        adoptionCenter.setWebsite(adoptionCenterDTO.getWebsite());
+        userRepository.save(adoptionCenter);
+
+        return ResponseEntity.ok("Website link updated successfully.");
     }
 
 }
