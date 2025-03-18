@@ -47,7 +47,6 @@ class AdoptionCenterServiceTest {
 
     @Mock
     private UserRepository userRepository;
-    private UserRepository userRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -55,14 +54,9 @@ class AdoptionCenterServiceTest {
     @Mock
     private EmailService emailService;
 
-    @Mock
-    private EmailService emailService;
-
     @InjectMocks
     private AdoptionCenterService adoptionCenterService;
 
-    private AdoptionCenterDTO testCenterDTO;
-    private User testUser;
     private AdoptionCenterDTO testCenterDTO;
     private User testUser;
 
@@ -156,7 +150,6 @@ class AdoptionCenterServiceTest {
 
         doNothing().when(emailService).sendVerificationEmail(any(User.class));
 
-        ResponseEntity<?> response = adoptionCenterService.registerAdoptionCenter(testCenterDTO);
         ResponseEntity<?> response = adoptionCenterService.registerAdoptionCenter(testCenterDTO);
         ResponseEntity<?> response = adoptionCenterService.registerAdoptionCenter(testCenterDTO);
         ResponseEntity<?> response = adoptionCenterService.registerAdoptionCenter(testCenterDTO);
