@@ -63,4 +63,28 @@ public class EventService {
         logger.info("Event ID {} successfully deleted for Adoption Center ID: {}", eventId, adoptionCenterId);
         return true;
     }
+
+    public boolean editEvent(Long adoptionCenterId, Long eventId, EventRequestDTO eventRequestDTO) {
+        Optional<Event> eventOptional = eventRepository.findById(eventId);
+
+        if(eventOptional.isEmpty()){
+            logger.info("Event ID {} not found in database", eventId);
+            return false;
+        }
+        Event event = eventOptional.get();
+
+        if (!event.getAdoptionCenter().getId().equals(adoptionCenterId)) {
+            logger.info("Adoption center ID mismatch. Expected: {}. but received: {}", event.getAdoptionCenter().getId(), adoptionCenterId);
+            return false;
+        }
+        event.setImage(eventRequestDTO.getImage());
+        event.setTitle(eventRequestDTO.getTitle());
+        event.setDescription(eventRequestDTO.getDescription());
+        event.setStartDate(eventRequestDTO.getStartDate());
+        event.setEndDate(eventRequestDTO.getEndDate());
+
+        eventRepository.save(event);
+        logger.info("Event ID {} successfully updated.", eventId);
+        return true;
+    }
 }
