@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/", "/oauth2/**", "/login/oauth2/**").permitAll()
-                        .requestMatchers("/api/users/**", "/api/adoption-center/**").permitAll()
+                        .requestMatchers("/api/users/**", "/api/adoption-center/**", "/api/pet/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .defaultSuccessUrl("/oauth/google/success", true)
