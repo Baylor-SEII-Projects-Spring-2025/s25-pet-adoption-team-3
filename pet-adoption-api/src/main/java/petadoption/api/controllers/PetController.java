@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import petadoption.api.DTO.PetRequestDTO;
 import petadoption.api.models.Pet;
 import petadoption.api.models.User;
+import petadoption.api.services.GCSStorageServicePets;
 import petadoption.api.services.PetService;
 import jakarta.validation.Valid;
 
@@ -17,8 +18,10 @@ import java.util.List;
 @RequestMapping("/api/pet")
 public class PetController {
     private final PetService petService;
+    private final GCSStorageServicePets gcsStorageServicePets;
 
     public PetController(PetService petService) {
+        this.gcsStorageServicePets = new GCSStorageServicePets();
         this.petService = petService;
     }
 
