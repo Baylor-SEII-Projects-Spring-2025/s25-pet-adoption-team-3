@@ -5,6 +5,8 @@ import petadoption.api.DTO.PetRequestDTO;
 import petadoption.api.models.Pet;
 import petadoption.api.models.User;
 import petadoption.api.repository.PetRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +15,9 @@ import java.util.Optional;
 public class PetService {
 
     private final PetRepository petRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(PetService.class);
+
 
     public PetService(PetRepository petRepository) {
         this.petRepository = petRepository;
@@ -37,32 +42,46 @@ public class PetService {
     }
 
     public boolean editPet(User user, Long petId, PetRequestDTO petRequestDTO) {
-        Optional<Pet> petOptional = petRepository.findPetById(petId);
+        Optional<Pet> petOptional = petRepository.findById(petId);
 
         if (petOptional.isEmpty()) {
-            System.out.println("Pet ID not found in database: " + petId);
+            logger.info("Pet ID not found in database: {}", petId);
             return false;
         }
 
         Pet pet = petOptional.get();
-        System.out.println("Found pet: " + pet.getId() + " | Owned by adoption center ID: " + pet.getAdoptionCenter().getId());
+        logger.info("Found pet: {} | Owned by adoption center ID: {}", pet.getId(), pet.getAdoptionCenter().getId());
 
         if (!pet.getAdoptionCenter().getId().equals(user.getId())) {
-            System.out.println("Adoption center ID mismatch. Expected: " + pet.getAdoptionCenter().getId() + ", but logged-in user ID: " + user.getId());
+            logger.info("Adoption center ID mismatch. Expected: {}, but logged-in user ID: {}", pet.getAdoptionCenter().getId(), user.getId());
             return false;
         }
 
         petRepository.deleteById(petId);
         addPet(user, petRequestDTO);
+
+        logger.info("Pet successfully updated. ID: {}", petId);
         return true;
     }
 
     public boolean deletePet(User user, Long petId) {
-        Optional<Pet> petOptional = petRepository.findById(user.getId());
-        if (petOptional.isEmpty() || !petOptional.get().getId().equals(user.getId())) {
+        Optional<Pet> petOptional = petRepository.findById(petId);
+
+        if (petOptional.isEmpty()) {
+            logger.info("Pet ID not found in database: {}", petId);
             return false;
         }
+
+        Pet pet = petOptional.get();
+        logger.info("Found pet: {} | Owned by adoption center ID: {}", pet.getId(), pet.getAdoptionCenter().getId());
+
+        if (!pet.getAdoptionCenter().getId().equals(user.getId())) {
+            logger.info("Adoption center ID mismatch. Expected: {}, but logged-in user ID: {}", pet.getAdoptionCenter().getId(), user.getId());
+            return false;
+        }
+
         petRepository.deleteById(petId);
+        logger.info("Pet successfully deleted. ID: {}", petId);
         return true;
     }
 
