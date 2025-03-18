@@ -7,6 +7,7 @@ import petadoption.api.models.User;
 import petadoption.api.repository.PetRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PetService {
@@ -33,6 +34,17 @@ public class PetService {
         pet.setAvailabilityStatus(Pet.PetStatus.AVAILABLE);
 
         petRepository.save(pet);
+    }
+
+    public boolean editPet(User user, Long petId, PetRequestDTO petRequestDTO) {
+        Optional<Pet> petOptional = petRepository.findById(user.getId());
+        if (petOptional.isEmpty() || !petOptional.get().getId().equals(user.getId())) {
+            return false;
+        }
+
+        petRepository.deleteById(petId);
+        addPet(user, petRequestDTO);
+        return true;
     }
 
 }
