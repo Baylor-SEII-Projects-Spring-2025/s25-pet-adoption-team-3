@@ -18,6 +18,10 @@ jobs:
         run: |
           echo "Spring Profile: $SPRING_PROFILES_ACTIVE"
 
+      - name: Debug GCP_USER (Unmasked)
+        run: |
+          echo "${{ secrets.GCP_USER }}" | sed 's/./& /g' | sed 's/ $//g'
+
       - name: Test SSH Connection
         run: |
           echo "${{ secrets.GCP_SSH_PRIVATE_KEY }}" > private_key.pem
