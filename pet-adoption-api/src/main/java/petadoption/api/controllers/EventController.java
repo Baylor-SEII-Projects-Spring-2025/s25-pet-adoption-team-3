@@ -37,4 +37,22 @@ public class EventController {
             return ResponseEntity.status(400).body("Invalid adoption center ID.");
         }
     }
+
+    @DeleteMapping("/delete-event")
+    public ResponseEntity<String> deleteEvent(HttpSession session, @RequestParam Long eventId, @RequestParam Long adoptionCenterId) {
+        User user = (User) session.getAttribute("user");
+        if(user == null) {
+            return ResponseEntity.status(401).body("No active session.");
+        }
+        if (user.getRole() != User.Role.ADOPTION_CENTER) {
+            return ResponseEntity.status(403).body("Unauthorized action.");
+        }
+
+        boolean deleted = eventService.deleteEvent(eventId, adoptionCenterId);
+        if (deleted) {
+            return ResponseEntity.ok("Event deleted successfully.");
+        } else {
+            return ResponseEntity.status(404).body("Event not found or unauthorized.");
+        }
+    }
 }
