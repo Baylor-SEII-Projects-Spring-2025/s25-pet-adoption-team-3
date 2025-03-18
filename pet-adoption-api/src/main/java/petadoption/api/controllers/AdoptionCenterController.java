@@ -66,4 +66,17 @@ public class AdoptionCenterController {
         return ResponseEntity.ok("Website link updated successfully.");
     }
 
+    @PutMapping("/update-bio")
+    public ResponseEntity<String> updateBio(HttpSession session, @RequestBody AdoptionCenterDTO adoptionCenterDTO) {
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
+        }
+        User adoptionCenter = (User) validationResponse.getBody();
+        adoptionCenter.setBio(adoptionCenterDTO.getBio());
+        userRepository.save(adoptionCenter);
+
+        return ResponseEntity.ok("Bio updated successfully.");
+    }
+
 }
