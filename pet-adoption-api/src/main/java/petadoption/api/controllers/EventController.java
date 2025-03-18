@@ -7,15 +7,18 @@ import org.springframework.web.bind.annotation.*;
 import petadoption.api.DTO.EventRequestDTO;
 import petadoption.api.models.User;
 import petadoption.api.services.EventService;
+import petadoption.api.services.GCSStorageServiceEvents;
 
 @CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000" })
 @RestController
 @RequestMapping("/api/event")
 public class EventController {
     private final EventService eventService;
+    private final GCSStorageServiceEvents gcsStorageServiceEvents;
 
     public EventController(EventService eventService) {
         this.eventService = eventService;
+        this.gcsStorageServiceEvents = new GCSStorageServiceEvents();
     }
 
     @PostMapping("/create-event/{adoptionCenterId}")
