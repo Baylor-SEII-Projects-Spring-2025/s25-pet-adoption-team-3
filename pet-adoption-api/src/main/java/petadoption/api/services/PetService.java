@@ -37,8 +37,18 @@ public class PetService {
     }
 
     public boolean editPet(User user, Long petId, PetRequestDTO petRequestDTO) {
-        Optional<Pet> petOptional = petRepository.findById(user.getId());
-        if (petOptional.isEmpty() || !petOptional.get().getId().equals(user.getId())) {
+        Optional<Pet> petOptional = petRepository.findPetById(petId);
+
+        if (petOptional.isEmpty()) {
+            System.out.println("Pet ID not found in database: " + petId);
+            return false;
+        }
+
+        Pet pet = petOptional.get();
+        System.out.println("Found pet: " + pet.getId() + " | Owned by adoption center ID: " + pet.getAdoptionCenter().getId());
+
+        if (!pet.getAdoptionCenter().getId().equals(user.getId())) {
+            System.out.println("Adoption center ID mismatch. Expected: " + pet.getAdoptionCenter().getId() + ", but logged-in user ID: " + user.getId());
             return false;
         }
 
