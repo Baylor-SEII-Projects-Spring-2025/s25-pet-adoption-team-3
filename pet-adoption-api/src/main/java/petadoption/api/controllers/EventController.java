@@ -80,4 +80,25 @@ public class EventController {
             return ResponseEntity.status(404).body("Event not found or unauthorized.");
         }
     }
+
+    @PutMapping("/edit-event")
+    public ResponseEntity<String> editEvent(HttpSession session, @RequestParam Long adoptionCenterID,
+                                            @RequestParam Long eventID,
+                                            @RequestBody @Valid EventRequestDTO eventRequestDTO) {
+
+        User user = (User) session.getAttribute("user");
+        if(user == null) {
+            return ResponseEntity.status(401).body("No active session.");
+        }
+        if (user.getRole() != User.Role.ADOPTION_CENTER) {
+            return ResponseEntity.status(403).body("Unauthorized action.");
+        }
+        boolean updated = eventService.editEvent(adoptionCenterID, eventID, eventRequestDTO);
+        if (updated) {
+            return ResponseEntity.ok("Event edited successfully.");
+        }
+        else {
+            return ResponseEntity.status(404).body("Event not found or unauthorized.");
+        }
+    }
 }
