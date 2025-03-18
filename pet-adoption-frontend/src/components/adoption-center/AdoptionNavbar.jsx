@@ -104,6 +104,23 @@ export default function AdoptionNavbar() {
         return `linear-gradient(135deg, ${color1}, ${color2})`;
     };
 
+    const roleLinks = {
+        ADOPTION_CENTER: {
+            dashboard: "/adoption-center/dashboard",
+            profile: "/adoption-center/dashboard",
+            settings: "/adoption-center/dashboard",
+        },
+        ADOPTER: {
+            dashboard: "/profile",
+            profile: "/profile",
+            settings: "/profile",
+        },
+    };
+
+    const links = user
+        ? roleLinks[user.role] || roleLinks["default"]
+        : roleLinks["default"];
+
     return (
         <nav className={styles.navbar}>
             <div className={styles.logo}>
@@ -188,7 +205,7 @@ export default function AdoptionNavbar() {
                                             <MenuList autoFocusItem={open}>
                                                 <MenuItem onClick={handleClose}>
                                                     <Link
-                                                        href="/profile/dashboard"
+                                                        href={links.profile}
                                                         className={
                                                             styles.navbarLink
                                                         }
@@ -198,7 +215,7 @@ export default function AdoptionNavbar() {
                                                 </MenuItem>
                                                 <MenuItem onClick={handleClose}>
                                                     <Link
-                                                        href="/profile/my-likes"
+                                                        href={links.profile}
                                                         className={
                                                             styles.navbarLink
                                                         }
@@ -208,7 +225,7 @@ export default function AdoptionNavbar() {
                                                 </MenuItem>
                                                 <MenuItem onClick={handleClose}>
                                                     <Link
-                                                        href="/profile/settings"
+                                                        href={links.profile}
                                                         className={
                                                             styles.navbarLink
                                                         }
