@@ -41,4 +41,10 @@ public class AdoptionCenterService {
         emailService.sendVerificationEmail(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
+
+    public void updateName(User user, String newName) {
+        user.setAdoptionCenterName(newName);
+        userRepository.save(user);
+    }
+
 }
