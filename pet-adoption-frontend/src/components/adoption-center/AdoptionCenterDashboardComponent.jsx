@@ -1,4 +1,6 @@
 import dayjs from "dayjs";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+
 import React, { useEffect, useState, useRef } from "react";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
@@ -12,7 +14,9 @@ import styles from "@/styles/AdoptionCenterDashboardComponent.module.css";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import {extractImageFiles} from "@/utils/extractImageFiles";
+import { extractImageFiles } from "@/utils/extractImageFiles";
+
+dayjs.extend(isSameOrAfter);
 
 const style = {
     position: "absolute",
@@ -74,12 +78,11 @@ export default function ProfileDashboardComponent() {
     const [isUpdated, setIsUpdated] = useState(false);
 
     const [openModal, setOpenModal] = React.useState(false);
-    
+
     const [availablePets, setAvailablePets] = useState([]);
+    const [availableEvents, setAvailableEvents] = useState([]);
 
     const [searchQuery, setSearchQuery] = useState("");
-
-
 
     const handleModalOpen = () => {
         setOpenModal(true);
@@ -277,7 +280,6 @@ export default function ProfileDashboardComponent() {
             const formData = new FormData();
             extractImageFiles(petData, formData);
 
-
             formData.append("name", petData.name);
             formData.append("breed", petData.breed);
             formData.append("spayedStatus", petData.spayedStatus);
@@ -287,11 +289,13 @@ export default function ProfileDashboardComponent() {
             formData.append("extra2", petData.extra2);
             formData.append("extra3", petData.extra3);
 
-            const response = await fetch(`${API_URL}/api/pet/add-pet-with-images`, {
+            const response = await fetch(
+                `${API_URL}/api/pet/add-pet-with-images`,
+                {
                     method: "POST",
                     body: formData,
                     credentials: "include",
-                }
+                },
             );
 
             if (!response.ok) {
@@ -368,11 +372,13 @@ export default function ProfileDashboardComponent() {
             formData.append("startDate", eventData.startDate);
             formData.append("endDate", eventData.endDate);
 
-            const response = await fetch(`${API_URL}/api/event/create-event-with-image/${user.id}`, {
+            const response = await fetch(
+                `${API_URL}/api/event/create-event-with-image/${user.id}`,
+                {
                     method: "POST",
                     body: formData,
                     credentials: "include",
-                }
+                },
             );
 
             if (response.ok) {
@@ -388,6 +394,53 @@ export default function ProfileDashboardComponent() {
         setEventData(initialEventData);
         handleModalClose();
     };
+
+    //fetch available events logic
+    const fetchAvailableEvents = async () => {
+        try {
+            const response = await fetch(
+                `${API_URL}/api/event/getAllEvents/${user.id}`,
+                {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                },
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch events");
+            }
+
+            const data = await response.json();
+
+            // Filter only available events
+            const filteredEvents = data.filter((event) =>
+                dayjs(event.startDate).isSameOrAfter(dayjs(), "day"),
+            );
+            setAvailableEvents(filteredEvents);
+        } catch (error) {
+            console.error("Error fetching events:", error);
+        }
+    };
+
+    useEffect(() => {
+        if (user && selectedEvents === "My Events") {
+            fetchAvailableEvents();
+        }
+    }, [user, selectedEvents]);
+
+    // searching in available events logic
+    const handleEventSearchChange = (event) => {
+        setSearchQuery(event.target.value.toLowerCase());
+    };
+
+    const filteredEvents = availableEvents.filter(
+        (event) =>
+            event.title.toLowerCase().includes(searchQuery) ||
+            event.description.toLowerCase().includes(searchQuery),
+    );
 
     //fetch available pets logic
     const fetchAvailablePets = async () => {
@@ -437,9 +490,6 @@ export default function ProfileDashboardComponent() {
             pet.spayedStatus.toLowerCase().includes(searchQuery),
     );
 
-
-
-
     // update adoption center logic
     useEffect(() => {
         if (user) {
@@ -451,7 +501,8 @@ export default function ProfileDashboardComponent() {
     }, [user]);
 
     const handleUpdateProfile = async () => {
-        if (adoptionCenterName !== user.adoptionCenterName) await updateAdoptionCenterName();
+        if (adoptionCenterName !== user.adoptionCenterName)
+            await updateAdoptionCenterName();
         if (websiteLink !== user.website) await updateWebsiteLink();
         if (bio !== user.bio) await updateBio();
         if (phoneNumber !== user.phoneNumber) await updatePhoneNumber();
@@ -776,7 +827,9 @@ export default function ProfileDashboardComponent() {
                                             <Button
                                                 variant="contained"
                                                 color="primary"
-                                                className={styles.addPetButtonClass}
+                                                className={
+                                                    styles.addPetButtonClass
+                                                }
                                                 onClick={handleModalOpen}
                                             >
                                                 <img
@@ -1157,8 +1210,10 @@ export default function ProfileDashboardComponent() {
                                                                     </p>
                                                                     <p>
                                                                         Born:{" "}
-                                                                        {pet.birthdate.join(
-                                                                            "-",
+                                                                        {dayjs(
+                                                                            pet.birthdate,
+                                                                        ).format(
+                                                                            "MMMM D, YYYY",
                                                                         )}
                                                                     </p>
                                                                 </div>
@@ -1234,9 +1289,24 @@ export default function ProfileDashboardComponent() {
                                 {selectedEvents === "My Events" && (
                                     <div>
                                         <div className={styles.addEventButton}>
+                                            <TextField
+                                                label="Search Events"
+                                                variant="outlined"
+                                                fullWidth
+                                                value={searchQuery}
+                                                onChange={
+                                                    handleEventSearchChange
+                                                }
+                                                className={styles.searchField}
+                                                size="small"
+                                                sx={{ mb: 2 }}
+                                            />
                                             <Button
                                                 variant="contained"
                                                 color="primary"
+                                                className={
+                                                    styles.addEventButtonClass
+                                                }
                                                 onClick={() =>
                                                     setOpenModal(true)
                                                 }
@@ -1286,7 +1356,8 @@ export default function ProfileDashboardComponent() {
                                                                 id="event-file-input"
                                                             />
 
-                                                            {eventData.images[0] ? (
+                                                            {eventData
+                                                                .images[0] ? (
                                                                 <div
                                                                     className={
                                                                         styles.eventImageWrapper
@@ -1294,7 +1365,9 @@ export default function ProfileDashboardComponent() {
                                                                 >
                                                                     <img
                                                                         src={
-                                                                            eventData.images[0].preview
+                                                                            eventData
+                                                                                .images[0]
+                                                                                .preview
                                                                         }
                                                                         className={
                                                                             styles.previewImageEvent
@@ -1312,7 +1385,9 @@ export default function ProfileDashboardComponent() {
                                                                             setEventData(
                                                                                 {
                                                                                     ...eventData,
-                                                                                    images: [null],
+                                                                                    images: [
+                                                                                        null,
+                                                                                    ],
                                                                                 },
                                                                             );
                                                                         }}
@@ -1486,18 +1561,84 @@ export default function ProfileDashboardComponent() {
                                         </div>
 
                                         <div className={styles.petsText}>
-                                            {user?.events?.length > 0 ? (
-                                                <ul>
-                                                    {user.events.map(
-                                                        (event, index) => (
-                                                            <li key={index}>
-                                                                {event.title}
-                                                            </li>
+                                            {filteredEvents.length > 0 ? (
+                                                <div
+                                                    className={
+                                                        styles.eventsGrid
+                                                    }
+                                                >
+                                                    {filteredEvents.map(
+                                                        (event) => (
+                                                            <div
+                                                                key={event.id}
+                                                                className={
+                                                                    styles.eventCard
+                                                                }
+                                                            >
+                                                                <img
+                                                                    src={
+                                                                        event.image
+                                                                    }
+                                                                    alt={
+                                                                        event.title
+                                                                    }
+                                                                    className={
+                                                                        styles.eventImage
+                                                                    }
+                                                                />
+                                                                <div
+                                                                    className={
+                                                                        styles.eventDetails
+                                                                    }
+                                                                >
+                                                                    <p
+                                                                        className={
+                                                                            styles.eventTitle
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            event.title
+                                                                        }
+                                                                    </p>
+                                                                    <p
+                                                                        className={
+                                                                            styles.eventDescription
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            event.description
+                                                                        }
+                                                                    </p>
+                                                                    <p
+                                                                        className={
+                                                                            styles.eventDate
+                                                                        }
+                                                                    >
+                                                                        {dayjs(
+                                                                            event.startDate,
+                                                                        ).format(
+                                                                            "MMMM D, YYYY",
+                                                                        )}{" "}
+                                                                        -{" "}
+                                                                        {dayjs(
+                                                                            event.endDate,
+                                                                        ).format(
+                                                                            "MMMM D, YYYY",
+                                                                        )}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
                                                         ),
                                                     )}
-                                                </ul>
+                                                </div>
                                             ) : (
-                                                <p>No events found.</p>
+                                                <p
+                                                    className={
+                                                        styles.noEventsMessage
+                                                    }
+                                                >
+                                                    No events found.
+                                                </p>
                                             )}
                                         </div>
                                     </div>
