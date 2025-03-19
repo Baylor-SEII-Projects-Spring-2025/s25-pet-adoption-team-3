@@ -107,6 +107,16 @@ public class PetController {
         return pets.isEmpty() ? ResponseEntity.status(404).body(null) : ResponseEntity.ok(pets);
     }
 
+    @GetMapping("/swipe/get-pet")
+    public ResponseEntity<Pet> getSwipePet() {
+        Optional<Pet> petOptional = petService.getSwipePet();
+
+        if (petOptional.isEmpty()) {
+            return ResponseEntity.status(404).body(null);
+        }
+
+        return ResponseEntity.ok(petOptional.get());
+    }
 
 
 }

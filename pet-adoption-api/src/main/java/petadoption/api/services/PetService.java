@@ -28,13 +28,15 @@ public class PetService {
         pet.setName(petRequestDTO.getName());
         pet.setAdoptionCenter(user);
         pet.setBreed(petRequestDTO.getBreed());
-        pet.setStatus(petRequestDTO.getStatus());
+        pet.setSpayedStatus(petRequestDTO.getSpayedStatus());
         pet.setBirthday(petRequestDTO.getBirthdate());
         pet.setAboutMe(petRequestDTO.getAboutMe());
         pet.setExtra1(petRequestDTO.getExtra1());
         pet.setExtra2(petRequestDTO.getExtra2());
         pet.setExtra3(petRequestDTO.getExtra3());
         pet.setImageUrl(petRequestDTO.getImageUrl());
+        pet.setAvailabilityStatus(petRequestDTO.getAvailabilityStatus());
+
 
 
         pet.setAvailabilityStatus(Pet.PetStatus.AVAILABLE);
@@ -96,6 +98,14 @@ public class PetService {
         }
 
         return pets;
+    }
+
+    public Optional<Pet> getSwipePet() {
+        List<Pet> availablePets = petRepository.findByAvailabilityStatus(Pet.PetStatus.AVAILABLE);
+        if (availablePets.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(availablePets.get(0));
     }
 
 }
