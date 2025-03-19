@@ -387,11 +387,12 @@
     align-items: center;
     gap: 10px;
     cursor: pointer;
-    margin-left: auto;
     width: 100%;
-    margin-left: auto;
     justify-content: flex-end !important;
-    max-width: 140px;
+}
+
+.addEventButtonClass{
+    width: 130px;
 }
 
 .addEventButton img {
@@ -517,4 +518,69 @@
 
 .addPetButtonClass{
     width: 120px;
+}
+
+.eventsGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.eventCard {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    width: 100%;
+}
+
+.eventCard:hover {
+    transform: scale(1.02);
+}
+
+.eventImage {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.eventDetails {
+    flex-grow: 1;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+}
+
+.eventDetails p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.eventTitle {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.eventDate {
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.searchField {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 15px;
+    width: 100%;
+    max-width: 200px !important;
 }
