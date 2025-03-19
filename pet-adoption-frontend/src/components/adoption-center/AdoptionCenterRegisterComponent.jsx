@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Router from "next/router";
-import { TextField, Button, Input } from "@mui/material";
+import { TextField, Button } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import PasswordStrengthBar from "react-password-strength-bar";
 import { theme } from "@/utils/theme";
@@ -263,9 +263,9 @@ export default function AdoptionCenterRegisterComponent() {
                                     value={formData.bio}
                                     onChange={handleChange}
                                 />
-                                <Input
+                                <input
                                     type="file"
-                                    accept="image/*"
+                                    accept=".png, .jpg, .jpeg"
                                     onChange={handleFileChange}
                                 />
                                 {previewImage && (
