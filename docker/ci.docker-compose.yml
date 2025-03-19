@@ -33,17 +33,5 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    entrypoint: >
-      sh -c "
-        docker-entrypoint.sh mysqld & 
-        sleep 10 && 
-        mysql -u root -p$${MYSQL_ROOT_PASSWORD} -e 'CREATE DATABASE IF NOT EXISTS petadoption;' &&
-        mysql -u root -p$${MYSQL_ROOT_PASSWORD} petadoption < /docker-entrypoint-initdb.d/init.sql &&
-        wait
-      "
-
 volumes:
   mysql-data:
-
-# Note: we are taking advantage of the Docker network that is automatically created so
-# that these containers are able to communicate with each other.
