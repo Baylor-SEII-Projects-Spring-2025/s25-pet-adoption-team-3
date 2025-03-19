@@ -102,29 +102,31 @@ class PetControllerTest {
         when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTION_CENTER)))
                 .thenReturn((ResponseEntity) ResponseEntity.ok(adoptionCenter));
 
-        PetRequestDTO petRequestDTO = new PetRequestDTO();
-        petRequestDTO.setName("Buddy");
-        petRequestDTO.setBreed("Golden Retriever");
-        petRequestDTO.setSpayedStatus("Neutered Male");
-        petRequestDTO.setBirthdate(LocalDate.of(2021, 6, 15));
-        petRequestDTO.setAboutMe("Loves playing fetch!");
-        petRequestDTO.setExtra1("Energetic");
-        petRequestDTO.setExtra2("Good with kids");
-        petRequestDTO.setExtra3("Needs a big backyard");
-
-        when(petService.editPet(eq(adoptionCenter), eq(1L), any(PetRequestDTO.class), any(MultipartFile[].class)))
-                .thenReturn(true);
+        when(petService.editPet(
+                eq(adoptionCenter), eq(1L),
+                any(PetRequestDTO.class),
+                any(MultipartFile[].class)
+        )).thenReturn(true);
 
         ResponseEntity<String> response = petController.editPet(
                 session,
                 1L,
-                petRequestDTO,
+                "Buddy",
+                "Golden Retriever",
+                "Neutered Male",
+                LocalDate.of(2021, 6, 15),
+                "Loves playing fetch!",
+                "Energetic",
+                "Good with kids",
+                "Needs a big backyard",
                 new MultipartFile[0]
         );
 
-        assertEquals(OK, response.getStatusCode());
+        assertEquals(200, response.getStatusCodeValue());
         assertEquals("Pet details updated successfully.", response.getBody());
     }
+
+
 
 
     @Test

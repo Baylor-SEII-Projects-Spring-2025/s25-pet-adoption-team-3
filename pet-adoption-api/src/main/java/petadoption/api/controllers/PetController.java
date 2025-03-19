@@ -71,13 +71,18 @@ public class PetController {
         return petService.addPetWithImages(user, petRequestDTO, files);
     }
 
-
-    //TODO - we might have to update this according to the new add pet method
     @PutMapping("/edit/{id}")
     public ResponseEntity<String> editPet(
             HttpSession session,
             @PathVariable Long id,
-            @RequestPart("pet") @Valid PetRequestDTO petRequestDTO,
+            @RequestParam("name") String name,
+            @RequestParam("breed") String breed,
+            @RequestParam("spayedStatus") String spayedStatus,
+            @RequestParam("birthdate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthdate,
+            @RequestParam("aboutMe") String aboutMe,
+            @RequestParam("extra1") String extra1,
+            @RequestParam("extra2") String extra2,
+            @RequestParam("extra3") String extra3,
             @RequestParam("files") MultipartFile[] files) {
 
         ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
@@ -86,11 +91,23 @@ public class PetController {
         }
 
         User user = (User) validationResponse.getBody();
+
+        PetRequestDTO petRequestDTO = new PetRequestDTO();
+        petRequestDTO.setName(name);
+        petRequestDTO.setBreed(breed);
+        petRequestDTO.setSpayedStatus(spayedStatus);
+        petRequestDTO.setBirthdate(birthdate);
+        petRequestDTO.setAboutMe(aboutMe);
+        petRequestDTO.setExtra1(extra1);
+        petRequestDTO.setExtra2(extra2);
+        petRequestDTO.setExtra3(extra3);
+
         boolean updated = petService.editPet(user, id, petRequestDTO, files);
 
-        return updated ? ResponseEntity.ok("Pet details updated successfully.") :
-                ResponseEntity.status(404).body("Pet not found or unauthorized.");
+        return updated ? ResponseEntity.ok("Pet details updated successfully.")
+                : ResponseEntity.status(404).body("Pet not found or unauthorized.");
     }
+
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deletePet(HttpSession session, @PathVariable Long id) {
@@ -109,6 +126,17 @@ public class PetController {
     public ResponseEntity<List<Pet>> getAllPets(@PathVariable Long adoptionCenterID) {
         List<Pet> pets = petService.getAllPets(adoptionCenterID);
         return pets.isEmpty() ? ResponseEntity.status(404).body(null) : ResponseEntity.ok(pets);
+    }
+
+    @GetMapping("/get-pet-detail/{petId}")
+    public ResponseEntity<?> getPetDetail(@PathVariable Long petId) {
+        Optional<Pet> petOptional = petService.getPetDetail(petId);
+
+        if (petOptional.isEmpty()) {
+            return ResponseEntity.status(404).body("Pet not found.");
+        }
+
+        return ResponseEntity.ok(petOptional.get());
     }
 
     @GetMapping("/swipe/get-pet")
