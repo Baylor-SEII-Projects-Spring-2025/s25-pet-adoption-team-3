@@ -37,10 +37,17 @@ CREATE TABLE IF NOT EXISTS pet (
     extra1              VARCHAR(255) NOT NULL,
     extra2              VARCHAR(255) NOT NULL,
     extra3              VARCHAR(255) NOT NULL,
-    image_url            VARCHAR(255),
     availability_status   ENUM('AVAILABLE', 'ARCHIVED') NOT NULL DEFAULT 'AVAILABLE',
     FOREIGN KEY (adoption_center_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS pet_images (
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    pet_id      BIGINT NOT NULL,
+    image_url   VARCHAR(255) NOT NULL,
+    FOREIGN KEY (pet_id) REFERENCES pet(id) ON DELETE CASCADE
+);
+
 
 CREATE TABLE IF NOT EXISTS event (
     id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -51,7 +58,7 @@ CREATE TABLE IF NOT EXISTS event (
     start_date          DATE         NOT NULL,
     end_date            DATE         NOT NULL,
     FOREIGN KEY (adoption_center_id) REFERENCES users(user_id) ON DELETE CASCADE
-    );
+);
 
 
 SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS

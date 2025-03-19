@@ -23,8 +23,8 @@ import java.util.UUID;
 @RequestMapping("/api/adoption-center")
 public class AdoptionCenterController {
     private final AdoptionCenterService adoptionCenterService;
-    private final GCSStorageService gcsStorageService;
     private final UserRepository userRepository;
+    private final GCSStorageService gcsStorageService;
     private final SessionValidation sessionValidation;
 
 
@@ -40,56 +40,92 @@ public class AdoptionCenterController {
         return adoptionCenterService.registerAdoptionCenter(adoptionCenterDTO);
     }
 
-    @PutMapping("/change-name")
-    public ResponseEntity<String> changeAdoptionCenterName(HttpSession session, @RequestParam String newName) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) return ResponseEntity.status(401).body("No active session.");
-        if (user.getRole() != User.Role.ADOPTION_CENTER) return ResponseEntity.status(403).body("Unauthorized action.");
 
-        adoptionCenterService.updateName(user, newName);
-        session.setAttribute("user", user); //Updates the session with the new name
 
-        return ResponseEntity.ok("Adoption center name updated successfully.");
-    }
-
-    @PutMapping("/update-website-link")
-    public ResponseEntity<String> updateWebsiteLink(HttpSession session, @RequestBody AdoptionCenterDTO adoptionCenterDTO) {
-        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
-        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
-            return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
+    @PutMapping("/change-name/{adoptionCenterId}")
+    public ResponseEntity<String> changeAdoptionCenterName(@PathVariable Long adoptionCenterId, @RequestBody AdoptionCenterDTO adoptionCenterDTO, HttpServletRequest request) {
+        if(adoptionCenterDTO.getAdoptionCenterName() == null || adoptionCenterDTO.getAdoptionCenterName().isEmpty()) {
+            return ResponseEntity.badRequest().body("Adoption center name cannot be empty.");
         }
-
-        User adoptionCenter = (User) validationResponse.getBody();
-        adoptionCenter.setWebsite(adoptionCenterDTO.getWebsite());
-        userRepository.save(adoptionCenter);
-
-        return ResponseEntity.ok("Website link updated successfully.");
-    }
-
-    @PutMapping("/update-bio")
-    public ResponseEntity<String> updateBio(HttpSession session, @RequestBody AdoptionCenterDTO adoptionCenterDTO) {
-        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
-        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
-            return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
+        Optional<User> userOptional = userRepository.findById(adoptionCenterId);
+        if(userOptional.isEmpty()) {
+            return ResponseEntity.badRequest().body("User not found.");
         }
-        User adoptionCenter = (User) validationResponse.getBody();
-        adoptionCenter.setBio(adoptionCenterDTO.getBio());
-        userRepository.save(adoptionCenter);
+        User user = userOptional.get();
+        user.setAdoptionCenterName(adoptionCenterDTO.getAdoptionCenterName());
+        userRepository.saveAndFlush(user);
 
-        return ResponseEntity.ok("Bio updated successfully.");
+        User updatedUser = userRepository.findById(adoptionCenterId).orElseThrow(() -> new RuntimeException("User not found after update"));
+        request.getSession().invalidate();
+        HttpSession newSession = request.getSession(true);
+        newSession.setAttribute("user", updatedUser);
+
+        return ResponseEntity.ok("First name updated to: " + adoptionCenterDTO.getAdoptionCenterName());
     }
 
-    @PutMapping("/update-phone-number")
-    public ResponseEntity<String> updatePhoneNumber(HttpSession session, @RequestBody AdoptionCenterDTO adoptionCenterDTO) {
-        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
-        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
-            return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
+
+
+
+    @PutMapping("/update-website-link/{adoptionCenterId}")
+    public ResponseEntity<String> updateWebsiteLink(@PathVariable Long adoptionCenterId, @RequestBody AdoptionCenterDTO adoptionCenterDTO, HttpServletRequest request) {
+        if(adoptionCenterDTO.getWebsite() == null || adoptionCenterDTO.getWebsite().isEmpty()) {
+            return ResponseEntity.badRequest().body("Adoption center website cannot be empty.");
         }
-        User adoptionCenter = (User) validationResponse.getBody();
-        adoptionCenter.setPhoneNumber(adoptionCenterDTO.getPhoneNumber());
-        userRepository.save(adoptionCenter);
+        Optional<User> userOptional = userRepository.findById(adoptionCenterId);
+        if(userOptional.isEmpty()) {
+            return ResponseEntity.badRequest().body("User not found.");
+        }
+        User user = userOptional.get();
+        user.setWebsite(adoptionCenterDTO.getWebsite());
+        userRepository.saveAndFlush(user);
 
-        return ResponseEntity.ok("Phone number updated successfully.");
+        User updatedUser = userRepository.findById(adoptionCenterId).orElseThrow(() -> new RuntimeException("User not found after update"));
+        request.getSession().invalidate();
+        HttpSession newSession = request.getSession(true);
+        newSession.setAttribute("user", updatedUser);
+
+        return ResponseEntity.ok("Website updated to: " + adoptionCenterDTO.getWebsite());
     }
 
+    @PutMapping("/update-bio/{adoptionCenterId}")
+    public ResponseEntity<String> updateBio(@PathVariable Long adoptionCenterId, @RequestBody AdoptionCenterDTO adoptionCenterDTO, HttpServletRequest request) {
+        if(adoptionCenterDTO.getBio() == null || adoptionCenterDTO.getBio().isEmpty()) {
+            return ResponseEntity.badRequest().body("Adoption center bio cannot be empty.");
+        }
+        Optional<User> userOptional = userRepository.findById(adoptionCenterId);
+        if(userOptional.isEmpty()) {
+            return ResponseEntity.badRequest().body("User not found.");
+        }
+        User user = userOptional.get();
+        user.setBio(adoptionCenterDTO.getBio());
+        userRepository.saveAndFlush(user);
+
+        User updatedUser = userRepository.findById(adoptionCenterId).orElseThrow(() -> new RuntimeException("User not found after update"));
+        request.getSession().invalidate();
+        HttpSession newSession = request.getSession(true);
+        newSession.setAttribute("user", updatedUser);
+
+        return ResponseEntity.ok("Bio updated to: " + adoptionCenterDTO.getBio());
+    }
+
+    @PutMapping("/update-phone-number/{adoptionCenterId}")
+    public ResponseEntity<String> updatePhoneNumber(@PathVariable Long adoptionCenterId, @RequestBody AdoptionCenterDTO adoptionCenterDTO, HttpServletRequest request) {
+        if(adoptionCenterDTO.getPhoneNumber() == null || adoptionCenterDTO.getPhoneNumber().isEmpty()) {
+            return ResponseEntity.badRequest().body("Adoption center phone number cannot be empty.");
+        }
+        Optional<User> userOptional = userRepository.findById(adoptionCenterId);
+        if(userOptional.isEmpty()) {
+            return ResponseEntity.badRequest().body("User not found.");
+        }
+        User user = userOptional.get();
+        user.setPhoneNumber(adoptionCenterDTO.getPhoneNumber());
+        userRepository.saveAndFlush(user);
+
+        User updatedUser = userRepository.findById(adoptionCenterId).orElseThrow(() -> new RuntimeException("User not found after update"));
+        request.getSession().invalidate();
+        HttpSession newSession = request.getSession(true);
+        newSession.setAttribute("user", updatedUser);
+
+        return ResponseEntity.ok("Phone number updated to: " + adoptionCenterDTO.getPhoneNumber());
+    }
 }

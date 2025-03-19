@@ -66,6 +66,12 @@ export default function ProfileDashboardComponent() {
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
+    const [adoptionCenterName, setAdoptionCenterName] = useState("");
+    const [websiteLink, setWebsiteLink] = useState("");
+    const [bio, setBio] = useState(false);
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [isUpdated, setIsUpdated] = useState(false);
+
     const [openModal, setOpenModal] = React.useState(false);
 
     const handleModalOpen = () => {
@@ -383,6 +389,173 @@ export default function ProfileDashboardComponent() {
         // Reset form
         setEventData(initialEventData);
         handleModalClose();
+    };
+
+    useEffect(() => {
+        if (user) {
+            setAdoptionCenterName(user.adoptionCenterName || "");
+            setWebsiteLink(user.website || "");
+            setBio(user.bio || "");
+            setPhoneNumber(user.phoneNumber || "");
+        }
+    }, [user]);
+
+    const handleUpdateProfile = async () => {
+        if (adoptionCenterName !== user.adoptionCenterName) await updateAdoptionCenterName();
+        if (websiteLink !== user.website) await updateWebsiteLink();
+        if (bio !== user.bio) await updateBio();
+        if (phoneNumber !== user.phoneNumber) await updatePhoneNumber();
+
+        fetchUserSession();
+        setIsUpdated(false);
+    };
+
+    const handleAdoptionCenterNameChange = (event) => {
+        setAdoptionCenterName(event.target.value);
+        setIsUpdated(
+            event.target.value !== user?.adoptionCenterName ||
+                websiteLink !== user?.website ||
+                bio !== user?.bio ||
+                phoneNumber !== user?.phoneNumber,
+        );
+    };
+
+    const handleWebsiteChange = (event) => {
+        setWebsiteLink(event.target.value);
+        setIsUpdated(
+            adoptionCenterName !== user?.adoptionCenterName ||
+                event.target.value !== user?.website ||
+                bio !== user?.bio ||
+                phoneNumber !== user?.phoneNumber,
+        );
+    };
+
+    const handleBioChange = (event) => {
+        setBio(event.target.value);
+        setIsUpdated(
+            adoptionCenterName !== user?.adoptionCenterName ||
+                websiteLink !== user?.website ||
+                event.target.value !== user?.bio ||
+                phoneNumber !== user?.phoneNumber,
+        );
+    };
+
+    const handlePhoneNumberChange = (event) => {
+        setPhoneNumber(event.target.value);
+        setIsUpdated(
+            adoptionCenterName !== user?.adoptionCenterName ||
+                websiteLink !== user?.website ||
+                bio !== user?.bio ||
+                event.target.value !== user?.phoneNumber,
+        );
+    };
+
+    const updateAdoptionCenterName = async () => {
+        try {
+            const response = await fetch(
+                `${API_URL}/api/adoption-center/change-name/${user.id}`,
+                {
+                    method: "PUT",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        adoptionCenterName,
+                    }),
+                },
+            );
+
+            if (response.ok) {
+                console.log("✅ Adoption center name updated successfully");
+                setIsUpdated(false);
+            } else {
+                console.error("Failed to update adoption center name");
+            }
+        } catch (error) {
+            console.error("Error updating adoption center name:", error);
+        }
+    };
+
+    const updateWebsiteLink = async () => {
+        try {
+            const response = await fetch(
+                `${API_URL}/api/adoption-center/update-website-link/${user.id}`,
+                {
+                    method: "PUT",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        website: websiteLink,
+                    }),
+                },
+            );
+
+            if (response.ok) {
+                console.log("✅ Website link updated successfully");
+                setIsUpdated(false);
+            } else {
+                console.error("Failed to update website link");
+            }
+        } catch (error) {
+            console.error("Error updating website link:", error);
+        }
+    };
+
+    const updateBio = async () => {
+        try {
+            const response = await fetch(
+                `${API_URL}/api/adoption-center/update-bio/${user.id}`,
+                {
+                    method: "PUT",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        bio,
+                    }),
+                },
+            );
+
+            if (response.ok) {
+                console.log("✅ Bio updated successfully");
+                setIsUpdated(false);
+            } else {
+                console.error("Failed to update bio");
+            }
+        } catch (error) {
+            console.error("Error updating bio:", error);
+        }
+    };
+
+    const updatePhoneNumber = async () => {
+        try {
+            const response = await fetch(
+                `${API_URL}/api/adoption-center/update-phone-number/${user.id}`,
+                {
+                    method: "PUT",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        phoneNumber,
+                    }),
+                },
+            );
+
+            if (response.ok) {
+                console.log("✅ Phone number updated successfully");
+                setIsUpdated(false);
+            } else {
+                console.error("Failed to update phone number");
+            }
+        } catch (error) {
+            console.error("Error updating phone number:", error);
+        }
     };
 
     return (
@@ -1369,7 +1542,10 @@ export default function ProfileDashboardComponent() {
                                 <div className={styles.dashboardContentTop}>
                                     <TextField
                                         label="Adoption Center Name"
-                                        value={user?.adoptionCenterName || ""}
+                                        value={adoptionCenterName}
+                                        onChange={
+                                            handleAdoptionCenterNameChange
+                                        }
                                         id="firstName"
                                         size="small"
                                     />
@@ -1392,6 +1568,41 @@ export default function ProfileDashboardComponent() {
                                         shrink: true,
                                     }}
                                 />
+                                <TextField
+                                    label="Website Link"
+                                    value={websiteLink}
+                                    onChange={handleWebsiteChange}
+                                    fullWidth
+                                    id="website link"
+                                    size="small"
+                                />
+                                <TextField
+                                    label="Bio"
+                                    value={bio}
+                                    onChange={handleBioChange}
+                                    fullWidth
+                                    id="bio"
+                                    size="small"
+                                    multiline
+                                    rows={3}
+                                />
+                                <TextField
+                                    label="Phone Number"
+                                    value={phoneNumber}
+                                    onChange={handlePhoneNumberChange}
+                                    fullWidth
+                                    id="phone number"
+                                    size="small"
+                                />
+
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={handleUpdateProfile}
+                                    disabled={!isUpdated}
+                                >
+                                    Update Profile
+                                </Button>
                             </div>
                         </div>
                     )}

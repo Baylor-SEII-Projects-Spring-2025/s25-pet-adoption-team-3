@@ -2,25 +2,56 @@ package petadoption.api.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import petadoption.api.DTO.EventRequestDTO;
 import petadoption.api.models.Event;
 import petadoption.api.models.User;
 import petadoption.api.repository.EventRepository;
 import petadoption.api.repository.UserRepository;
 
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private static final Logger logger = LoggerFactory.getLogger(EventService.class);
+    private final GCSStorageServiceEvents gcsStorageServiceEvents;
 
-    public EventService(EventRepository eventRepository, UserRepository userRepository) {
+    public EventService(EventRepository eventRepository, UserRepository userRepository, GCSStorageServiceEvents gcsStorageServiceEvents) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
+        this.gcsStorageServiceEvents = gcsStorageServiceEvents;
     }
+
+    public ResponseEntity<Event> createEventWithImage(User user, Long adoptionCenterId, String title,
+                                                      String description, LocalDate startDate, LocalDate endDate,
+                                                      MultipartFile file) {
+        try {
+            String fileName = "event_photo_" + adoptionCenterId + "_" + UUID.randomUUID();
+            String uploadedFileUrl = gcsStorageServiceEvents.uploadFile(file, fileName);
+
+            Event event = new Event();
+            event.setAdoptionCenter(user);
+            event.setTitle(title);
+            event.setDescription(description);
+            event.setStartDate(startDate);
+            event.setEndDate(endDate);
+            event.setImage(uploadedFileUrl);
+
+            eventRepository.save(event);
+
+            return ResponseEntity.status(201).body(event);
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
 
     public boolean createEvent(Long adoptionCenterId, EventRequestDTO eventRequestDTO) {
         Optional<User> adoptionCenterOptional = userRepository.findById(adoptionCenterId);

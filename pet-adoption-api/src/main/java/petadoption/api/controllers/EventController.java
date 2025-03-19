@@ -3,6 +3,7 @@ package petadoption.api.controllers;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import petadoption.api.services.GCSStorageServiceEvents;
 import petadoption.api.services.SessionValidation;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,43 +39,28 @@ public class EventController {
         this.eventRepository = eventRepository;
     }
 
-    @PostMapping("/{eventId}/uploadEventPhoto")
-    public ResponseEntity<Event> uploadEventPhoto(@PathVariable Long eventId, @RequestParam("file") MultipartFile file, HttpServletRequest request) {
-        Optional<Event> eventOptional = eventRepository.findById(eventId);
-        if (eventOptional.isEmpty()) {
-            return ResponseEntity.badRequest().body(null);
-        }
+    @PostMapping("/create-event-with-image/{adoptionCenterId}")
+    public ResponseEntity<Event> createEventWithImage(
+            HttpSession session,
+            @PathVariable Long adoptionCenterId,
+            @RequestParam("title") String title,
+            @RequestParam("description") String description,
+            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam("file") MultipartFile file) {
 
-        try {
-            String fileName = "event_photo_" + eventId + "_" + UUID.randomUUID();
-            String uploadFileUrl = gcsStorageServiceEvents.uploadFile(file, fileName);
-
-            Event event = eventOptional.get();
-            event.setImage(uploadFileUrl);
-
-            eventRepository.saveAndFlush(event);
-
-            Event updatedEvent = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found after update"));
-
-            System.out.println("Pet AFTER UPLOAD: " + updatedEvent.getImage());
-
-            return ResponseEntity.ok(updatedEvent);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(null);
-        }
-    }
-
-    @PostMapping("/create-event/{adoptionCenterId}")
-    public ResponseEntity<String> createEvent(HttpSession session, @PathVariable Long adoptionCenterId, @RequestBody @Valid EventRequestDTO eventRequestDTO) {
         ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
         if (!validationResponse.getStatusCode().is2xxSuccessful()) {
-            return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
+            return ResponseEntity.status(validationResponse.getStatusCode()).body(null);
         }
+        User user = (User) validationResponse.getBody();
 
-        boolean created = eventService.createEvent(adoptionCenterId, eventRequestDTO);
-        return created ? ResponseEntity.status(201).body("Event created successfully.") : ResponseEntity.status(400).body("Invalid adoption center ID.");
+        ResponseEntity<Event> eventResponse = eventService.createEventWithImage(
+                user, adoptionCenterId, title, description, startDate, endDate, file);
+
+        return eventResponse;
     }
+
 
     @DeleteMapping("/delete-event")
     public ResponseEntity<String> deleteEvent(HttpSession session, @RequestParam Long eventId, @RequestParam Long adoptionCenterId) {
