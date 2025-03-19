@@ -40,7 +40,7 @@ public class PetService {
         pet.setName(petRequestDTO.getName());
         pet.setBreed(petRequestDTO.getBreed());
         pet.setSpayedStatus(petRequestDTO.getSpayedStatus());
-        pet.setBirthday(petRequestDTO.getBirthdate());
+        pet.setBirthdate(petRequestDTO.getBirthdate());
         pet.setAboutMe(petRequestDTO.getAboutMe());
         pet.setExtra1(petRequestDTO.getExtra1());
         pet.setExtra2(petRequestDTO.getExtra2());

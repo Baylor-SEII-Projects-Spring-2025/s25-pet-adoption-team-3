@@ -34,7 +34,7 @@ public class Pet {
     private String spayedStatus; //"Spayed Female", "Unspayed Female", etc.
 
     @Column(nullable = false, columnDefinition="date default '9999-12-30'")
-    private LocalDate birthday;
+    private LocalDate birthdate;
 
     @Column(columnDefinition = "TEXT")
     private String aboutMe;
