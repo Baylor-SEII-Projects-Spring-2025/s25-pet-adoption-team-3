@@ -93,4 +93,14 @@ public class EventController {
         return ResponseEntity.ok(events);
     }
 
+    @GetMapping("/get-event/{eventId}")
+    public ResponseEntity<?> getEventById(@PathVariable Long eventId) {
+        Optional<Event> eventOptional = eventService.getEventById(eventId);
+
+        if (eventOptional.isEmpty()) {
+            return ResponseEntity.ok("Event not found.");
+        }
+
+        return ResponseEntity.ok(eventOptional.get());
+    }
 }
