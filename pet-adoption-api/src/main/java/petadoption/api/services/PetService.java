@@ -30,8 +30,8 @@ public class PetService {
         this.gcsStorageServicePets = gcsStorageServicePets;
     }
 
-    public ResponseEntity<Pet> addPetWithImages(User user, PetRequestDTO petRequestDTO, List<MultipartFile> files) {
-        if (files.size() != 4) {
+    public ResponseEntity<Pet> addPetWithImages(User user, PetRequestDTO petRequestDTO, MultipartFile[] files) {
+        if (files.length != 4) {
             return ResponseEntity.status(400).body(null);
         }
 
@@ -71,7 +71,7 @@ public class PetService {
     }
 
 
-    public boolean editPet(User user, Long petId, PetRequestDTO petRequestDTO, List<MultipartFile> files) {
+    public boolean editPet(User user, Long petId, PetRequestDTO petRequestDTO, MultipartFile[] files) {
         Optional<Pet> petOptional = petRepository.findById(petId);
 
         if (petOptional.isEmpty()) {

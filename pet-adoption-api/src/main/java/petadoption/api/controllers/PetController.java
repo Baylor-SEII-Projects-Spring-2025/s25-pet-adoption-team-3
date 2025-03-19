@@ -50,7 +50,7 @@ public class PetController {
             @RequestParam("extra1") String extra1,
             @RequestParam("extra2") String extra2,
             @RequestParam("extra3") String extra3,
-            @RequestParam("files") List<MultipartFile> files) {
+            @RequestParam("files") MultipartFile[] files) {
 
         ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
         if (!validationResponse.getStatusCode().is2xxSuccessful()) {
@@ -78,7 +78,7 @@ public class PetController {
             HttpSession session,
             @PathVariable Long id,
             @RequestPart("pet") @Valid PetRequestDTO petRequestDTO,
-            @RequestParam("files") List<MultipartFile> files) {
+            @RequestParam("files") MultipartFile[] files) {
 
         ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
         if (!validationResponse.getStatusCode().is2xxSuccessful()) {
