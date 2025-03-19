@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import petadoption.api.DTO.AdoptionCenterDTO;
+import petadoption.api.models.User;
 import petadoption.api.repository.UserRepository;
 import petadoption.api.services.AdoptionCenterService;
 
