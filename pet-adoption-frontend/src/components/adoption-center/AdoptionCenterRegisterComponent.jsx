@@ -14,7 +14,7 @@ export default function AdoptionCenterRegisterComponent() {
         email: "",
         password: "",
         confirmPassword: "",
-        phone: "",
+        phoneNumber: "",
         website: "",
         bio: "",
         photo: null,
@@ -56,7 +56,7 @@ export default function AdoptionCenterRegisterComponent() {
             adoptionCenterName: formData.adoptionCenterName,
             email: formData.email,
             password: formData.password,
-            phone: formData.phone,
+            phoneNumber: formData.phoneNumber,
             website: formData.website,
             bio: formData.bio,
             photo: placeholderPhotoUrl,
@@ -125,7 +125,7 @@ export default function AdoptionCenterRegisterComponent() {
         passwordScore >= 2 &&
         isPasswordSame;
 
-    const isStep2Valid = formData.phone.trim() && formData.website.trim();
+    const isStep2Valid = formData.phoneNumber.trim() && formData.website.trim();
 
     const isStep3Valid = formData.bio.trim() && formData.photo;
 
@@ -222,9 +222,9 @@ export default function AdoptionCenterRegisterComponent() {
                             <>
                                 <TextField
                                     label="Phone Number"
-                                    name="phone"
+                                    name="phoneNumber"
                                     size="small"
-                                    value={formData.phone}
+                                    value={formData.phoneNumber}
                                     onChange={handleChange}
                                 />
                                 <TextField
@@ -295,7 +295,9 @@ export default function AdoptionCenterRegisterComponent() {
                                             ) : null
                                         }
                                     >
-                                        {loading ? "Creating account..." : "Sign Up"}
+                                        {loading
+                                            ? "Creating account..."
+                                            : "Sign Up"}
                                     </Button>
                                 </section>
                             </>
