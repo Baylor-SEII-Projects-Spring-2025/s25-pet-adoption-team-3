@@ -12,6 +12,7 @@ import petadoption.api.repository.UserRepository;
 import petadoption.api.services.AdoptionCenterService;
 
 import petadoption.api.services.GCSStorageService;
+import petadoption.api.services.SessionValidation;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -23,12 +24,15 @@ import java.util.UUID;
 public class AdoptionCenterController {
     private final AdoptionCenterService adoptionCenterService;
     private final GCSStorageService gcsStorageService;
+    private final UserRepository userRepository;
+    private final SessionValidation sessionValidation;
 
 
-    public AdoptionCenterController(AdoptionCenterService adoptionCenterService) {
+    public AdoptionCenterController(AdoptionCenterService adoptionCenterService, UserRepository userRepository, SessionValidation sessionValidation) {
+        this.sessionValidation = sessionValidation;
         this.adoptionCenterService = adoptionCenterService;
         this.gcsStorageService = new GCSStorageService();
-
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/register")
@@ -46,6 +50,46 @@ public class AdoptionCenterController {
         session.setAttribute("user", user); //Updates the session with the new name
 
         return ResponseEntity.ok("Adoption center name updated successfully.");
+    }
+
+    @PutMapping("/update-website-link")
+    public ResponseEntity<String> updateWebsiteLink(HttpSession session, @RequestBody AdoptionCenterDTO adoptionCenterDTO) {
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
+        }
+
+        User adoptionCenter = (User) validationResponse.getBody();
+        adoptionCenter.setWebsite(adoptionCenterDTO.getWebsite());
+        userRepository.save(adoptionCenter);
+
+        return ResponseEntity.ok("Website link updated successfully.");
+    }
+
+    @PutMapping("/update-bio")
+    public ResponseEntity<String> updateBio(HttpSession session, @RequestBody AdoptionCenterDTO adoptionCenterDTO) {
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
+        }
+        User adoptionCenter = (User) validationResponse.getBody();
+        adoptionCenter.setBio(adoptionCenterDTO.getBio());
+        userRepository.save(adoptionCenter);
+
+        return ResponseEntity.ok("Bio updated successfully.");
+    }
+
+    @PutMapping("/update-phone-number")
+    public ResponseEntity<String> updatePhoneNumber(HttpSession session, @RequestBody AdoptionCenterDTO adoptionCenterDTO) {
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
+        }
+        User adoptionCenter = (User) validationResponse.getBody();
+        adoptionCenter.setPhoneNumber(adoptionCenterDTO.getPhoneNumber());
+        userRepository.save(adoptionCenter);
+
+        return ResponseEntity.ok("Phone number updated successfully.");
     }
 
 }
