@@ -280,11 +280,8 @@
     align-items: center;
     gap: 10px;
     cursor: pointer;
-    margin-left: auto;
     width: 100%;
-    margin-left: auto;
     justify-content: flex-end !important;
-    max-width: 120px;
 }
 
 .addPetButton img {
@@ -507,4 +504,17 @@
     font-size: 1.3rem;
     font-weight: bold;
     color: #333;
+}
+
+.searchField{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 15px;
+    width: 100%;
+    max-width: 200px !important;
+}
+
+.addPetButtonClass{
+    width: 120px;
 }

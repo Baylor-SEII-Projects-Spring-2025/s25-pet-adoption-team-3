@@ -76,6 +76,9 @@ export default function ProfileDashboardComponent() {
     
     const [availablePets, setAvailablePets] = useState([]);
 
+    const [searchQuery, setSearchQuery] = useState("");
+
+
 
     const handleModalOpen = () => {
         setOpenModal(true);
@@ -429,6 +432,19 @@ export default function ProfileDashboardComponent() {
         }
     }, [user, selectedPets]);
 
+    // searching in available pets logic
+    const handleSearchChange = (event) => {
+        setSearchQuery(event.target.value.toLowerCase());
+    };
+
+    const filteredPets = availablePets.filter(
+        (pet) =>
+            pet.name.toLowerCase().includes(searchQuery) ||
+            pet.breed.toLowerCase().includes(searchQuery) ||
+            pet.spayedStatus.toLowerCase().includes(searchQuery),
+    );
+
+
 
 
     // update adoption center logic
@@ -754,9 +770,20 @@ export default function ProfileDashboardComponent() {
                                 {selectedPets === "My Pets" && (
                                     <div>
                                         <div className={styles.addPetButton}>
+                                            <TextField
+                                                label="Search Pets"
+                                                variant="outlined"
+                                                fullWidth
+                                                value={searchQuery}
+                                                onChange={handleSearchChange}
+                                                className={styles.searchField}
+                                                size="small"
+                                                sx={{ mb: 2 }}
+                                            />
                                             <Button
                                                 variant="contained"
                                                 color="primary"
+                                                className={styles.addPetButtonClass}
                                                 onClick={handleModalOpen}
                                             >
                                                 <img
@@ -1089,70 +1116,65 @@ export default function ProfileDashboardComponent() {
                                             </Modal>
                                         </div>
                                         <div className={styles.petsText}>
-                                            {availablePets.length > 0 ? (
+                                            {filteredPets.length > 0 ? (
                                                 <div
                                                     className={styles.petsGrid}
                                                 >
-                                                    {availablePets.map(
-                                                        (pet) => (
-                                                            <div
-                                                                key={pet.id}
+                                                    {filteredPets.map((pet) => (
+                                                        <div
+                                                            key={pet.id}
+                                                            className={
+                                                                styles.petCard
+                                                            }
+                                                        >
+                                                            <img
+                                                                src={
+                                                                    pet.image[0]
+                                                                }
+                                                                alt={pet.name}
                                                                 className={
-                                                                    styles.petCard
+                                                                    styles.petImage
+                                                                }
+                                                            />
+                                                            <div
+                                                                className={
+                                                                    styles.petDetails
                                                                 }
                                                             >
-                                                                <img
-                                                                    src={
-                                                                        pet
-                                                                            .image[0]
-                                                                    }
-                                                                    alt={
-                                                                        pet.name
-                                                                    }
-                                                                    className={
-                                                                        styles.petImage
-                                                                    }
-                                                                />
-                                                                <div
-                                                                    className={
-                                                                        styles.petDetails
-                                                                    }
-                                                                >
-                                                                    <div>
-                                                                        <p
-                                                                            className={
-                                                                                styles.petName
-                                                                            }
-                                                                        >
-                                                                            {
-                                                                                pet.name
-                                                                            }
-                                                                        </p>
-                                                                        <p>
-                                                                            Breed:{" "}
-                                                                            {
-                                                                                pet.breed
-                                                                            }
-                                                                        </p>
-                                                                        <p>
-                                                                            {
-                                                                                pet.spayedStatus
-                                                                            }
-                                                                        </p>
-                                                                        <p>
-                                                                            Born:{" "}
-                                                                            {pet.birthdate.join(
-                                                                                "-",
-                                                                            )}
-                                                                        </p>
-                                                                    </div>
+                                                                <div>
+                                                                    <p
+                                                                        className={
+                                                                            styles.petName
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            pet.name
+                                                                        }
+                                                                    </p>
+                                                                    <p>
+                                                                        Breed:{" "}
+                                                                        {
+                                                                            pet.breed
+                                                                        }
+                                                                    </p>
+                                                                    <p>
+                                                                        {
+                                                                            pet.spayedStatus
+                                                                        }
+                                                                    </p>
+                                                                    <p>
+                                                                        Born:{" "}
+                                                                        {pet.birthdate.join(
+                                                                            "-",
+                                                                        )}
+                                                                    </p>
                                                                 </div>
                                                             </div>
-                                                        ),
-                                                    )}
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             ) : (
-                                                <p>No available pets found.</p>
+                                                <p>No pets found.</p>
                                             )}
                                         </div>
                                     </div>
