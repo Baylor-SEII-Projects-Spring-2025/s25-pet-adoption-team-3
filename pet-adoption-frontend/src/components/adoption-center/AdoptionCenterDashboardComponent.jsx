@@ -74,6 +74,12 @@ export default function ProfileDashboardComponent() {
     const [isUpdated, setIsUpdated] = useState(false);
 
     const [openModal, setOpenModal] = React.useState(false);
+    
+    const [availablePets, setAvailablePets] = useState([]);
+
+    const [searchQuery, setSearchQuery] = useState("");
+
+
 
     const handleModalOpen = () => {
         setOpenModal(true);
@@ -271,6 +277,7 @@ export default function ProfileDashboardComponent() {
             const formData = new FormData();
             extractImageFiles(petData, formData);
 
+
             formData.append("name", petData.name);
             formData.append("breed", petData.breed);
             formData.append("spayedStatus", petData.spayedStatus);
@@ -343,7 +350,6 @@ export default function ProfileDashboardComponent() {
         );
     };
 
-    // Handle form submission
     const handleEventSubmit = async (e) => {
         e.preventDefault();
 
@@ -383,6 +389,58 @@ export default function ProfileDashboardComponent() {
         handleModalClose();
     };
 
+    //fetch available pets logic
+    const fetchAvailablePets = async () => {
+        try {
+            const response = await fetch(
+                `http://localhost:8080/api/pet/get-all-pets/${user.id}`,
+                {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                },
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch pets");
+            }
+
+            const data = await response.json();
+
+            // Filter only available pets
+            const filteredPets = data.filter(
+                (pet) => pet.availabilityStatus === "AVAILABLE",
+            );
+            setAvailablePets(filteredPets);
+        } catch (error) {
+            console.error("Error fetching pets:", error);
+        }
+    };
+
+    useEffect(() => {
+        if (user && selectedPets === "My Pets") {
+            fetchAvailablePets();
+        }
+    }, [user, selectedPets]);
+
+    // searching in available pets logic
+    const handleSearchChange = (event) => {
+        setSearchQuery(event.target.value.toLowerCase());
+    };
+
+    const filteredPets = availablePets.filter(
+        (pet) =>
+            pet.name.toLowerCase().includes(searchQuery) ||
+            pet.breed.toLowerCase().includes(searchQuery) ||
+            pet.spayedStatus.toLowerCase().includes(searchQuery),
+    );
+
+
+
+
+    // update adoption center logic
     useEffect(() => {
         if (user) {
             setAdoptionCenterName(user.adoptionCenterName || "");
@@ -705,9 +763,20 @@ export default function ProfileDashboardComponent() {
                                 {selectedPets === "My Pets" && (
                                     <div>
                                         <div className={styles.addPetButton}>
+                                            <TextField
+                                                label="Search Pets"
+                                                variant="outlined"
+                                                fullWidth
+                                                value={searchQuery}
+                                                onChange={handleSearchChange}
+                                                className={styles.searchField}
+                                                size="small"
+                                                sx={{ mb: 2 }}
+                                            />
                                             <Button
                                                 variant="contained"
                                                 color="primary"
+                                                className={styles.addPetButtonClass}
                                                 onClick={handleModalOpen}
                                             >
                                                 <img
@@ -1040,16 +1109,63 @@ export default function ProfileDashboardComponent() {
                                             </Modal>
                                         </div>
                                         <div className={styles.petsText}>
-                                            {user?.likes?.length > 0 ? (
-                                                <ul>
-                                                    {user.likes.map(
-                                                        (like, index) => (
-                                                            <li key={index}>
-                                                                {like}
-                                                            </li>
-                                                        ),
-                                                    )}
-                                                </ul>
+                                            {filteredPets.length > 0 ? (
+                                                <div
+                                                    className={styles.petsGrid}
+                                                >
+                                                    {filteredPets.map((pet) => (
+                                                        <div
+                                                            key={pet.id}
+                                                            className={
+                                                                styles.petCard
+                                                            }
+                                                        >
+                                                            <img
+                                                                src={
+                                                                    pet.image[0]
+                                                                }
+                                                                alt={pet.name}
+                                                                className={
+                                                                    styles.petImage
+                                                                }
+                                                            />
+                                                            <div
+                                                                className={
+                                                                    styles.petDetails
+                                                                }
+                                                            >
+                                                                <div>
+                                                                    <p
+                                                                        className={
+                                                                            styles.petName
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            pet.name
+                                                                        }
+                                                                    </p>
+                                                                    <p>
+                                                                        Breed:{" "}
+                                                                        {
+                                                                            pet.breed
+                                                                        }
+                                                                    </p>
+                                                                    <p>
+                                                                        {
+                                                                            pet.spayedStatus
+                                                                        }
+                                                                    </p>
+                                                                    <p>
+                                                                        Born:{" "}
+                                                                        {pet.birthdate.join(
+                                                                            "-",
+                                                                        )}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             ) : (
                                                 <p>No pets found.</p>
                                             )}

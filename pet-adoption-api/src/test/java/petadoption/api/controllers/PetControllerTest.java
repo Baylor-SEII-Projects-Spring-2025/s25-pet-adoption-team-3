@@ -7,8 +7,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 import java.time.LocalDate;
+
+import org.springframework.web.multipart.MultipartFile;
 import petadoption.api.DTO.PetRequestDTO;
-import petadoption.api.controllers.PetController;
 import petadoption.api.models.Pet;
 import petadoption.api.models.User;
 import petadoption.api.services.PetService;
@@ -76,7 +77,7 @@ class PetControllerTest {
         when(petService.addPetWithImages(
                 eq(adoptionCenter),
                 any(PetRequestDTO.class),
-                anyList()
+                any(MultipartFile[].class)
         )).thenReturn(ResponseEntity.status(201).body(new Pet()));
 
         ResponseEntity<Pet> response = petController.addPetWithImages(
@@ -89,7 +90,7 @@ class PetControllerTest {
                 petRequestDTO.getExtra1(),
                 petRequestDTO.getExtra2(),
                 petRequestDTO.getExtra3(),
-                Collections.emptyList()
+                new MultipartFile[0]
         );
 
         assertEquals(CREATED, response.getStatusCode());
@@ -111,14 +112,14 @@ class PetControllerTest {
         petRequestDTO.setExtra2("Good with kids");
         petRequestDTO.setExtra3("Needs a big backyard");
 
-        when(petService.editPet(eq(adoptionCenter), eq(1L), any(PetRequestDTO.class), anyList()))
+        when(petService.editPet(eq(adoptionCenter), eq(1L), any(PetRequestDTO.class), any(MultipartFile[].class)))
                 .thenReturn(true);
 
         ResponseEntity<String> response = petController.editPet(
                 session,
                 1L,
                 petRequestDTO,
-                Collections.emptyList()
+                new MultipartFile[0]
         );
 
         assertEquals(OK, response.getStatusCode());
