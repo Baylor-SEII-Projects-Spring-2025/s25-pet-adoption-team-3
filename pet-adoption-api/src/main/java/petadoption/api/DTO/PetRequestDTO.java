@@ -2,6 +2,7 @@ package petadoption.api.DTO;
 
 import lombok.Data;
 import org.antlr.v4.runtime.misc.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
 import petadoption.api.models.Pet;
 
 import java.time.LocalDate;
@@ -9,9 +10,6 @@ import java.util.List;
 
 @Data
 public class PetRequestDTO {
-    @NotNull
-    private String image; // Stores the image URLs
-
     @NotNull
     private String name;
 
@@ -22,6 +20,7 @@ public class PetRequestDTO {
     private String spayedStatus;
 
     @NotNull
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate birthdate;
 
     @NotNull

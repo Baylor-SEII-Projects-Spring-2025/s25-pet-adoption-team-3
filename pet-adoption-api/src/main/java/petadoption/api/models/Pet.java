@@ -15,8 +15,10 @@ public class Pet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String image; // Stores the image URLs
+    @CollectionTable(name = "pet_images", joinColumns = @JoinColumn(name = "pet_id"))
+    @Column(name = "image_url", nullable = false)
+    @ElementCollection
+    private List<String> image;
 
     @Column(nullable = false)
     private String name;

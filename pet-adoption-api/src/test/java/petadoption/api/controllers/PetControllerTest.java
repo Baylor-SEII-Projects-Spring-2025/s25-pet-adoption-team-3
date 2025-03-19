@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 import petadoption.api.DTO.PetRequestDTO;
+import petadoption.api.controllers.PetController;
 import petadoption.api.models.Pet;
 import petadoption.api.models.User;
 import petadoption.api.services.PetService;
@@ -22,7 +23,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.*;
 
 class PetControllerTest {
-
 
     @InjectMocks
     private PetController petController;
@@ -54,29 +54,10 @@ class PetControllerTest {
 
         when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTION_CENTER)))
                 .thenReturn((ResponseEntity) ResponseEntity.ok(adoptionCenter));
+
     }
 
-    @Test
-    void testAddPet_Success() {
-        when(session.getAttribute("user")).thenReturn(adoptionCenter);
-        doNothing().when(petService).addPet(adoptionCenter, petRequestDTO);
 
-        ResponseEntity<String> response = petController.addPet(session, petRequestDTO);
-
-        assertEquals(CREATED, response.getStatusCode());
-        assertEquals("Buddy was successfully added.", response.getBody());
-    }
-
-    @Test
-    void testEditPet_Success() {
-        when(session.getAttribute("user")).thenReturn(adoptionCenter);
-        when(petService.editPet(adoptionCenter, 1L, petRequestDTO)).thenReturn(true);
-
-        ResponseEntity<String> response = petController.editPet(session, 1L, petRequestDTO);
-
-        assertEquals(OK, response.getStatusCode());
-        assertEquals("Pet details updated successfully.", response.getBody());
-    }
 
     @Test
     void testDeletePet_Success() {
@@ -99,5 +80,4 @@ class PetControllerTest {
         assertEquals(NOT_FOUND, response.getStatusCode());
         assertNull(response.getBody());
     }
-
 }

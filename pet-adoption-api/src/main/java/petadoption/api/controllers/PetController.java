@@ -2,6 +2,7 @@ package petadoption.api.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +16,7 @@ import jakarta.validation.Valid;
 import petadoption.api.services.SessionValidation;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,55 +39,57 @@ public class PetController {
         this.sessionValidation = sessionValidation;
     }
 
-    @PostMapping("/{petId}/uploadPetPhoto")
-    public ResponseEntity<Pet> uploadPetPhoto(@PathVariable Long petId, @RequestParam("file") MultipartFile file, HttpServletRequest request) {
-        Optional<Pet> petOptional = petRepository.findById(petId);
-        if (petOptional.isEmpty()) {
-            return ResponseEntity.badRequest().body(null);
-        }
+    @PostMapping("/add-pet-with-images")
+    public ResponseEntity<Pet> addPetWithImages(
+            HttpSession session,
+            @RequestParam("name") String name,
+            @RequestParam("breed") String breed,
+            @RequestParam("spayedStatus") String spayedStatus,
+            @RequestParam("birthdate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthdate,
+            @RequestParam("aboutMe") String aboutMe,
+            @RequestParam("extra1") String extra1,
+            @RequestParam("extra2") String extra2,
+            @RequestParam("extra3") String extra3,
+            @RequestParam("files") List<MultipartFile> files) {
 
-        try {
-            String fileName = "pet_photo_" + petId + "_" + UUID.randomUUID();
-            String uploadFileUrl = gcsStorageServicePets.uploadFile(file, fileName);
-
-            Pet pet = petOptional.get();
-            pet.setImage(uploadFileUrl);
-
-            petRepository.saveAndFlush(pet);
-
-            Pet updatedPet = petRepository.findById(petId).orElseThrow(() -> new RuntimeException("Pet not found after update"));
-
-            System.out.println("Pet AFTER UPLOAD: " + updatedPet.getImage());
-
-            return ResponseEntity.ok(updatedPet);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(null);
-        }
-    }
-    @PostMapping("/add-pet")
-    public ResponseEntity<String> addPet(HttpSession session, @RequestBody @Valid PetRequestDTO petRequestDTO) {
         ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
         if (!validationResponse.getStatusCode().is2xxSuccessful()) {
-            return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
+            return ResponseEntity.status(validationResponse.getStatusCode()).body(null);
         }
-
         User user = (User) validationResponse.getBody();
-        petService.addPet(user, petRequestDTO);
-        return ResponseEntity.status(201).body(petRequestDTO.getName() + " was successfully added.");
+
+        PetRequestDTO petRequestDTO = new PetRequestDTO();
+        petRequestDTO.setName(name);
+        petRequestDTO.setBreed(breed);
+        petRequestDTO.setSpayedStatus(spayedStatus);
+        petRequestDTO.setBirthdate(birthdate);
+        petRequestDTO.setAboutMe(aboutMe);
+        petRequestDTO.setExtra1(extra1);
+        petRequestDTO.setExtra2(extra2);
+        petRequestDTO.setExtra3(extra3);
+
+        return petService.addPetWithImages(user, petRequestDTO, files);
     }
+
+
 
     @PutMapping("/edit/{id}")
-    public ResponseEntity<String> editPet(HttpSession session, @PathVariable Long id, @RequestBody @Valid PetRequestDTO petRequestDTO) {
+    public ResponseEntity<String> editPet(
+            HttpSession session,
+            @PathVariable Long id,
+            @RequestPart("pet") @Valid PetRequestDTO petRequestDTO,
+            @RequestParam("files") List<MultipartFile> files) {
+
         ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
         if (!validationResponse.getStatusCode().is2xxSuccessful()) {
             return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
         }
 
         User user = (User) validationResponse.getBody();
-        boolean updated = petService.editPet(user, id, petRequestDTO);
+        boolean updated = petService.editPet(user, id, petRequestDTO, files);
 
-        return updated ? ResponseEntity.ok("Pet details updated successfully.") : ResponseEntity.status(404).body("Pet not found or unauthorized.");
+        return updated ? ResponseEntity.ok("Pet details updated successfully.") :
+                ResponseEntity.status(404).body("Pet not found or unauthorized.");
     }
 
     @DeleteMapping("/delete/{id}")
