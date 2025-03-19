@@ -16,7 +16,7 @@ public class Pet {
     private Long id;
 
     @Column(nullable = false)
-    private String imageUrl; // Stores the image URLs
+    private String image; // Stores the image URLs
 
     @Column(nullable = false)
     private String name;
