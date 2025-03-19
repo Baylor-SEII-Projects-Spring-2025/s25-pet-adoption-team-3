@@ -335,7 +335,7 @@ export default function ProfileDashboardComponent() {
     };
 
     // Handle form submission
-    const handleEventSubmit = (e) => {
+    const handleEventSubmit = async (e) => {
         e.preventDefault();
 
         if (!isEventFormValid()) {
@@ -343,7 +343,43 @@ export default function ProfileDashboardComponent() {
             return;
         }
 
+        /*
+
+                const initialEventData = {
+                    image: null,
+                    title: "",
+                    description: "",
+                    startDate: "",
+                    endDate: "",
+                };
+         */
         console.log("Submitting event data:", eventData);
+
+        const formData = new FormData();
+        formData.append("image", eventData.image);
+        formData.append("title", eventData.title);
+        formData.append("description", eventData.description);
+        formData.append("startDate", eventData.startDate);
+        formData.append("endDate", eventData.endDate);
+
+        try {
+            const response = await fetch(
+                `${API_URL}/api/event/create-event/${user.id}`,
+                {
+                    method: "POST",
+                    body: formData,
+                    credentials: "include",
+                },
+            );
+
+            if (response.ok) {
+                console.log("✅ ", response.body);
+            } else {
+                console.log("❌ Error creating event: ", response.body);
+            }
+        } catch (error) {
+            console.log("❌ Error creating event: ", error);
+        }
 
         // Reset form
         setEventData(initialEventData);
