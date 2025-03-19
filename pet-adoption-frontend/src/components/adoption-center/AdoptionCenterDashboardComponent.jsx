@@ -361,7 +361,7 @@ export default function ProfileDashboardComponent() {
 
             const response = await fetch(
                 `${API_URL}/api/event/create-event/${user.id}`,
-                {
+            {
                     method: "POST",
                     body: JSON.stringify(eventData),
                     credentials: "include",
@@ -373,11 +373,6 @@ export default function ProfileDashboardComponent() {
 
             if (response.ok) {
                 console.log("✅ ", response.body);
-                try {
-
-                }catch(e){
-                    console.log("❌ Error creating event: ", error);
-                }
             } else {
                 console.log("❌ Error creating event: ", response.body);
             }
