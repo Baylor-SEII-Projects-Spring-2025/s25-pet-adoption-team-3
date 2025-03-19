@@ -1,13 +1,23 @@
 package petadoption.api.controllers;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.*;
 import petadoption.api.DTO.EventRequestDTO;
 import petadoption.api.models.User;
+import petadoption.api.models.Event;
 import petadoption.api.services.EventService;
+import petadoption.api.repository.EventRepository;
 import petadoption.api.services.GCSStorageServiceEvents;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000" })
 @RestController
@@ -15,10 +25,39 @@ import petadoption.api.services.GCSStorageServiceEvents;
 public class EventController {
     private final EventService eventService;
     private final GCSStorageServiceEvents gcsStorageServiceEvents;
+    private final EventRepository eventRepository;
 
-    public EventController(EventService eventService) {
+    public EventController(EventService eventService, EventRepository eventRepository) {
         this.eventService = eventService;
         this.gcsStorageServiceEvents = new GCSStorageServiceEvents();
+        this.eventRepository = eventRepository;
+    }
+
+    @PostMapping("/{eventId}/uploadEventPhoto")
+    public ResponseEntity<Event> uploadEventPhoto(@PathVariable Long eventId, @RequestParam("file") MultipartFile file, HttpServletRequest request) {
+        Optional<Event> eventOptional = eventRepository.findById(eventId);
+        if (eventOptional.isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        try {
+            String fileName = "event_photo_" + eventId + "_" + UUID.randomUUID();
+            String uploadFileUrl = gcsStorageServiceEvents.uploadFile(file, fileName);
+
+            Event event = eventOptional.get();
+            event.setImage(uploadFileUrl);
+
+            eventRepository.saveAndFlush(event);
+
+            Event updatedEvent = eventRepository.findById(eventId).orElseThrow(() -> new RuntimeException("Event not found after update"));
+
+            System.out.println("Pet AFTER UPLOAD: " + updatedEvent.getImage());
+
+            return ResponseEntity.ok(updatedEvent);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(null);
+        }
     }
 
     @PostMapping("/create-event/{adoptionCenterId}")

@@ -46,13 +46,13 @@ public class PetController {
             String uploadFileUrl = gcsStorageServicePets.uploadFile(file, fileName);
 
             Pet pet = petOptional.get();
-            pet.setImageUrl(uploadFileUrl);
+            pet.setImage(uploadFileUrl);
 
             petRepository.saveAndFlush(pet);
 
             Pet updatedPet = petRepository.findById(petId).orElseThrow(() -> new RuntimeException("Pet not found after update"));
 
-            System.out.println("Pet AFTER UPLOAD: " + updatedPet.getImageUrl());
+            System.out.println("Pet AFTER UPLOAD: " + updatedPet.getImage());
 
             return ResponseEntity.ok(updatedPet);
         } catch (IOException e) {
