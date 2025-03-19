@@ -16,40 +16,40 @@ public class Pet {
     private Long id;
 
     @CollectionTable(name = "pet_images", joinColumns = @JoinColumn(name = "pet_id"))
-    @Column(name = "image_url", nullable = false)
+    @Column(name = "image_url", nullable = false, columnDefinition = "varchar(255) default 'n/a'")
     @ElementCollection
     private List<String> image;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'n/a'")
     private String name;
 
     @ManyToOne
     @JoinColumn(name = "adoption_center_id", nullable = false)
     private User adoptionCenter;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'n/a'")
     private String breed;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'n/a'")
     private String spayedStatus; //"Spayed Female", "Unspayed Female", etc.
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition="date default '9999-12-30'")
     private LocalDate birthday;
 
     @Column(columnDefinition = "TEXT")
     private String aboutMe;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'n/a'")
     private String extra1;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'n/a'")
     private String extra2;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'n/a'")
     private String extra3;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition="enum('AVAILABLE','ARCHIVED') default 'AVAILABLE'")
     private PetStatus availabilityStatus;
 
     public enum PetStatus {

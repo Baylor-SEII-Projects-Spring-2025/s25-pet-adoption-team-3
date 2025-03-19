@@ -35,7 +35,7 @@ const initialPetData = {
     images: [null, null, null, null],
     name: "",
     breed: "",
-    status: "",
+    spayedStatus: "",
     birthdate: "",
     aboutMe: "",
     extra1: "",
@@ -216,7 +216,7 @@ export default function ProfileDashboardComponent() {
         images: [null, null, null, null],
         name: "",
         breed: "",
-        status: "",
+        spayedStatus: "",
         birthdate: "",
         aboutMe: "",
         extra1: "",
@@ -256,7 +256,7 @@ export default function ProfileDashboardComponent() {
             petData.images.every((img) => img !== null) && // All 4 images uploaded
             petData.name.trim() !== "" &&
             petData.breed.trim() !== "" &&
-            petData.status.trim() !== "" &&
+            petData.spayedStatus.trim() !== "" &&
             petData.birthdate.trim() !== "" &&
             petData.aboutMe.trim() !== "" &&
             petData.extra1.trim() !== "" &&
@@ -270,28 +270,29 @@ export default function ProfileDashboardComponent() {
             const formData = new FormData();
             petData.images.forEach((imgObj) => {
                 if (imgObj && imgObj.file) {
-                    formData.append("images", imgObj.file); // Append actual files
+                    formData.append("files", imgObj.file);
                 }
             });
 
             formData.append("name", petData.name);
             formData.append("breed", petData.breed);
-            formData.append("status", petData.status);
+            formData.append("spayedStatus", petData.spayedStatus);
             formData.append("birthdate", petData.birthdate);
             formData.append("aboutMe", petData.aboutMe);
             formData.append("extra1", petData.extra1);
             formData.append("extra2", petData.extra2);
             formData.append("extra3", petData.extra3);
 
-            // const response = await fetch(`${API_URL}/api/pets/upload`, {
-            //     method: "POST",
-            //     body: formData,
-            //     credentials: "include",
-            // });
+            const response = await fetch(`${API_URL}/api/pet/add-pet-with-images`, {
+                    method: "POST",
+                    body: formData,
+                    credentials: "include",
+                }
+            );
 
-            // if (!response.ok) {
-            //     throw new Error("Failed to upload pet details");
-            // }
+            if (!response.ok) {
+                throw new Error("Failed to upload pet details");
+            }
 
             console.log("✅ Pet added successfully");
 
@@ -341,7 +342,7 @@ export default function ProfileDashboardComponent() {
     };
 
     // Handle form submission
-    const handleEventSubmit = (e) => {
+    const handleEventSubmit = async (e) => {
         e.preventDefault();
 
         if (!isEventFormValid()) {
@@ -349,7 +350,41 @@ export default function ProfileDashboardComponent() {
             return;
         }
 
+        /*
+
+                const initialEventData = {
+                    image: null,
+                    title: "",
+                    description: "",
+                    startDate: "",
+                    endDate: "",
+                };
+         */
         console.log("Submitting event data:", eventData);
+
+        try {
+            setEventData()
+
+            const response = await fetch(
+                `${API_URL}/api/event/create-event/${user.id}`,
+            {
+                    method: "POST",
+                    body: JSON.stringify(eventData),
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                },
+            );
+
+            if (response.ok) {
+                console.log("✅ ", response.body);
+            } else {
+                console.log("❌ Error creating event: ", response.body);
+            }
+        } catch (error) {
+            console.log("❌ Error creating event: ", error);
+        }
 
         // Reset form
         setEventData(initialEventData);
@@ -838,9 +873,9 @@ export default function ProfileDashboardComponent() {
                                                         <TextField
                                                             select
                                                             label="Spayed/Neutered Status"
-                                                            name="status"
+                                                            name="spayedStatus"
                                                             value={
-                                                                petData.status
+                                                                petData.spayedStatus
                                                             }
                                                             onChange={
                                                                 handleChange
