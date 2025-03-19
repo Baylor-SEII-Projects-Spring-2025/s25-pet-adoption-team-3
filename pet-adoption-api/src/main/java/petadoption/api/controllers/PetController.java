@@ -125,7 +125,7 @@ public class PetController {
     @GetMapping("/get-all-pets/{adoptionCenterID}")
     public ResponseEntity<List<Pet>> getAllPets(@PathVariable Long adoptionCenterID) {
         List<Pet> pets = petService.getAllPets(adoptionCenterID);
-        return pets.isEmpty() ? ResponseEntity.status(404).body(null) : ResponseEntity.ok(pets);
+        return ResponseEntity.ok(pets);
     }
 
     @GetMapping("/get-pet-detail/{petId}")
