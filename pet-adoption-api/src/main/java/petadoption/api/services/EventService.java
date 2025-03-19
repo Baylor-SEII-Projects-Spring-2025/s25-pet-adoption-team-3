@@ -13,6 +13,7 @@ import petadoption.api.repository.UserRepository;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -117,5 +118,13 @@ public class EventService {
         eventRepository.save(event);
         logger.info("Event ID {} successfully updated.", eventId);
         return true;
+    }
+
+    public List<Event> getAllEvents() {
+        return eventRepository.findAll();
+    }
+
+    public Optional<Event> getEventById(Long eventId) {
+        return eventRepository.findById(eventId);
     }
 }
