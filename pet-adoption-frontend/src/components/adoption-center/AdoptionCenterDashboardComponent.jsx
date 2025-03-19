@@ -355,20 +355,16 @@ export default function ProfileDashboardComponent() {
          */
         console.log("Submitting event data:", eventData);
 
-        const formData = new FormData();
-        formData.append("image", eventData.image);
-        formData.append("title", eventData.title);
-        formData.append("description", eventData.description);
-        formData.append("startDate", eventData.startDate);
-        formData.append("endDate", eventData.endDate);
-
         try {
             const response = await fetch(
                 `${API_URL}/api/event/create-event/${user.id}`,
                 {
                     method: "POST",
-                    body: formData,
+                    body: JSON.stringify(eventData),
                     credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
                 },
             );
 
