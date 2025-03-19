@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 import petadoption.api.DTO.EventRequestDTO;
+import petadoption.api.models.Event;
 import petadoption.api.models.User;
 import petadoption.api.services.EventService;
 import petadoption.api.services.SessionValidation;
@@ -56,14 +57,32 @@ class EventControllerTest {
 
     @Test
     void testCreateEvent_Success() {
-        when(session.getAttribute("user")).thenReturn(adoptionCenter);
-        when(eventService.createEvent(1L, eventRequestDTO)).thenReturn(true);
+        when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTION_CENTER)))
+                .thenReturn((ResponseEntity) ResponseEntity.ok(adoptionCenter));
 
-        ResponseEntity<String> response = eventController.createEvent(session, 1L, eventRequestDTO);
+        when(eventService.createEventWithImage(
+                eq(adoptionCenter),
+                eq(1L),
+                anyString(),
+                anyString(),
+                any(LocalDate.class),
+                any(LocalDate.class),
+                any()
+        )).thenReturn(ResponseEntity.status(201).body(new Event()));
+
+        ResponseEntity<Event> response = eventController.createEventWithImage(
+                session,
+                1L,
+                "Adoption Fair",
+                "Join us for a pet adoption event!",
+                LocalDate.of(2025, 3, 20),
+                LocalDate.of(2025, 3, 22),
+                null  // Mock file (no image for this test)
+        );
 
         assertEquals(CREATED, response.getStatusCode());
-        assertEquals("Event created successfully.", response.getBody());
     }
+
 
     @Test
     void testEditEvent_Success() {
