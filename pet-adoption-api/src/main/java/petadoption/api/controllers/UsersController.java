@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.google.api.Http;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -106,7 +107,7 @@ public class UsersController {
     }
 
     @PutMapping("/changeFirstName/{userId}")
-    public ResponseEntity<String> changeFirstName(@PathVariable Long userId, @RequestBody UserDTO userDTO) {
+    public ResponseEntity<String> changeFirstName(@PathVariable Long userId, @RequestBody UserDTO userDTO, HttpServletRequest request) {
         if(userDTO.getFirstName() == null || userDTO.getFirstName().isEmpty()) {
             return ResponseEntity.badRequest().body("First name cannot be empty.");
         }
@@ -116,12 +117,18 @@ public class UsersController {
         }
         User user = userOptional.get();
         user.setFirstName(userDTO.getFirstName());
-        userRepository.save(user);
+        userRepository.saveAndFlush(user);
+
+        User updatedUser = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found after update"));
+        request.getSession().invalidate();
+        HttpSession newSession = request.getSession(true);
+        newSession.setAttribute("user", updatedUser);
+
         return ResponseEntity.ok("First name updated to: " + userDTO.getFirstName());
     }
 
     @PutMapping("/changeLastName/{userId}")
-    public ResponseEntity<String> changeLastName(@PathVariable Long userId, @RequestBody UserDTO userDTO) {
+    public ResponseEntity<String> changeLastName(@PathVariable Long userId, @RequestBody UserDTO userDTO, HttpServletRequest request) {
         if(userDTO.getLastName() == null || userDTO.getLastName().isEmpty()) {
             return ResponseEntity.badRequest().body("Last name cannot be empty.");
         }
@@ -131,7 +138,12 @@ public class UsersController {
         }
         User user = userOptional.get();
         user.setLastName(userDTO.getLastName());
-        userRepository.save(user);
+        userRepository.saveAndFlush(user);
+
+        User updatedUser = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found after update"));
+        request.getSession().invalidate();
+        HttpSession newSession = request.getSession(true);
+        newSession.setAttribute("user", updatedUser);
         return ResponseEntity.ok("Last name updated to: " + userDTO.getLastName());
     }
 
