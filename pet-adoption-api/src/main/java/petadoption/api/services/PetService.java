@@ -34,7 +34,7 @@ public class PetService {
         pet.setExtra1(petRequestDTO.getExtra1());
         pet.setExtra2(petRequestDTO.getExtra2());
         pet.setExtra3(petRequestDTO.getExtra3());
-        pet.setImageUrl(petRequestDTO.getImageUrl());
+        pet.setImage(petRequestDTO.getImage());
 
 
         pet.setAvailabilityStatus(Pet.PetStatus.AVAILABLE);
