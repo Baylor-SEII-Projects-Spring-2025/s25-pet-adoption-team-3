@@ -147,7 +147,9 @@ class PetControllerTest {
 
         ResponseEntity<List<Pet>> response = petController.getAllPets(1L);
 
-        assertEquals(NOT_FOUND, response.getStatusCode());
-        assertNull(response.getBody());
+        assertEquals(200, response.getStatusCodeValue());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().isEmpty());
     }
+
 }
