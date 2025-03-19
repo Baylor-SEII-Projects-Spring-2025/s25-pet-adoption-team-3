@@ -6,20 +6,19 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import petadoption.api.DTO.EventRequestDTO;
-import petadoption.api.models.User;
 import petadoption.api.models.Event;
+import petadoption.api.models.Event;
+import petadoption.api.models.User;
+import petadoption.api.repository.EventRepository;
 import petadoption.api.services.EventService;
 import petadoption.api.repository.EventRepository;
 import petadoption.api.services.GCSStorageServiceEvents;
 import petadoption.api.services.SessionValidation;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-
 
 @CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000" })
 @RestController
@@ -30,10 +29,9 @@ public class EventController {
     private final SessionValidation sessionValidation;
     private final EventRepository eventRepository;
 
-    public EventController(EventService eventService, SessionValidation sessionValidation, EventRepository eventRepository) {
+    public EventController(EventService eventService, SessionValidation sessionValidation) {
         this.eventService = eventService;
         this.gcsStorageServiceEvents = new GCSStorageServiceEvents();
-        this.eventRepository = eventRepository;
         this.sessionValidation = sessionValidation;
     }
 
