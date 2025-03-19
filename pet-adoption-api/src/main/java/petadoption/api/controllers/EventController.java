@@ -20,6 +20,7 @@ import petadoption.api.services.SessionValidation;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -85,4 +86,11 @@ public class EventController {
         boolean updated = eventService.editEvent(adoptionCenterID, eventID, eventRequestDTO);
         return updated ? ResponseEntity.ok("Event edited successfully.") : ResponseEntity.status(404).body("Event not found or unauthorized.");
     }
+
+    @GetMapping("/get-all-events")
+    public ResponseEntity<?> getAllEvents() {
+        List<Event> events = eventService.getAllEvents();
+        return ResponseEntity.ok(events);
+    }
+
 }
