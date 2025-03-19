@@ -42,13 +42,6 @@ CREATE TABLE IF NOT EXISTS pet (
     FOREIGN KEY (adoption_center_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
-
-CREATE TABLE IF NOT EXISTS pet_images (
-    pet_id BIGINT NOT NULL,
-    images VARCHAR(255),
-    FOREIGN KEY (pet_id) REFERENCES pet(id) ON DELETE CASCADE
-);
-
 CREATE TABLE IF NOT EXISTS event (
     id                  BIGINT AUTO_INCREMENT PRIMARY KEY,
     adoption_center_id  BIGINT       NOT NULL,
