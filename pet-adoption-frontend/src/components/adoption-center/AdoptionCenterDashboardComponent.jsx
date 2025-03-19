@@ -393,7 +393,7 @@ export default function ProfileDashboardComponent() {
     const fetchAvailablePets = async () => {
         try {
             const response = await fetch(
-                `http://localhost:8080/api/pet/get-all-pets/${user.id}`,
+                `${API_URL}/api/pet/get-all-pets/${user.id}`,
                 {
                     method: "GET",
                     credentials: "include",
