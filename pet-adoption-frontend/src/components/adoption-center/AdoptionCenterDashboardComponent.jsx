@@ -15,6 +15,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { extractImageFiles } from "@/utils/extractImageFiles";
+import { CircularProgress } from "@mui/material";
 
 dayjs.extend(isSameOrAfter);
 
@@ -66,6 +67,7 @@ export default function ProfileDashboardComponent() {
     const [uploadError, setUploadError] = useState("");
     const anchorRef = useRef(null);
     const [eventData, setEventData] = useState(initialEventData);
+    const [loading, setLoading] = useState(false);
 
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
@@ -258,7 +260,6 @@ export default function ProfileDashboardComponent() {
         }
 
         console.log("Submitting pet data:", petData);
-        handleModalClose();
     };
 
     const isFormValid = () => {
@@ -276,6 +277,7 @@ export default function ProfileDashboardComponent() {
     };
 
     const handleAddPetSubmit = async () => {
+        setLoading(true);
         try {
             const formData = new FormData();
             extractImageFiles(petData, formData);
@@ -303,13 +305,18 @@ export default function ProfileDashboardComponent() {
             }
 
             console.log("✅ Pet added successfully");
-
-            // Reset form
-            setPetData(initialPetData);
-            handleModalClose();
         } catch (error) {
             console.error("Error uploading pet data:", error);
+        } finally {
+            setLoading(false);
         }
+
+        // Reset form
+        setPetData(initialPetData);
+        handleModalClose();
+
+        // Refresh pets
+        fetchAvailablePets();
     };
 
     // add an event logic
@@ -356,6 +363,7 @@ export default function ProfileDashboardComponent() {
 
     const handleEventSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
         if (!isEventFormValid()) {
             alert("Please fill out all fields and upload an image.");
@@ -388,11 +396,16 @@ export default function ProfileDashboardComponent() {
             }
         } catch (error) {
             console.log("❌ Error creating event: ", error);
+        } finally {
+            setLoading(false);
         }
 
         // Reset form
         setEventData(initialEventData);
         handleModalClose();
+
+        // Refresh events
+        fetchAvailableEvents();
     };
 
     //fetch available events logic
@@ -552,6 +565,7 @@ export default function ProfileDashboardComponent() {
     };
 
     const updateAdoptionCenterName = async () => {
+        setLoading(true);
         try {
             const response = await fetch(
                 `${API_URL}/api/adoption-center/change-name/${user.id}`,
@@ -575,10 +589,13 @@ export default function ProfileDashboardComponent() {
             }
         } catch (error) {
             console.error("Error updating adoption center name:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     const updateWebsiteLink = async () => {
+        setLoading(true);
         try {
             const response = await fetch(
                 `${API_URL}/api/adoption-center/update-website-link/${user.id}`,
@@ -602,10 +619,13 @@ export default function ProfileDashboardComponent() {
             }
         } catch (error) {
             console.error("Error updating website link:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     const updateBio = async () => {
+        setLoading(true);
         try {
             const response = await fetch(
                 `${API_URL}/api/adoption-center/update-bio/${user.id}`,
@@ -629,10 +649,13 @@ export default function ProfileDashboardComponent() {
             }
         } catch (error) {
             console.error("Error updating bio:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     const updatePhoneNumber = async () => {
+        setLoading(true);
         try {
             const response = await fetch(
                 `${API_URL}/api/adoption-center/update-phone-number/${user.id}`,
@@ -656,6 +679,8 @@ export default function ProfileDashboardComponent() {
             }
         } catch (error) {
             console.error("Error updating phone number:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -1153,8 +1178,20 @@ export default function ProfileDashboardComponent() {
                                                                 onClick={
                                                                     handleAddPetSubmit
                                                                 }
+                                                                startIcon={
+                                                                    loading ? (
+                                                                        <CircularProgress
+                                                                            size={
+                                                                                20
+                                                                            }
+                                                                            color="inherit"
+                                                                        />
+                                                                    ) : null
+                                                                }
                                                             >
-                                                                Add Pet
+                                                                {loading
+                                                                    ? "Adding Pet..."
+                                                                    : "Add Pet"}
                                                             </Button>
                                                         </Box>
                                                     </form>
@@ -1551,8 +1588,20 @@ export default function ProfileDashboardComponent() {
                                                                 disabled={
                                                                     !isEventFormValid()
                                                                 }
+                                                                startIcon={
+                                                                    loading ? (
+                                                                        <CircularProgress
+                                                                            size={
+                                                                                20
+                                                                            }
+                                                                            color="inherit"
+                                                                        />
+                                                                    ) : null
+                                                                }
                                                             >
-                                                                Create Event
+                                                                {loading
+                                                                    ? "Creating Event..."
+                                                                    : "Create Event"}
                                                             </Button>
                                                         </Box>
                                                     </form>
@@ -1849,8 +1898,16 @@ export default function ProfileDashboardComponent() {
                                     color="primary"
                                     onClick={handleUpdateProfile}
                                     disabled={!isUpdated}
+                                    startIcon={
+                                        loading ? (
+                                            <CircularProgress
+                                                size={20}
+                                                color="inherit"
+                                            />
+                                        ) : null
+                                    }
                                 >
-                                    Update Profile
+                                    {loading ? "Updating Profile..." : "Update Profile"}
                                 </Button>
                             </div>
                         </div>
