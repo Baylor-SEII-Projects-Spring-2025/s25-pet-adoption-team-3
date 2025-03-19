@@ -30,6 +30,7 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
     @Query(value = "INSERT INTO pet_images (pet_id, image_url) VALUES (:petId, :imageUrl)", nativeQuery = true)
     void insertPetImage(@Param("petId") Long petId, @Param("imageUrl") String imageUrl);
 
-
+    @Query(value = "SELECT image_url FROM pet_images WHERE pet_id = :petId", nativeQuery = true)
+    List<String> findImagesByPetId(@Param("petId") Long petId);
 
 }

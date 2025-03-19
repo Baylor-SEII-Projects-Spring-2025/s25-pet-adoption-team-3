@@ -160,4 +160,20 @@ public class PetService {
         return Optional.of(availablePets.get(0));
     }
 
+    public Optional<Pet> getPetDetail(Long petId) {
+        Optional<Pet> petOptional = petRepository.findById(petId);
+
+        if (petOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Pet pet = petOptional.get();
+
+        List<String> imageUrls = petRepository.findImagesByPetId(petId);
+        pet.setImage(imageUrls);
+
+        return Optional.of(pet);
+    }
+
+
 }

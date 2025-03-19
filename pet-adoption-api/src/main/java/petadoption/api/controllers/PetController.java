@@ -128,6 +128,17 @@ public class PetController {
         return pets.isEmpty() ? ResponseEntity.status(404).body(null) : ResponseEntity.ok(pets);
     }
 
+    @GetMapping("/get-pet-detail/{petId}")
+    public ResponseEntity<?> getPetDetail(@PathVariable Long petId) {
+        Optional<Pet> petOptional = petService.getPetDetail(petId);
+
+        if (petOptional.isEmpty()) {
+            return ResponseEntity.status(404).body("Pet not found.");
+        }
+
+        return ResponseEntity.ok(petOptional.get());
+    }
+
     @GetMapping("/swipe/get-pet")
     public ResponseEntity<Pet> getSwipePet() {
         Optional<Pet> petOptional = petService.getSwipePet();
