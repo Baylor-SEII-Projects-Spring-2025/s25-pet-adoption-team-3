@@ -1,6 +1,7 @@
 package petadoption.api.controllers;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +14,13 @@ import petadoption.api.repository.EventRepository;
 import petadoption.api.services.GCSStorageServiceEvents;
 import petadoption.api.services.SessionValidation;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+
 @CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000" })
 @RestController
 @RequestMapping("/api/event")
@@ -20,11 +28,13 @@ public class EventController {
     private final EventService eventService;
     private final GCSStorageServiceEvents gcsStorageServiceEvents;
     private final SessionValidation sessionValidation;
+    private final EventRepository eventRepository;
 
-    public EventController(EventService eventService, SessionValidation sessionValidation) {
+    public EventController(EventService eventService, SessionValidation sessionValidation, EventRepository eventRepository) {
         this.eventService = eventService;
         this.gcsStorageServiceEvents = new GCSStorageServiceEvents();
         this.eventRepository = eventRepository;
+        this.sessionValidation = sessionValidation;
     }
 
     @PostMapping("/{eventId}/uploadEventPhoto")
