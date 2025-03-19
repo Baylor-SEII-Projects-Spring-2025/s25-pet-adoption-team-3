@@ -1,6 +1,8 @@
 package petadoption.api.services;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import petadoption.api.DTO.PetRequestDTO;
 import petadoption.api.models.Pet;
 import petadoption.api.models.User;
@@ -8,41 +10,68 @@ import petadoption.api.repository.PetRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class PetService {
 
     private final PetRepository petRepository;
+    private final GCSStorageServicePets gcsStorageServicePets;
 
     private static final Logger logger = LoggerFactory.getLogger(PetService.class);
 
 
-    public PetService(PetRepository petRepository) {
+    public PetService(PetRepository petRepository, GCSStorageServicePets gcsStorageServicePets) {
         this.petRepository = petRepository;
+        this.gcsStorageServicePets = gcsStorageServicePets;
     }
 
-    public void addPet(User user, PetRequestDTO petRequestDTO) {
+    public ResponseEntity<Pet> addPetWithImages(User user, PetRequestDTO petRequestDTO, List<MultipartFile> files) {
+        if (files.size() != 4) {
+            return ResponseEntity.status(400).body(null);
+        }
+
         Pet pet = new Pet();
-        pet.setName(petRequestDTO.getName());
         pet.setAdoptionCenter(user);
+        pet.setName(petRequestDTO.getName());
         pet.setBreed(petRequestDTO.getBreed());
-        pet.setStatus(petRequestDTO.getStatus());
+        pet.setSpayedStatus(petRequestDTO.getSpayedStatus());
         pet.setBirthday(petRequestDTO.getBirthdate());
         pet.setAboutMe(petRequestDTO.getAboutMe());
         pet.setExtra1(petRequestDTO.getExtra1());
         pet.setExtra2(petRequestDTO.getExtra2());
         pet.setExtra3(petRequestDTO.getExtra3());
-        pet.setImage(petRequestDTO.getImage());
+        pet.setAvailabilityStatus(petRequestDTO.getAvailabilityStatus());
+
 
 
         pet.setAvailabilityStatus(Pet.PetStatus.AVAILABLE);
 
+        pet = petRepository.save(pet);
+
+        List<String> uploadedUrls = new ArrayList<>();
+        for (MultipartFile file : files) {
+            try {
+                String fileName = "pet_photo_" + pet.getId() + "_" + UUID.randomUUID();
+                String uploadedFileUrl = gcsStorageServicePets.uploadFile(file, fileName);
+                uploadedUrls.add(uploadedFileUrl);
+            } catch (IOException e) {
+                return ResponseEntity.status(500).body(null);
+            }
+        }
+
+        pet.setImage(uploadedUrls);
         petRepository.save(pet);
+
+        return ResponseEntity.status(201).body(pet);
     }
 
-    public boolean editPet(User user, Long petId, PetRequestDTO petRequestDTO) {
+
+    public boolean editPet(User user, Long petId, PetRequestDTO petRequestDTO, List<MultipartFile> files) {
         Optional<Pet> petOptional = petRepository.findById(petId);
 
         if (petOptional.isEmpty()) {
@@ -59,10 +88,14 @@ public class PetService {
         }
 
         petRepository.deleteById(petId);
-        addPet(user, petRequestDTO);
+        ResponseEntity<Pet> newPetResponse = addPetWithImages(user, petRequestDTO, files);
 
-        logger.info("Pet successfully updated. ID: {}", petId);
-        return true;
+        if (newPetResponse.getStatusCode().is2xxSuccessful()) {
+            logger.info("Pet successfully updated. ID: {}", petId);
+            return true;
+        }
+
+        return false;
     }
 
     public boolean deletePet(User user, Long petId) {
@@ -96,6 +129,14 @@ public class PetService {
         }
 
         return pets;
+    }
+
+    public Optional<Pet> getSwipePet() {
+        List<Pet> availablePets = petRepository.findByAvailabilityStatus(Pet.PetStatus.AVAILABLE);
+        if (availablePets.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(availablePets.get(0));
     }
 
 }

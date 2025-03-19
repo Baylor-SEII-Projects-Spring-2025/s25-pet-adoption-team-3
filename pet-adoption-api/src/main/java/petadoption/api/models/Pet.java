@@ -15,8 +15,10 @@ public class Pet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String image; // Stores the image URLs
+    @CollectionTable(name = "pet_images", joinColumns = @JoinColumn(name = "pet_id"))
+    @Column(name = "image_url", nullable = false)
+    @ElementCollection
+    private List<String> image;
 
     @Column(nullable = false)
     private String name;
@@ -29,7 +31,7 @@ public class Pet {
     private String breed;
 
     @Column(nullable = false)
-    private String status; //"Spayed Female", "Unspayed Female", etc.
+    private String spayedStatus; //"Spayed Female", "Unspayed Female", etc.
 
     @Column(nullable = false)
     private LocalDate birthday;
