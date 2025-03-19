@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import petadoption.api.DTO.EventRequestDTO;
 import petadoption.api.models.User;
 import petadoption.api.services.EventService;
+import petadoption.api.services.SessionValidation;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -28,6 +29,9 @@ class EventControllerTest {
     @Mock
     private HttpSession session;
 
+    @Mock
+    private SessionValidation sessionValidation;
+
     private User adoptionCenter;
     private EventRequestDTO eventRequestDTO;
 
@@ -45,6 +49,10 @@ class EventControllerTest {
         eventRequestDTO.setImage("some-image-url");
         eventRequestDTO.setStartDate(LocalDate.parse("2025-03-20"));
         eventRequestDTO.setEndDate(LocalDate.parse("2025-03-22"));
+
+        // ✅ Fix: Mock session validation response to avoid NullPointerException
+        when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTION_CENTER)))
+                .thenReturn((ResponseEntity) ResponseEntity.ok(adoptionCenter));
     }
 
     @Test

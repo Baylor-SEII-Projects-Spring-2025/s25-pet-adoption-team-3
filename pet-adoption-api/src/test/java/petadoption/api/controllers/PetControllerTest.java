@@ -12,6 +12,8 @@ import petadoption.api.models.User;
 import petadoption.api.services.PetService;
 
 import jakarta.servlet.http.HttpSession;
+import petadoption.api.services.SessionValidation;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -21,6 +23,7 @@ import static org.springframework.http.HttpStatus.*;
 
 class PetControllerTest {
 
+
     @InjectMocks
     private PetController petController;
 
@@ -29,6 +32,9 @@ class PetControllerTest {
 
     @Mock
     private HttpSession session;
+
+    @Mock
+    private SessionValidation sessionValidation;
 
     private User adoptionCenter;
     private PetRequestDTO petRequestDTO;
@@ -45,6 +51,9 @@ class PetControllerTest {
         petRequestDTO.setName("Buddy");
         petRequestDTO.setBreed("Golden Retriever");
         petRequestDTO.setStatus("Spayed Male");
+
+        when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTION_CENTER)))
+                .thenReturn((ResponseEntity) ResponseEntity.ok(adoptionCenter));
     }
 
     @Test
@@ -66,7 +75,7 @@ class PetControllerTest {
         ResponseEntity<String> response = petController.editPet(session, 1L, petRequestDTO);
 
         assertEquals(OK, response.getStatusCode());
-        assertEquals("Pet details updated successfully. ", response.getBody());
+        assertEquals("Pet details updated successfully.", response.getBody());
     }
 
     @Test
