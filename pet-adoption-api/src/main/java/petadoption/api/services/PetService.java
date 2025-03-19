@@ -75,28 +75,49 @@ public class PetService {
         Optional<Pet> petOptional = petRepository.findById(petId);
 
         if (petOptional.isEmpty()) {
-            logger.info("Pet ID not found in database: {}", petId);
+            logger.info("Pet ID {} not found.", petId);
             return false;
         }
 
         Pet pet = petOptional.get();
-        logger.info("Found pet: {} | Owned by adoption center ID: {}", pet.getId(), pet.getAdoptionCenter().getId());
 
         if (!pet.getAdoptionCenter().getId().equals(user.getId())) {
-            logger.info("Adoption center ID mismatch. Expected: {}, but logged-in user ID: {}", pet.getAdoptionCenter().getId(), user.getId());
+            logger.info("Unauthorized attempt to edit pet ID: {}", petId);
             return false;
         }
 
-        petRepository.deleteById(petId);
-        ResponseEntity<Pet> newPetResponse = addPetWithImages(user, petRequestDTO, files);
+        pet.setName(petRequestDTO.getName());
+        pet.setBreed(petRequestDTO.getBreed());
+        pet.setSpayedStatus(petRequestDTO.getSpayedStatus());
+        pet.setBirthdate(petRequestDTO.getBirthdate());
+        pet.setAboutMe(petRequestDTO.getAboutMe());
+        pet.setExtra1(petRequestDTO.getExtra1());
+        pet.setExtra2(petRequestDTO.getExtra2());
+        pet.setExtra3(petRequestDTO.getExtra3());
 
-        if (newPetResponse.getStatusCode().is2xxSuccessful()) {
-            logger.info("Pet successfully updated. ID: {}", petId);
-            return true;
+        petRepository.deleteImagesByPetId(petId);
+
+        List<String> uploadedUrls = new ArrayList<>();
+        for (MultipartFile file : files) {
+            try {
+                String fileName = "pet_photo_" + petId + "_" + UUID.randomUUID();
+                String uploadedFileUrl = gcsStorageServicePets.uploadFile(file, fileName);
+                uploadedUrls.add(uploadedFileUrl);
+            } catch (IOException e) {
+                logger.error("Failed to upload pet image", e);
+                return false;
+            }
         }
 
-        return false;
+        for (String imageUrl : uploadedUrls) {
+            petRepository.insertPetImage(petId, imageUrl);
+        }
+
+        petRepository.save(pet);
+        return true;
     }
+
+
 
     public boolean deletePet(User user, Long petId) {
         Optional<Pet> petOptional = petRepository.findById(petId);
