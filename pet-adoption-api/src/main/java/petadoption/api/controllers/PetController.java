@@ -12,6 +12,7 @@ import petadoption.api.repository.PetRepository;
 import petadoption.api.services.GCSStorageServicePets;
 import petadoption.api.services.PetService;
 import jakarta.validation.Valid;
+import petadoption.api.services.SessionValidation;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,11 +28,13 @@ public class PetController {
     private final PetService petService;
     private final GCSStorageServicePets gcsStorageServicePets;
     private final PetRepository petRepository;
+    private final SessionValidation sessionValidation;
 
-    public PetController(PetService petService, PetRepository petRepository) {
+    public PetController(PetService petService, PetRepository petRepository, SessionValidation sessionValidation) {
         this.gcsStorageServicePets = new GCSStorageServicePets();
         this.petService = petService;
         this.petRepository = petRepository;
+        this.sessionValidation = sessionValidation;
     }
 
     @PostMapping("/{petId}/uploadPetPhoto")
@@ -60,39 +63,39 @@ public class PetController {
             return ResponseEntity.status(500).body(null);
         }
     }
-
     @PostMapping("/add-pet")
     public ResponseEntity<String> addPet(HttpSession session, @RequestBody @Valid PetRequestDTO petRequestDTO) {
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
+        }
 
-        User user = (User) session.getAttribute("user");
-        if (user == null) return ResponseEntity.status(401).body("No active session.");
-        if (user.getRole() != User.Role.ADOPTION_CENTER) return ResponseEntity.status(403).body("Unauthorized action.");
-
+        User user = (User) validationResponse.getBody();
         petService.addPet(user, petRequestDTO);
         return ResponseEntity.status(201).body(petRequestDTO.getName() + " was successfully added.");
     }
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<String> editPet(HttpSession session, @PathVariable Long id, @RequestBody @Valid PetRequestDTO petRequestDTO) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) return ResponseEntity.status(401).body("No active session.");
-
-        if(user.getRole() != User.Role.ADOPTION_CENTER){
-            return ResponseEntity.status(403).body("Unauthorized action.");
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
         }
 
+        User user = (User) validationResponse.getBody();
         boolean updated = petService.editPet(user, id, petRequestDTO);
 
-        return updated ? ResponseEntity.ok("Pet details updated successfully. ") : ResponseEntity.status(404).body("Pet not found or unauthorized.");
+        return updated ? ResponseEntity.ok("Pet details updated successfully.") : ResponseEntity.status(404).body("Pet not found or unauthorized.");
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deletePet(HttpSession session, @PathVariable Long id) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) return ResponseEntity.status(401).body("No active session.");
-        if(user.getRole() != User.Role.ADOPTION_CENTER){
-            return ResponseEntity.status(403).body("Unauthorized action.");
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
         }
+
+        User user = (User) validationResponse.getBody();
         boolean deleted = petService.deletePet(user, id);
 
         return deleted ? ResponseEntity.ok("Pet successfully deleted.") : ResponseEntity.status(404).body("Pet not found or unauthorized.");
