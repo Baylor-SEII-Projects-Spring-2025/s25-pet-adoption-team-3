@@ -32,6 +32,10 @@ export default function ProfileDashboardComponent() {
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [isUpdated, setIsUpdated] = useState(false);
+
     const fetchUserSession = async () => {
         try {
             const response = await fetch(`${API_URL}/auth/session`, {
@@ -132,7 +136,7 @@ export default function ProfileDashboardComponent() {
                 const updatedUser = await response.json();
                 console.log("✅ Photo uploaded, updated user:", updatedUser);
                 setUser(updatedUser);
-                setUploadError(""); // Clear any previous errors
+                setUploadError("");
                 window.location.reload();
             } else if (response.status === 413) {
                 setUploadError("❌ File size too large. Max allowed is 5MB.");
@@ -157,6 +161,85 @@ export default function ProfileDashboardComponent() {
         const color2 = `hsl(${(hash * 3) % 360}, 70%, 60%)`;
 
         return `linear-gradient(135deg, ${color1}, ${color2})`;
+    };
+
+    useEffect(() => {
+        if (user) {
+            setFirstName(user.firstName || "");
+            setLastName(user.lastName || "");
+        }
+    }, [user]);
+
+    const handleFirstNameChange = (event) => {
+        setFirstName(event.target.value);
+        setIsUpdated(
+            event.target.value !== user?.firstName ||
+                lastName !== user?.lastName,
+        );
+    };
+
+    const handleLastNameChange = (event) => {
+        setLastName(event.target.value);
+        setIsUpdated(
+            firstName !== user?.firstName ||
+                event.target.value !== user?.lastName,
+        );
+    };
+
+    const updateFirstName = async () => {
+        try {
+            const response = await fetch(
+                `${API_URL}/api/users/changeFirstName/${user.id}`,
+                {
+                    method: "PUT",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ firstName }),
+                },
+            );
+
+            if (response.ok) {
+                console.log(`✅ First name updated to: ${firstName}`);
+            } else {
+                console.error("❌ Failed to update first name");
+            }
+        } catch (error) {
+            console.error("❌ Error updating first name:", error);
+        }
+    };
+
+    const updateLastName = async () => {
+        try {
+            const response = await fetch(
+                `${API_URL}/api/users/changeLastName/${user.id}`,
+                {
+                    method: "PUT",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ lastName }),
+                },
+            );
+
+            if (response.ok) {
+                console.log(`✅ Last name updated to: ${lastName}`);
+            } else {
+                console.error("❌ Failed to update last name");
+            }
+        } catch (error) {
+            console.error("❌ Error updating last name:", error);
+        }
+    };
+
+    const handleUpdateProfile = async () => {
+        if (firstName !== user.firstName) await updateFirstName();
+        if (lastName !== user.lastName) await updateLastName();
+
+        fetchUserSession();
+        setIsUpdated(false);
     };
 
     return (
@@ -555,13 +638,15 @@ export default function ProfileDashboardComponent() {
                                 <div className={styles.dashboardContentTop}>
                                     <TextField
                                         label="First Name"
-                                        value={user?.firstName || ""}
+                                        value={firstName}
+                                        onChange={handleFirstNameChange}
                                         id="firstName"
                                         size="small"
                                     />
                                     <TextField
                                         label="Last Name"
-                                        value={user?.lastName || ""}
+                                        value={lastName}
+                                        onChange={handleLastNameChange}
                                         id="lastName"
                                         size="small"
                                     />
@@ -584,6 +669,15 @@ export default function ProfileDashboardComponent() {
                                         shrink: true,
                                     }}
                                 />
+
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={handleUpdateProfile}
+                                    disabled={!isUpdated}
+                                >
+                                    Update Profile
+                                </Button>
                             </div>
                         </div>
                     )}
