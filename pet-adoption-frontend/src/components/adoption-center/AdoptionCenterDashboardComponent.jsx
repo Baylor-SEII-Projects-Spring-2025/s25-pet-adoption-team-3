@@ -12,6 +12,7 @@ import styles from "@/styles/AdoptionCenterDashboardComponent.module.css";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import {extractImageFiles} from "@/utils/extractImageFiles";
 
 const style = {
     position: "absolute",
@@ -44,7 +45,7 @@ const initialPetData = {
 };
 
 const initialEventData = {
-    image: null,
+    images: [null],
     title: "",
     description: "",
     startDate: "",
@@ -274,11 +275,8 @@ export default function ProfileDashboardComponent() {
     const handleAddPetSubmit = async () => {
         try {
             const formData = new FormData();
-            petData.images.forEach((imgObj) => {
-                if (imgObj && imgObj.file) {
-                    formData.append("files", imgObj.file);
-                }
-            });
+            extractImageFiles(petData, formData);
+
 
             formData.append("name", petData.name);
             formData.append("breed", petData.breed);
@@ -333,13 +331,18 @@ export default function ProfileDashboardComponent() {
         const file = event.target.files[0];
         if (!file) return;
 
-        const imageUrl = URL.createObjectURL(file);
-        setEventData({ ...eventData, image: imageUrl });
+        const newImages = [...eventData.images];
+        newImages[0] = {
+            preview: URL.createObjectURL(file),
+            file: file,
+        };
+
+        setEventData({ ...eventData, images: newImages });
     };
 
     const isEventFormValid = () => {
         return (
-            eventData.image !== null &&
+            eventData.images[0] !== null &&
             eventData.title.trim() !== "" &&
             eventData.description.trim() !== "" &&
             eventData.startDate.trim() !== "" &&
@@ -355,31 +358,21 @@ export default function ProfileDashboardComponent() {
             return;
         }
 
-        /*
-
-                const initialEventData = {
-                    image: null,
-                    title: "",
-                    description: "",
-                    startDate: "",
-                    endDate: "",
-                };
-         */
         console.log("Submitting event data:", eventData);
 
         try {
-            setEventData()
+            const formData = new FormData();
+            extractImageFiles(eventData, formData);
+            formData.append("title", eventData.title);
+            formData.append("description", eventData.description);
+            formData.append("startDate", eventData.startDate);
+            formData.append("endDate", eventData.endDate);
 
-            const response = await fetch(
-                `${API_URL}/api/event/create-event/${user.id}`,
-            {
+            const response = await fetch(`${API_URL}/api/event/create-event-with-image/${user.id}`, {
                     method: "POST",
-                    body: JSON.stringify(eventData),
+                    body: formData,
                     credentials: "include",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                },
+                }
             );
 
             if (response.ok) {
@@ -1293,7 +1286,7 @@ export default function ProfileDashboardComponent() {
                                                                 id="event-file-input"
                                                             />
 
-                                                            {eventData.image ? (
+                                                            {eventData.images[0] ? (
                                                                 <div
                                                                     className={
                                                                         styles.eventImageWrapper
@@ -1301,7 +1294,7 @@ export default function ProfileDashboardComponent() {
                                                                 >
                                                                     <img
                                                                         src={
-                                                                            eventData.image
+                                                                            eventData.images[0].preview
                                                                         }
                                                                         className={
                                                                             styles.previewImageEvent
@@ -1319,7 +1312,7 @@ export default function ProfileDashboardComponent() {
                                                                             setEventData(
                                                                                 {
                                                                                     ...eventData,
-                                                                                    image: null,
+                                                                                    images: [null],
                                                                                 },
                                                                             );
                                                                         }}

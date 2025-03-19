@@ -47,7 +47,7 @@ public class EventController {
             @RequestParam("description") String description,
             @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam("file") MultipartFile file) {
+            @RequestParam("files") MultipartFile files) {
 
         ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
         if (!validationResponse.getStatusCode().is2xxSuccessful()) {
@@ -56,7 +56,7 @@ public class EventController {
         User user = (User) validationResponse.getBody();
 
         ResponseEntity<Event> eventResponse = eventService.createEventWithImage(
-                user, adoptionCenterId, title, description, startDate, endDate, file);
+                user, adoptionCenterId, title, description, startDate, endDate, files);
 
         return eventResponse;
     }
