@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import petadoption.api.DTO.EventRequestDTO;
 import petadoption.api.models.Event;
 import petadoption.api.models.Event;
+import petadoption.api.models.Pet;
 import petadoption.api.models.User;
 import petadoption.api.repository.EventRepository;
 import petadoption.api.services.EventService;
@@ -102,5 +103,11 @@ public class EventController {
         }
 
         return ResponseEntity.ok(eventOptional.get());
+    }
+
+    @GetMapping("/getAllEvents/{adoptionCenterId}")
+    public ResponseEntity<?> getAllEvents(@PathVariable Long adoptionCenterId) {
+        List<Event> events = eventService.getEventsByAdoptionCenterId(adoptionCenterId);
+        return ResponseEntity.ok(events);
     }
 }
