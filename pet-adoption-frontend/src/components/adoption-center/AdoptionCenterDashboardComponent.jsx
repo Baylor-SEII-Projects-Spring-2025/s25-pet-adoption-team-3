@@ -350,16 +350,6 @@ export default function ProfileDashboardComponent() {
             return;
         }
 
-        /*
-
-                const initialEventData = {
-                    image: null,
-                    title: "",
-                    description: "",
-                    startDate: "",
-                    endDate: "",
-                };
-         */
         console.log("Submitting event data:", eventData);
 
         try {
