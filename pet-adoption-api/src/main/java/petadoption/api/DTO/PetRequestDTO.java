@@ -2,6 +2,7 @@ package petadoption.api.DTO;
 
 import lombok.Data;
 import org.antlr.v4.runtime.misc.NotNull;
+import petadoption.api.models.Pet;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,7 +19,7 @@ public class PetRequestDTO {
     private String breed;
 
     @NotNull
-    private String status;
+    private String spayedStatus;
 
     @NotNull
     private LocalDate birthdate;
@@ -32,4 +33,7 @@ public class PetRequestDTO {
     private String extra2;
     @NotNull
     private String extra3;
+
+    @NotNull
+    private Pet.PetStatus availabilityStatus;
 }

@@ -29,7 +29,7 @@ public class Pet {
     private String breed;
 
     @Column(nullable = false)
-    private String status; //"Spayed Female", "Unspayed Female", etc.
+    private String spayedStatus; //"Spayed Female", "Unspayed Female", etc.
 
     @Column(nullable = false)
     private LocalDate birthday;

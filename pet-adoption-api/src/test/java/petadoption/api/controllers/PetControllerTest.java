@@ -50,7 +50,7 @@ class PetControllerTest {
         petRequestDTO = new PetRequestDTO();
         petRequestDTO.setName("Buddy");
         petRequestDTO.setBreed("Golden Retriever");
-        petRequestDTO.setStatus("Spayed Male");
+        petRequestDTO.setSpayedStatus("Spayed Male");
 
         when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTION_CENTER)))
                 .thenReturn((ResponseEntity) ResponseEntity.ok(adoptionCenter));
