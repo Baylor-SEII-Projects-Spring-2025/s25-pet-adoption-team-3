@@ -1,7 +1,6 @@
 package petadoption.api.controllers;
 
 import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,12 +11,7 @@ import petadoption.api.models.Event;
 import petadoption.api.services.EventService;
 import petadoption.api.repository.EventRepository;
 import petadoption.api.services.GCSStorageServiceEvents;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import petadoption.api.services.SessionValidation;
 
 @CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000" })
 @RestController
@@ -25,9 +19,9 @@ import java.util.UUID;
 public class EventController {
     private final EventService eventService;
     private final GCSStorageServiceEvents gcsStorageServiceEvents;
-    private final EventRepository eventRepository;
+    private final SessionValidation sessionValidation;
 
-    public EventController(EventService eventService, EventRepository eventRepository) {
+    public EventController(EventService eventService, SessionValidation sessionValidation) {
         this.eventService = eventService;
         this.gcsStorageServiceEvents = new GCSStorageServiceEvents();
         this.eventRepository = eventRepository;
@@ -62,60 +56,36 @@ public class EventController {
 
     @PostMapping("/create-event/{adoptionCenterId}")
     public ResponseEntity<String> createEvent(HttpSession session, @PathVariable Long adoptionCenterId, @RequestBody @Valid EventRequestDTO eventRequestDTO) {
-
-        User user = (User) session.getAttribute("user");
-
-        if(user == null) {
-            return ResponseEntity.status(401).body("No active session.");
-        }
-        if (user.getRole() != User.Role.ADOPTION_CENTER) {
-            return ResponseEntity.status(403).body("Unauthorized action.");
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
         }
 
         boolean created = eventService.createEvent(adoptionCenterId, eventRequestDTO);
-        if (created) {
-            return ResponseEntity.status(201).body("Event created successfully.");
-        } else {
-            return ResponseEntity.status(400).body("Invalid adoption center ID.");
-        }
+        return created ? ResponseEntity.status(201).body("Event created successfully.") : ResponseEntity.status(400).body("Invalid adoption center ID.");
     }
 
     @DeleteMapping("/delete-event")
     public ResponseEntity<String> deleteEvent(HttpSession session, @RequestParam Long eventId, @RequestParam Long adoptionCenterId) {
-        User user = (User) session.getAttribute("user");
-        if(user == null) {
-            return ResponseEntity.status(401).body("No active session.");
-        }
-        if (user.getRole() != User.Role.ADOPTION_CENTER) {
-            return ResponseEntity.status(403).body("Unauthorized action.");
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
         }
 
         boolean deleted = eventService.deleteEvent(eventId, adoptionCenterId);
-        if (deleted) {
-            return ResponseEntity.ok("Event deleted successfully.");
-        } else {
-            return ResponseEntity.status(404).body("Event not found or unauthorized.");
-        }
+        return deleted ? ResponseEntity.ok("Event deleted successfully.") : ResponseEntity.status(404).body("Event not found or unauthorized.");
     }
 
     @PutMapping("/edit-event")
     public ResponseEntity<String> editEvent(HttpSession session, @RequestParam Long adoptionCenterID,
                                             @RequestParam Long eventID,
                                             @RequestBody @Valid EventRequestDTO eventRequestDTO) {
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
+        }
 
-        User user = (User) session.getAttribute("user");
-        if(user == null) {
-            return ResponseEntity.status(401).body("No active session.");
-        }
-        if (user.getRole() != User.Role.ADOPTION_CENTER) {
-            return ResponseEntity.status(403).body("Unauthorized action.");
-        }
         boolean updated = eventService.editEvent(adoptionCenterID, eventID, eventRequestDTO);
-        if (updated) {
-            return ResponseEntity.ok("Event edited successfully.");
-        }
-        else {
-            return ResponseEntity.status(404).body("Event not found or unauthorized.");
-        }
+        return updated ? ResponseEntity.ok("Event edited successfully.") : ResponseEntity.status(404).body("Event not found or unauthorized.");
     }
 }
