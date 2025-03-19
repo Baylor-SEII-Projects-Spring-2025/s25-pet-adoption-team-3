@@ -1357,6 +1357,30 @@ export default function ProfileDashboardComponent() {
                                         shrink: true,
                                     }}
                                 />
+                                <TextField 
+                                    label="Website Link" 
+                                    value={user?.website || ""} 
+                                    fullWidth
+                                    id="website link"
+                                    size="small"
+                                />
+                                <TextField 
+                                    label="Bio" 
+                                    value={user?.bio || ""} 
+                                    fullWidth
+                                    id="bio"
+                                    size="small"
+                                    multiline rows={3} 
+                                />
+                                <TextField 
+                                    label="Phone Number" 
+                                    value={user?.phone || ""} 
+
+                                    fullWidth
+                                    id="phone number"
+                                    size="small"
+                                />
+                            
                             </div>
                         </div>
                     )}
