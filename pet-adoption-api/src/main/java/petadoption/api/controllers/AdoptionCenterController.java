@@ -40,8 +40,6 @@ public class AdoptionCenterController {
         return adoptionCenterService.registerAdoptionCenter(adoptionCenterDTO);
     }
 
-
-
     @PutMapping("/change-name/{adoptionCenterId}")
     public ResponseEntity<String> changeAdoptionCenterName(@PathVariable Long adoptionCenterId, @RequestBody AdoptionCenterDTO adoptionCenterDTO, HttpServletRequest request) {
         if(adoptionCenterDTO.getAdoptionCenterName() == null || adoptionCenterDTO.getAdoptionCenterName().isEmpty()) {
@@ -62,9 +60,6 @@ public class AdoptionCenterController {
 
         return ResponseEntity.ok("First name updated to: " + adoptionCenterDTO.getAdoptionCenterName());
     }
-
-
-
 
     @PutMapping("/update-website-link/{adoptionCenterId}")
     public ResponseEntity<String> updateWebsiteLink(@PathVariable Long adoptionCenterId, @RequestBody AdoptionCenterDTO adoptionCenterDTO, HttpServletRequest request) {
