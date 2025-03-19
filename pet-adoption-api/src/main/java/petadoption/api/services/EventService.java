@@ -127,4 +127,8 @@ public class EventService {
     public Optional<Event> getEventById(Long eventId) {
         return eventRepository.findById(eventId);
     }
+
+    public List<Event> getEventsByAdoptionCenterId(Long adoptionCenterId) {
+        return eventRepository.findByAdoptionCenterId(adoptionCenterId);
+    }
 }
