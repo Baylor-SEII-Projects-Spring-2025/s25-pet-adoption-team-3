@@ -27,7 +27,7 @@ export default function HeroSection() {
                     className={styles.bottomRight}
                 />
                 <h1 className={styles.heroText}>
-                    Ready to Meet Your Furry Friend? Hi Im Sam
+                    Ready to Meet Your Furry Friend?
                 </h1>
                 <Link href="/find-friends" className={styles.ctaButton}>
                     <strong>Start Swiping Now</strong>
