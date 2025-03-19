@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
+import java.time.LocalDate;
 import petadoption.api.DTO.PetRequestDTO;
 import petadoption.api.controllers.PetController;
 import petadoption.api.models.Pet;
@@ -57,6 +58,72 @@ class PetControllerTest {
 
     }
 
+    @Test
+    void testAddPet_Success() {
+        when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTION_CENTER)))
+                .thenReturn((ResponseEntity) ResponseEntity.ok(adoptionCenter));
+
+        PetRequestDTO petRequestDTO = new PetRequestDTO();
+        petRequestDTO.setName("Buddy");
+        petRequestDTO.setBreed("Golden Retriever");
+        petRequestDTO.setSpayedStatus("Neutered Male");
+        petRequestDTO.setBirthdate(LocalDate.of(2021, 6, 15));
+        petRequestDTO.setAboutMe("Loves playing fetch!");
+        petRequestDTO.setExtra1("Energetic");
+        petRequestDTO.setExtra2("Good with kids");
+        petRequestDTO.setExtra3("Needs a big backyard");
+
+        when(petService.addPetWithImages(
+                eq(adoptionCenter),
+                any(PetRequestDTO.class),
+                anyList()
+        )).thenReturn(ResponseEntity.status(201).body(new Pet()));
+
+        ResponseEntity<Pet> response = petController.addPetWithImages(
+                session,
+                petRequestDTO.getName(),
+                petRequestDTO.getBreed(),
+                petRequestDTO.getSpayedStatus(),
+                petRequestDTO.getBirthdate(),
+                petRequestDTO.getAboutMe(),
+                petRequestDTO.getExtra1(),
+                petRequestDTO.getExtra2(),
+                petRequestDTO.getExtra3(),
+                Collections.emptyList()
+        );
+
+        assertEquals(CREATED, response.getStatusCode());
+    }
+
+
+    @Test
+    void testEditPet_Success() {
+        when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTION_CENTER)))
+                .thenReturn((ResponseEntity) ResponseEntity.ok(adoptionCenter));
+
+        PetRequestDTO petRequestDTO = new PetRequestDTO();
+        petRequestDTO.setName("Buddy");
+        petRequestDTO.setBreed("Golden Retriever");
+        petRequestDTO.setSpayedStatus("Neutered Male");
+        petRequestDTO.setBirthdate(LocalDate.of(2021, 6, 15));
+        petRequestDTO.setAboutMe("Loves playing fetch!");
+        petRequestDTO.setExtra1("Energetic");
+        petRequestDTO.setExtra2("Good with kids");
+        petRequestDTO.setExtra3("Needs a big backyard");
+
+        when(petService.editPet(eq(adoptionCenter), eq(1L), any(PetRequestDTO.class), anyList()))
+                .thenReturn(true);
+
+        ResponseEntity<String> response = petController.editPet(
+                session,
+                1L,
+                petRequestDTO,
+                Collections.emptyList()
+        );
+
+        assertEquals(OK, response.getStatusCode());
+        assertEquals("Pet details updated successfully.", response.getBody());
+    }
 
 
     @Test
