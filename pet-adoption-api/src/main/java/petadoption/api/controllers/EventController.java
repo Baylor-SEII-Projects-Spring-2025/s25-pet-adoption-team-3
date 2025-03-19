@@ -19,6 +19,7 @@ import petadoption.api.services.SessionValidation;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 @CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000" })
 @RestController
@@ -29,10 +30,11 @@ public class EventController {
     private final SessionValidation sessionValidation;
     private final EventRepository eventRepository;
 
-    public EventController(EventService eventService, SessionValidation sessionValidation) {
+    public EventController(EventService eventService, SessionValidation sessionValidation, EventRepository eventRepository, GCSStorageServiceEvents gcsStorageServiceEvents) {
         this.eventService = eventService;
         this.gcsStorageServiceEvents = new GCSStorageServiceEvents();
         this.sessionValidation = sessionValidation;
+        this.eventRepository = eventRepository;
     }
 
     @PostMapping("/{eventId}/uploadEventPhoto")
