@@ -171,14 +171,6 @@ export default function ProfileDashboardComponent() {
         const file = event.target.files[0];
         if (!file) return;
 
-        const maxSize = 5 * 1024 * 1024;
-        if (file.size > maxSize) {
-            setUploadError(
-                "File size exceeds 5MB. Please upload a smaller file.",
-            );
-            return;
-        }
-
         const formData = new FormData();
         formData.append("file", file);
 
@@ -244,6 +236,12 @@ export default function ProfileDashboardComponent() {
         const file = event.target.files[0];
         if (!file) return;
 
+        const maxSize = 5*1024*1024;
+        if(file.size > maxSize){
+            alert("❌ File size exceeds 5MB. Please upload a smaller file.");
+            return;
+        }
+
         const newImages = [...petData.images];
         newImages[index] = {
             preview: URL.createObjectURL(file),
@@ -278,9 +276,20 @@ export default function ProfileDashboardComponent() {
 
     const handleAddPetSubmit = async () => {
         setLoading(true);
+        if (!isFormValid()) {
+            alert("Please fill out all fields and upload exactly 4 images.");
+            setLoading(false);
+            return;
+        }
+        console.log("📤 Submitting pet data:", petData);
+        
         try {
             const formData = new FormData();
-            extractImageFiles(petData, formData);
+            petData.images.forEach((imgObj) => {
+                if (imgObj && imgObj.file) {
+                    formData.append("files", imgObj.file); 
+                }
+            });
 
             formData.append("name", petData.name);
             formData.append("breed", petData.breed);
@@ -290,6 +299,11 @@ export default function ProfileDashboardComponent() {
             formData.append("extra1", petData.extra1);
             formData.append("extra2", petData.extra2);
             formData.append("extra3", petData.extra3);
+
+            console.log("📤 Sending request to:", `${API_URL}/api/pet/add-pet-with-images`);
+            for (let [key, value] of formData.entries()) {
+                console.log(`${key}:`, value);
+            }
 
             const response = await fetch(
                 `${API_URL}/api/pet/add-pet-with-images`,
@@ -301,7 +315,9 @@ export default function ProfileDashboardComponent() {
             );
 
             if (!response.ok) {
-                throw new Error("Failed to upload pet details");
+                const errorText = await response.text();
+                console.error("❌ Server response:", errorText);
+                throw new Error(`Failed to upload pet details: ${response.status} ${errorText}`);
             }
 
             console.log("✅ Pet added successfully");
