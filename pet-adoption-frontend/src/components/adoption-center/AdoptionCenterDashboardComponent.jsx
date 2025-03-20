@@ -285,7 +285,7 @@ export default function ProfileDashboardComponent() {
         
         try {
             const formData = new FormData();
-            extractImageFiles(eventData, formData);
+            extractImageFiles(petData, formData);
 
             formData.append("name", petData.name);
             formData.append("breed", petData.breed);
