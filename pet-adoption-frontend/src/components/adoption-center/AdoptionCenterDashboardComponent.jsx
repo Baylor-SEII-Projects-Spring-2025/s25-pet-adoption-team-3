@@ -285,11 +285,7 @@ export default function ProfileDashboardComponent() {
         
         try {
             const formData = new FormData();
-            petData.images.forEach((imgObj) => {
-                if (imgObj && imgObj.file) {
-                    formData.append("files", imgObj.file); 
-                }
-            });
+            extractImageFiles(eventData, formData);
 
             formData.append("name", petData.name);
             formData.append("breed", petData.breed);
@@ -300,7 +296,6 @@ export default function ProfileDashboardComponent() {
             formData.append("extra2", petData.extra2);
             formData.append("extra3", petData.extra3);
 
-            console.log("📤 Sending request to:", `${API_URL}/api/pet/add-pet-with-images`);
             for (let [key, value] of formData.entries()) {
                 console.log(`${key}:`, value);
             }
