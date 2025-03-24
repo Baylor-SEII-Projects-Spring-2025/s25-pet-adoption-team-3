@@ -6,7 +6,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import petadoption.api.models.Pet;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Data
 public class PetRequestDTO {

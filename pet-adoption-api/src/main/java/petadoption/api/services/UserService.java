@@ -9,7 +9,6 @@ import petadoption.api.models.Token;
 import petadoption.api.models.User;
 import petadoption.api.repository.TokenRepository;
 import petadoption.api.repository.UserRepository;
-import petadoption.api.services.EmailService;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

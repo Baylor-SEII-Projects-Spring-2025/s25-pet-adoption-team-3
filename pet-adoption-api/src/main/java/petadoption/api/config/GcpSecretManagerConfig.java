@@ -25,9 +25,6 @@ public class GcpSecretManagerConfig {
 
         System.setProperty("googleClientId", googleClientId);
         System.setProperty("googleClientSecret", googleClientSecret);
-
-        System.out.println("✅ Google Client ID: " + googleClientId);
-        System.out.println("✅ Google Client Secret: " + googleClientSecret);
     }
 
     private String getSecret(String secretId) {

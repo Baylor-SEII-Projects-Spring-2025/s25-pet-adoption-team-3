@@ -1,6 +1,5 @@
 package petadoption.api.controllers;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -12,16 +11,11 @@ import petadoption.api.models.User;
 import petadoption.api.repository.PetRepository;
 import petadoption.api.services.GCSStorageServicePets;
 import petadoption.api.services.PetService;
-import jakarta.validation.Valid;
 import petadoption.api.services.SessionValidation;
 
-import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-
 
 @CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000" })
 @RestController
