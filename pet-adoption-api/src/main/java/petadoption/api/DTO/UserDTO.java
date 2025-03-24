@@ -2,7 +2,6 @@ package petadoption.api.DTO;
 
 import lombok.Getter;
 import lombok.Setter;
-import petadoption.api.models.User;
 
 @Getter
 @Setter
