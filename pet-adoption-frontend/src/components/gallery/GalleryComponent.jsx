@@ -1,5 +1,6 @@
 import React from 'react';
-import '../../styles/GalleryPage.css';
+import styles from '@/styles/GalleryPage.module.css';
+
 
 const pets = [
   {
@@ -62,17 +63,17 @@ const pets = [
 
 const GalleryPage = () => {
   return (
-    <div className="gallery-bg">
-      <div className="gallery-container">
-        <h1 className="gallery-heading">Meet Your New BFF</h1>
-        <div className="gallery-grid">
+    <div className={styles.galleryBg}>
+      <div className={styles.galleryContainer}>
+        <h1 className={styles.galleryHeading}>Meet Your New BFF</h1>
+        <div className={styles.galleryGrid}>
           {pets.map((pet) => (
-            <div key={pet.id} className="gallery-card">
-              <img src={pet.image[0]} alt={pet.name} className="gallery-image" />
-              <div className="gallery-card-body">
-                <h2 className="pet-name">{pet.name}</h2>
-                <p className="pet-breed">{pet.breed}</p>
-                <p className="pet-about">{pet.aboutMe}</p>
+            <div key={pet.id} className={styles.galleryCard}>
+              <img src={pet.image[0]} alt={pet.name} className={styles.galleryImage} />
+              <div className={styles.galleryCardBody}>
+                <h2 className={styles.petName}>{pet.name}</h2>
+                <p className={styles.petBreed}>{pet.breed}</p>
+                <p className={styles.petAbout}>{pet.aboutMe}</p>
               </div>
             </div>
           ))}

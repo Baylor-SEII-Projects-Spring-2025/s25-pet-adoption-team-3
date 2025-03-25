@@ -1,16 +1,16 @@
-.gallery-bg {
+.galleryBg {
     background-color: #CFBFF7; 
     min-height: 100vh;
     color: CFBFF7;
     padding: 3rem 1rem;
   }
   
-  .gallery-container {
+  .galleryContainer {
     max-width: 1280px;
     margin: 0 auto;
   }
   
-  .gallery-heading {
+  .galleryHeading {
     font-size: 3rem;
     font-weight: 900;
     text-align: center;
@@ -18,13 +18,13 @@
     margin-bottom: 3rem;
   }
   
-  .gallery-grid {
+  .galleryGrid {
     display: grid;
     gap: 2.5rem;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
   
-  .gallery-card {
+  .galleryCard {
     background-color: #1a1a1f; 
     border-radius: 1rem;
     overflow: hidden;
@@ -32,33 +32,33 @@
     transition: transform 0.3s ease;
   }
   
-  .gallery-card:hover {
+  .galleryCard:hover {
     transform: scale(1.02);
   }
   
-  .gallery-image {
+  .galleryImage {
     width: 100%;
     height: 16rem;
     object-fit: cover;
   }
   
-  .gallery-card-body {
+  .galleryCardBody {
     padding: 1.25rem;
   }
   
-  .pet-name {
+  .petName {
     font-size: 1.5rem;
     font-weight: 700;
     color: #8B80F9; 
   }
   
-  .pet-breed {
+  .petBreed {
     color: #CFBFF7; 
     font-style: italic;
     margin-bottom: 0.5rem;
   }
   
-  .pet-about {
+  .petAbout {
     font-size: 0.875rem;
     color: #CFBFF7;
     line-height: 1.4;
