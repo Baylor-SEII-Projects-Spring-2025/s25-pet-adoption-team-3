@@ -1,4 +1,4 @@
-package petadoption.api.userTesting;
+package petadoption.api.controllers;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,7 +20,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import petadoption.api.DTO.LoginRequestsDTO;
 import petadoption.api.DTO.UserDTO;
-import petadoption.api.controllers.AuthenticationController;
 import petadoption.api.models.User;
 import petadoption.api.services.UserService;
 
