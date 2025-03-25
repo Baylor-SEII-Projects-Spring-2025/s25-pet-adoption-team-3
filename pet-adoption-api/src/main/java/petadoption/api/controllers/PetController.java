@@ -1,26 +1,27 @@
 package petadoption.api.controllers;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import petadoption.api.DTO.PetRequestDTO;
+import petadoption.api.models.Characteristic;
 import petadoption.api.models.Pet;
 import petadoption.api.models.User;
+import petadoption.api.repository.CharacteristicRepository;
 import petadoption.api.repository.PetRepository;
+import petadoption.api.repository.UserRepository;
 import petadoption.api.services.GCSStorageServicePets;
 import petadoption.api.services.PetService;
-import jakarta.validation.Valid;
+import petadoption.api.services.RecEngineService;
 import petadoption.api.services.SessionValidation;
 
-import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 
 @CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000" })
@@ -31,12 +32,21 @@ public class PetController {
     private final GCSStorageServicePets gcsStorageServicePets;
     private final PetRepository petRepository;
     private final SessionValidation sessionValidation;
+    private final RecEngineService recEngineService;
+    private final UserRepository userRepository;
+    private final CharacteristicRepository CharacteristicRepository;
+    private final CharacteristicRepository characteristicRepository;
 
-    public PetController(PetService petService, PetRepository petRepository, SessionValidation sessionValidation) {
+    @Autowired
+    public PetController(PetService petService, PetRepository petRepository, SessionValidation sessionValidation, RecEngineService recEngineService, GCSStorageServicePets gcsStorageServicePets, UserRepository userRepository, CharacteristicRepository characteristicRepository) {
+        this.CharacteristicRepository = characteristicRepository;
         this.gcsStorageServicePets = new GCSStorageServicePets();
         this.petService = petService;
         this.petRepository = petRepository;
         this.sessionValidation = sessionValidation;
+        this.recEngineService = recEngineService;
+        this.userRepository = userRepository;
+        this.characteristicRepository = characteristicRepository;
     }
 
     @PostMapping("/add-pet-with-images")
@@ -150,5 +160,15 @@ public class PetController {
         return ResponseEntity.ok(petOptional.get());
     }
 
-
+    // DEV ONLY
+    @PostMapping("/add-characteristics")
+    @Transactional
+    public void addCharacteristics(@RequestParam("c") String[] characteristics) {
+        for(String characteristicStr : characteristics) {
+            // System.out.println(characteristic);
+            Characteristic characteristic = new Characteristic();
+            characteristic.setName(characteristicStr);
+            characteristicRepository.save(characteristic);
+        }
+    }
 }
