@@ -79,8 +79,6 @@ export default function ProfileDashboardComponent() {
 
     const [searchQuery, setSearchQuery] = useState("");
 
-
-
     const handleModalOpen = () => {
         setOpenModal(true);
     };
