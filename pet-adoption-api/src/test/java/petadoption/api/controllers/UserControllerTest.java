@@ -1,4 +1,4 @@
-package petadoption.api.userTesting;
+package petadoption.api.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,7 +7,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 import petadoption.api.DTO.UserDTO;
-import petadoption.api.controllers.UsersController;
 import petadoption.api.models.User;
 import petadoption.api.repository.UserRepository;
 
