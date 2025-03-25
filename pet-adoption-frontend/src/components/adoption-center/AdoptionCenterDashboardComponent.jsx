@@ -111,6 +111,7 @@ export default function ProfileDashboardComponent() {
             }
 
             if (!response.ok) {
+                alert("⚠️ Failed to load user session. Please refresh or log in again.");
                 throw new Error("Error fetching session");
             }
 
@@ -123,6 +124,7 @@ export default function ProfileDashboardComponent() {
             setUser(data.user);
         } catch (error) {
             console.error("Error fetching session:", error);
+            alert("❌ Error fetching session.");
         }
     };
 
@@ -164,6 +166,7 @@ export default function ProfileDashboardComponent() {
             }
         } catch (error) {
             console.error("Error deleting profile photo:", error);
+            alert("❌ Error deleting profile photo. Please try again.");
         }
     };
 
@@ -318,6 +321,7 @@ export default function ProfileDashboardComponent() {
             console.log("✅ Pet added successfully");
         } catch (error) {
             console.error("Error uploading pet data:", error);
+            alert("❌ Failed to add pet. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -407,6 +411,7 @@ export default function ProfileDashboardComponent() {
             }
         } catch (error) {
             console.log("❌ Error creating event: ", error);
+            alert("❌ Failed to create event. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -434,6 +439,7 @@ export default function ProfileDashboardComponent() {
             );
 
             if (!response.ok) {
+                alert("❌ Failed to fetch events.");
                 throw new Error("Failed to fetch events");
             }
 
@@ -481,6 +487,7 @@ export default function ProfileDashboardComponent() {
             );
 
             if (!response.ok) {
+                alert("❌ Failed to fetch pets.");
                 throw new Error("Failed to fetch pets");
             }
 
@@ -597,6 +604,7 @@ export default function ProfileDashboardComponent() {
                 setIsUpdated(false);
             } else {
                 console.error("Failed to update adoption center name");
+                alert("❌ Failed to update adoption center name.");
             }
         } catch (error) {
             console.error("Error updating adoption center name:", error);
@@ -627,6 +635,7 @@ export default function ProfileDashboardComponent() {
                 setIsUpdated(false);
             } else {
                 console.error("Failed to update website link");
+                alert("❌ Failed to update website link.");
             }
         } catch (error) {
             console.error("Error updating website link:", error);
@@ -657,6 +666,7 @@ export default function ProfileDashboardComponent() {
                 setIsUpdated(false);
             } else {
                 console.error("Failed to update bio");
+                alert("❌ Failed to update bio.");
             }
         } catch (error) {
             console.error("Error updating bio:", error);
@@ -687,6 +697,7 @@ export default function ProfileDashboardComponent() {
                 setIsUpdated(false);
             } else {
                 console.error("Failed to update phone number");
+                alert("❌ Failed to update phone number.");
             }
         } catch (error) {
             console.error("Error updating phone number:", error);
