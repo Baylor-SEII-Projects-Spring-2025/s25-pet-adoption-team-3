@@ -50,13 +50,13 @@ public class User {
     @Column(name = "website", nullable = true)
     private String website;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Pet> recommendedPets;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Pet> savedPets;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Weight> weights;
 
     public enum Role {

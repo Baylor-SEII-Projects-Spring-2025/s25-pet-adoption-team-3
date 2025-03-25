@@ -10,7 +10,7 @@ import lombok.Setter;
 public class Weight {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "weight_id")
     private Long id;
 
