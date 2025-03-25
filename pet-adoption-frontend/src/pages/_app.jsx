@@ -7,8 +7,6 @@ import { CssBaseline } from "@mui/material";
 import { PetAdoptionThemeProvider } from "@/utils/theme";
 import { buildStore } from "@/utils/redux";
 import "@/styles/globals.css";
-import '../styles/GalleryPage.css';
-import '../styles/LearnPage.css';
 
 
 // Initialize Redux
