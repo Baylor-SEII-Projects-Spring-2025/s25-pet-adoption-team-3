@@ -12,7 +12,7 @@ import java.util.List;
 public class Pet {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @CollectionTable(name = "pet_images", joinColumns = @JoinColumn(name = "pet_id"))
@@ -52,7 +52,7 @@ public class Pet {
     @Column(nullable = false, columnDefinition="enum('AVAILABLE','ARCHIVED') default 'AVAILABLE'")
     private PetStatus availabilityStatus;
 
-    @OneToMany
+    @ManyToMany
     private List<Characteristic> petCharacteristics;
 
     public enum PetStatus {

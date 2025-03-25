@@ -30,6 +30,25 @@ public class PetService {
         this.gcsStorageServicePets = gcsStorageServicePets;
     }
 
+    public void addPet(User user, PetRequestDTO petRequestDTO) {
+        Pet pet = new Pet();
+        pet.setName(petRequestDTO.getName());
+        pet.setAdoptionCenter(user);
+        pet.setBreed(petRequestDTO.getBreed());
+        pet.setSpayedStatus(petRequestDTO.getSpayedStatus());
+        pet.setBirthdate(petRequestDTO.getBirthdate());
+        pet.setAboutMe(petRequestDTO.getAboutMe());
+        pet.setExtra1(petRequestDTO.getExtra1());
+        pet.setExtra2(petRequestDTO.getExtra2());
+        pet.setExtra3(petRequestDTO.getExtra3());
+
+        pet.setAvailabilityStatus(Pet.PetStatus.AVAILABLE);
+        pet.setPetCharacteristics(petRequestDTO.getCharacteristics());
+
+        petRepository.save(pet);
+    }
+
+
     public ResponseEntity<Pet> addPetWithImages(User user, PetRequestDTO petRequestDTO, MultipartFile[] files) {
         if (files.length != 4) {
             return ResponseEntity.status(400).body(null);

@@ -2,6 +2,7 @@ package petadoption.api.controllers;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -80,6 +81,18 @@ public class PetController {
 
         return petService.addPetWithImages(user, petRequestDTO, files);
     }
+
+    @PostMapping("/add-pet")
+    public ResponseEntity<String> addPet(HttpSession session, @RequestBody @Valid PetRequestDTO petRequestDTO) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) return ResponseEntity.status(401).body("No active session.");
+        if (user.getRole() != User.Role.ADOPTION_CENTER) return ResponseEntity.status(403).body("Unauthorized action.");
+        //User user = userRepository.getOne(1L);
+
+        petService.addPet(user, petRequestDTO);
+        return ResponseEntity.status(201).body(petRequestDTO.getName() + " was successfully added.");
+    }
+
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<String> editPet(
