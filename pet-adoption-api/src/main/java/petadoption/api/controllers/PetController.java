@@ -174,15 +174,30 @@ public class PetController {
     }
 
     @PostMapping("/like-pet/{petId}")
-    public ResponseEntity<String> likePet(@PathVariable Long petId) {
-        /*ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTER);
+    public ResponseEntity<String> likePet(HttpSession session, @PathVariable Long petId) {
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTER);
         if (!validationResponse.getStatusCode().is2xxSuccessful()) {
             return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
-        }*/
-        //User user = (User) validationResponse.getBody();
+        }
+        User user = (User) validationResponse.getBody();
 
-        User user = userRepository.getOne(1L);
+        //User user = userRepository.getOne(1L);
         String response = recEngineService.likePet(user, petService.getPetDetail(petId));
+        if(response.contains("Error"))
+            return ResponseEntity.status(400).body(response);
+        return ResponseEntity.status(200).body(response);
+    }
+
+    @PostMapping("/dislike-pet/{petId}")
+    public ResponseEntity<String> dislikePet(HttpSession session, @PathVariable Long petId) {
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTER);
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body((String) validationResponse.getBody());
+        }
+        User user = (User) validationResponse.getBody();
+
+        //User user = userRepository.getOne(1L);
+        String response = recEngineService.dislikePet(user, petService.getPetDetail(petId));
         if(response.contains("Error"))
             return ResponseEntity.status(400).body(response);
         return ResponseEntity.status(200).body(response);

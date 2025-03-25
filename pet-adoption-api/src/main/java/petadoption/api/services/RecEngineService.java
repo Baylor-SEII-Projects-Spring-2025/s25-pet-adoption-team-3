@@ -80,6 +80,40 @@ public class RecEngineService {
         userRepository.save(user);
         return "Successfully liked pet " + pet.getName();
     }
+    @Transactional
+    public String dislikePet(User user, Optional<Pet> petDetail) {
+        if (petDetail.isEmpty()) {
+            return "Error: Pet not found";
+        }
+
+        Pet pet = petDetail.get();
+        List<Weight> userWeights = user.getWeights();
+
+        Map<Characteristic, Weight> weightMap = convertListToWeightMap(userWeights);
+
+        /*
+        System.out.println("printing user weights");
+        user.getWeights().forEach(System.out::println);
+
+        System.out.println("printing pet chars");
+        pet.getPetCharacteristics().forEach(System.out::println);
+        */
+
+        for (Characteristic characteristic : pet.getPetCharacteristics()) {
+            Weight weight = weightMap.get(characteristic);
+            if (weight != null) {
+                weight.setWeight(weight.getWeight() - 1);
+            } else {
+                addWeight(userWeights, characteristic, false);
+            }
+        }
+
+        //System.out.println("printing weights");
+        //user.getWeights().forEach(System.out::println);
+
+        userRepository.save(user);
+        return "Successfully disliked pet " + pet.getName();
+    }
 
     // TODO: RecEngine functions
 }
