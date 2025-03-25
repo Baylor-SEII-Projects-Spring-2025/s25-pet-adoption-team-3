@@ -19,6 +19,7 @@ import petadoption.api.services.SessionValidation;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -152,4 +153,51 @@ class PetControllerTest {
         assertTrue(response.getBody().isEmpty());
     }
 
+    @Test
+    void testGetPetDetail_Found() {
+        Pet pet = new Pet();
+        pet.setId(1L);
+        pet.setName("Buddy");
+
+        when(petService.getPetDetail(1L)).thenReturn(Optional.of(pet));
+
+        ResponseEntity<?> response = petController.getPetDetail(1L);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(pet, response.getBody());
+    }
+
+    @Test
+    void testGetPetDetail_NotFound() {
+        when(petService.getPetDetail(999L)).thenReturn(Optional.empty());
+
+        ResponseEntity<?> response = petController.getPetDetail(999L);
+
+        assertEquals(404, response.getStatusCodeValue());
+        assertEquals("Pet not found.", response.getBody());
+    }
+
+    @Test
+    void testGetSwipePet_Found() {
+        Pet pet = new Pet();
+        pet.setId(2L);
+        pet.setName("Swipey");
+
+        when(petService.getSwipePet()).thenReturn(Optional.of(pet));
+
+        ResponseEntity<Pet> response = petController.getSwipePet();
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(pet, response.getBody());
+    }
+
+    @Test
+    void testGetSwipePet_NotFound() {
+        when(petService.getSwipePet()).thenReturn(Optional.empty());
+
+        ResponseEntity<Pet> response = petController.getSwipePet();
+
+        assertEquals(404, response.getStatusCodeValue());
+        assertNull(response.getBody());
+    }
 }
