@@ -1,5 +1,4 @@
 import React from "react";
-import '../../styles/LearnPage.css';
 
 const LearnPage = () => {
   return (
