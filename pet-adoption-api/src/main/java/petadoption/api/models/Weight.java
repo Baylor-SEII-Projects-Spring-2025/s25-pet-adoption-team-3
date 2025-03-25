@@ -10,6 +10,7 @@ import lombok.Setter;
 public class Weight {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "weight_id")
     private Long id;
 
