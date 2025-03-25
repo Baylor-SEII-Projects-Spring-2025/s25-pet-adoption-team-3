@@ -50,6 +50,7 @@ export default function RegisterComponent() {
             router.push("/");
         } catch (error) {
             console.error("Error fetching session:", error);
+            alert("⚠️ Failed to fetch session. Please refresh or try again later.");
         }
     };
 
@@ -90,6 +91,7 @@ export default function RegisterComponent() {
         } catch (error) {
             console.error("Registration failed:", error.message);
             setErrorMessage(error.message);
+            alert(`❌ Registration failed: ${error.message}`);
         } finally {
             setLoading(false);
         }
