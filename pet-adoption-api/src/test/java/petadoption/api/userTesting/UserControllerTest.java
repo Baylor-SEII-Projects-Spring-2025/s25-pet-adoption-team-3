@@ -99,4 +99,55 @@ class UserControllerTest {
         assertEquals(400, response.getStatusCodeValue());
         assertEquals("User not found.", response.getBody());
     }
+
+    @Test
+    void testChangeEmail_Success() {
+        userDTO.setEmail("updated@email.com");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+
+        ResponseEntity<String> response = userController.changeEmail(1L, userDTO);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Email updated to: " + userDTO.getEmail(), response.getBody());
+
+        verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    void testChangeEmail_UserNotFound() {
+        userDTO.setEmail("updated@email.com");
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        ResponseEntity<String> response = userController.changeEmail(1L, userDTO);
+
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("User not found.", response.getBody());
+    }
+
+    @Test
+    void testDeleteProfilePhoto_Success() {
+        testUser.setProfilePhoto("some-photo-url");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser)).thenReturn(Optional.of(testUser));
+
+        ResponseEntity<String> response = userController.deleteProfilePhoto(1L, request);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Profile photo deleted successfully!", response.getBody());
+
+        verify(session).invalidate();
+        verify(session).setAttribute(eq("user"), any(User.class));
+        verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    void testUpdateProfilePhoto_Success() {
+        String newUrl = "https://new-photo-url.com";
+        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+
+        ResponseEntity<String> response = userController.updateProfilePhoto(1L, newUrl);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Profile photo updated successfully!", response.getBody());
+        verify(userRepository).save(any(User.class));
+    }
 }
