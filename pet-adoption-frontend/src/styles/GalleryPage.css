@@ -1,7 +1,7 @@
 .gallery-bg {
-    background-color: #1f2937; 
+    background-color: #CFBFF7; 
     min-height: 100vh;
-    color: white;
+    color: CFBFF7;
     padding: 3rem 1rem;
   }
   
@@ -14,7 +14,7 @@
     font-size: 3rem;
     font-weight: 900;
     text-align: center;
-    color: #c4b5fd; 
+    color: #8B80F9; 
     margin-bottom: 3rem;
   }
   
@@ -25,7 +25,7 @@
   }
   
   .gallery-card {
-    background-color: #374151; 
+    background-color: #1a1a1f; 
     border-radius: 1rem;
     overflow: hidden;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
@@ -49,18 +49,18 @@
   .pet-name {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #ddd6fe; 
+    color: #8B80F9; 
   }
   
   .pet-breed {
-    color: #a78bfa; 
+    color: #CFBFF7; 
     font-style: italic;
     margin-bottom: 0.5rem;
   }
   
   .pet-about {
     font-size: 0.875rem;
-    color: #d1d5db;
+    color: #CFBFF7;
     line-height: 1.4;
   }
   

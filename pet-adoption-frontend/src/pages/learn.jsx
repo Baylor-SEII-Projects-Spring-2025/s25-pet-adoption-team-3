@@ -1,5 +1,5 @@
 import React from "react";
-import { LearnComponent } from "@/components/learn/LearnComponent";
+import LearnComponent from "@/components/learn/LearnComponent";
 
 export default function Learn() {
     return (
