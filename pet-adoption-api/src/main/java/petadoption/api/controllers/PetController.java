@@ -219,12 +219,11 @@ public class PetController {
     // temporary swipe get pets
     @GetMapping("/swipe/temp-get-pets")
     public ResponseEntity<List<SwipePetDTO>> getSwipePets() {
-        /*ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTER);
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTER);
         if (!validationResponse.getStatusCode().is2xxSuccessful()) {
             return ResponseEntity.status(validationResponse.getStatusCode()).body(null);
         }
-        User user = (User) validationResponse.getBody();*/
-        User user = userRepository.getOne(1L);
+        User user = (User) validationResponse.getBody();
 
         return ResponseEntity.status(200).body(recEngineService.getPets(user));
     }
