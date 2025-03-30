@@ -18,6 +18,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 class EventControllerTest {
 
@@ -105,4 +108,61 @@ class EventControllerTest {
         assertEquals(OK, response.getStatusCode());
         assertEquals("Event deleted successfully.", response.getBody());
     }
+
+    @Test
+    void testGetAllEvents() {
+        List<Event> eventList = new ArrayList<>();
+        Event event = new Event();
+        event.setId(1L);
+        event.setTitle("Adoption Day");
+        eventList.add(event);
+
+        when(eventService.getAllEvents()).thenReturn(eventList);
+
+        ResponseEntity<?> response = eventController.getAllEvents();
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(eventList, response.getBody());
+    }
+
+    @Test
+    void testGetEventById_Found() {
+        Event event = new Event();
+        event.setId(2L);
+        event.setTitle("Meet & Greet");
+
+        when(eventService.getEventById(2L)).thenReturn(Optional.of(event));
+
+        ResponseEntity<?> response = eventController.getEventById(2L);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(event, response.getBody());
+    }
+
+    @Test
+    void testGetEventById_NotFound() {
+        when(eventService.getEventById(99L)).thenReturn(Optional.empty());
+
+        ResponseEntity<?> response = eventController.getEventById(99L);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Event not found.", response.getBody());
+    }
+
+    @Test
+    void testGetEventsByAdoptionCenterId() {
+        List<Event> events = new ArrayList<>();
+        Event e1 = new Event();
+        e1.setId(3L);
+        e1.setTitle("Rescue Rally");
+        events.add(e1);
+
+        when(eventService.getEventsByAdoptionCenterId(1L)).thenReturn(events);
+
+        ResponseEntity<?> response = eventController.getAllEvents(1L);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(events, response.getBody());
+    }
+
 }

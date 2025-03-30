@@ -1,5 +1,4 @@
 package petadoption.api.DTO;
-import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
 import petadoption.api.models.User;

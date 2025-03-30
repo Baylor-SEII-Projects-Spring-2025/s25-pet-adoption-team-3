@@ -62,6 +62,7 @@ export default function ProfileDashboardComponent() {
             setUser(data.user);
         } catch (error) {
             console.error("Error fetching session:", error);
+            alert("⚠️ Failed to fetch your session. Please refresh or log in again.");
         }
     };
 
@@ -92,6 +93,7 @@ export default function ProfileDashboardComponent() {
 
             if (response.status === 400) {
                 console.log("User not found");
+                alert("User not found.");
                 return;
             }
 
@@ -100,9 +102,11 @@ export default function ProfileDashboardComponent() {
                 window.location.reload();
             } else {
                 console.error("Failed to delete profile photo");
+                alert("❌ Failed to delete profile photo.");
             }
         } catch (error) {
             console.error("Error deleting profile photo:", error);
+            alert("❌ Error deleting profile photo. Please try again.");
         }
     };
 
@@ -204,9 +208,11 @@ export default function ProfileDashboardComponent() {
                 console.log(`✅ First name updated to: ${firstName}`);
             } else {
                 console.error("❌ Failed to update first name");
+                alert("❌ Failed to update first name.");
             }
         } catch (error) {
             console.error("❌ Error updating first name:", error);
+            alert("❌ Error updating first name. Please try again.");
         }
     };
 
@@ -228,9 +234,11 @@ export default function ProfileDashboardComponent() {
                 console.log(`✅ Last name updated to: ${lastName}`);
             } else {
                 console.error("❌ Failed to update last name");
+                alert("❌ Failed to update last name.");
             }
         } catch (error) {
             console.error("❌ Error updating last name:", error);
+            alert("❌ Error updating last name. Please try again.");
         }
     };
 

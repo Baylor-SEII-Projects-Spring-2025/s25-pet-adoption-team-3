@@ -10,8 +10,6 @@ import petadoption.api.DTO.AdoptionCenterDTO;
 import petadoption.api.models.User;
 import petadoption.api.repository.UserRepository;
 
-import java.util.Optional;
-
 @Service
 public class AdoptionCenterService {
     private final UserRepository userRepository;

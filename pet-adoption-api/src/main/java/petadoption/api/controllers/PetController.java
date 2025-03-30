@@ -26,7 +26,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-
 @CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000" })
 @RestController
 @RequestMapping("/api/pet")

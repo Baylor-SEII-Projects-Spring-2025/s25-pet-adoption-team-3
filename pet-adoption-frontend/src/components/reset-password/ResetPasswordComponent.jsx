@@ -68,6 +68,8 @@ export default function ResetPasswordComponent() {
         } catch (error) {
             console.error("Error resetting password:", error);
             setMessage("Failed to reset password.");
+            alert("❌ Failed to reset password. Please try again.");
+
         } finally {
             setloading(false);
         }

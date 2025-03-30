@@ -104,6 +104,7 @@ export default function AdoptionCenterRegisterComponent() {
                 );
 
                 if (!uploadResponse.ok) {
+                    alert("❌ Photo upload failed. Try again later.");
                     throw new Error("Photo upload failed");
                 }
             }

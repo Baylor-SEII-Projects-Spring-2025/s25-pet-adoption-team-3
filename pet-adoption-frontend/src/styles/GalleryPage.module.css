@@ -1,0 +1,66 @@
+.galleryBg {
+    background-color: #CFBFF7; 
+    min-height: 100vh;
+    color: CFBFF7;
+    padding: 3rem 1rem;
+  }
+  
+  .galleryContainer {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  
+  .galleryHeading {
+    font-size: 3rem;
+    font-weight: 900;
+    text-align: center;
+    color: #8B80F9; 
+    margin-bottom: 3rem;
+  }
+  
+  .galleryGrid {
+    display: grid;
+    gap: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+  
+  .galleryCard {
+    background-color: #1a1a1f; 
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+  }
+  
+  .galleryCard:hover {
+    transform: scale(1.02);
+  }
+  
+  .galleryImage {
+    width: 100%;
+    height: 16rem;
+    object-fit: cover;
+  }
+  
+  .galleryCardBody {
+    padding: 1.25rem;
+  }
+  
+  .petName {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #8B80F9; 
+  }
+  
+  .petBreed {
+    color: #CFBFF7; 
+    font-style: italic;
+    margin-bottom: 0.5rem;
+  }
+  
+  .petAbout {
+    font-size: 0.875rem;
+    color: #CFBFF7;
+    line-height: 1.4;
+  }
+  
