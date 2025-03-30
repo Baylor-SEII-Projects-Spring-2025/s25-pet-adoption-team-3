@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import petadoption.api.DTO.PetRequestDTO;
+import petadoption.api.DTO.SwipePetDTO;
 import petadoption.api.models.Characteristic;
 import petadoption.api.models.Pet;
 import petadoption.api.models.User;
@@ -213,5 +214,18 @@ public class PetController {
             characteristic.setName(characteristicStr);
             characteristicRepository.save(characteristic);
         }
+    }
+
+    // temporary swipe get pets
+    @GetMapping("/swipe/temp-get-pets")
+    public ResponseEntity<List<SwipePetDTO>> getSwipePets() {
+        /*ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTER);
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body(null);
+        }
+        User user = (User) validationResponse.getBody();*/
+        User user = userRepository.getOne(1L);
+
+        return ResponseEntity.status(200).body(recEngineService.getPets(user));
     }
 }
