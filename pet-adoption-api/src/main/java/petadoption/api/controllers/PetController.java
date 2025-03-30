@@ -1,5 +1,6 @@
 package petadoption.api.controllers;
 
+import com.google.api.Http;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -218,7 +219,7 @@ public class PetController {
 
     // temporary swipe get pets
     @GetMapping("/swipe/temp-get-pets")
-    public ResponseEntity<List<SwipePetDTO>> getSwipePets() {
+    public ResponseEntity<List<SwipePetDTO>> getSwipePets(HttpSession session) {
         ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTER);
         if (!validationResponse.getStatusCode().is2xxSuccessful()) {
             return ResponseEntity.status(validationResponse.getStatusCode()).body(null);
