@@ -49,9 +49,9 @@ public class PetService {
     }
 
 
-    public ResponseEntity<Pet> addPetWithImages(User user, PetRequestDTO petRequestDTO, MultipartFile[] files) {
+    public Pet addPetWithImages(User user, PetRequestDTO petRequestDTO, MultipartFile[] files) {
         if (files.length != 4) {
-            return ResponseEntity.status(400).body(null);
+            return null;
         }
 
         Pet pet = new Pet();
@@ -79,14 +79,14 @@ public class PetService {
                 String uploadedFileUrl = gcsStorageServicePets.uploadFile(file, fileName);
                 uploadedUrls.add(uploadedFileUrl);
             } catch (IOException e) {
-                return ResponseEntity.status(500).body(null);
+                return null;
             }
         }
 
         pet.setImage(uploadedUrls);
         petRepository.save(pet);
 
-        return ResponseEntity.status(201).body(pet);
+        return pet;
     }
 
 

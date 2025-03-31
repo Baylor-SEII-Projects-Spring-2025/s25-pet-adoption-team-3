@@ -52,7 +52,7 @@ public class PetController {
     }
 
     @PostMapping("/add-pet-with-images")
-    public ResponseEntity<Pet> addPetWithImages(
+    public ResponseEntity<PetRequestDTO> addPetWithImages(
             HttpSession session,
             @RequestParam("name") String name,
             @RequestParam("breed") String breed,
@@ -80,7 +80,13 @@ public class PetController {
         petRequestDTO.setExtra2(extra2);
         petRequestDTO.setExtra3(extra3);
 
-        return petService.addPetWithImages(user, petRequestDTO, files);
+        Pet pet = petService.addPetWithImages(user, petRequestDTO, files);
+
+        if(pet == null) {
+            return ResponseEntity.status(400).body(null);
+        }
+
+        return ResponseEntity.status(200).body(new PetRequestDTO(pet));
     }
 
     @PostMapping("/add-pet")

@@ -7,6 +7,7 @@ import petadoption.api.models.Characteristic;
 import petadoption.api.models.Pet;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -39,4 +40,19 @@ public class PetRequestDTO {
 
     @NotNull
     private Pet.PetStatus availabilityStatus;
+
+    public PetRequestDTO() {}
+
+    public PetRequestDTO(Pet pet) {
+        this.name = pet.getName();
+        this.breed = pet.getBreed();
+        this.spayedStatus = pet.getSpayedStatus();
+        this.birthdate = pet.getBirthdate();
+        this.aboutMe = pet.getAboutMe();
+        this.extra1 = pet.getExtra1();
+        this.extra2 = pet.getExtra2();
+        this.extra3 = pet.getExtra3();
+        this.characteristics = new ArrayList<>();
+        this.availabilityStatus = pet.getAvailabilityStatus();
+    }
 }
