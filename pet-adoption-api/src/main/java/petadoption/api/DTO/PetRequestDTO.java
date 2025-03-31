@@ -7,6 +7,7 @@ import petadoption.api.models.Characteristic;
 import petadoption.api.models.Pet;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 public class PetRequestDTO {
