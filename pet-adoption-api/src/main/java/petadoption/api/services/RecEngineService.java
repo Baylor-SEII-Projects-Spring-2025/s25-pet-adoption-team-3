@@ -120,17 +120,7 @@ public class RecEngineService {
         List<SwipePetDTO> swipePetDTOs = new ArrayList<>();
 
         for(Pet pet : pets){
-            SwipePetDTO swipePetDTO = new SwipePetDTO();
-            swipePetDTO.setId(pet.getId());
-            swipePetDTO.setName(pet.getName());
-            swipePetDTO.setAvailabilityStatus(pet.getAvailabilityStatus());
-            swipePetDTO.setBirthdate(pet.getBirthdate().toString());
-            swipePetDTO.setImage(pet.getImage());
-            swipePetDTO.setExtra2(pet.getExtra2());
-            swipePetDTO.setExtra3(pet.getExtra3());
-            swipePetDTO.setExtra1(pet.getExtra1());
-            swipePetDTO.setSpayedStatus(pet.getSpayedStatus());
-            swipePetDTO.setId(pet.getId());
+            SwipePetDTO swipePetDTO = new SwipePetDTO(pet);
             swipePetDTOs.add(swipePetDTO);
         }
 

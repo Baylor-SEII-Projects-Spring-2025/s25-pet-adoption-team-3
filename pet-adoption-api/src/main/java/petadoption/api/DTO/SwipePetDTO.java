@@ -33,4 +33,17 @@ public class SwipePetDTO {
 
     private Pet.PetStatus availabilityStatus;
 
+    public SwipePetDTO(Pet pet) {
+        this.id = pet.getId();
+        this.name = pet.getName();
+        this.spayedStatus = pet.getSpayedStatus();
+        this.birthdate = pet.getBirthdate().toString();
+        this.aboutMe = pet.getAboutMe();
+        this.extra1 = pet.getExtra1();
+        this.extra2 = pet.getExtra2();
+        this.extra3 = pet.getExtra3();
+        this.availabilityStatus = pet.getAvailabilityStatus();
+        this.image = pet.getImage();
+    }
+
 }
