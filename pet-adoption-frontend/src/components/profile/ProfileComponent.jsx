@@ -55,6 +55,11 @@ export default function ProfileDashboardComponent() {
                 return;
             }
 
+            if (!response.ok) {
+                alert("⚠️ Failed to load user session. Please refresh or log in again.");
+                throw new Error("Error fetching session");
+            }
+
             const data = await response.json();
             console.log("User session data:", data);
 
