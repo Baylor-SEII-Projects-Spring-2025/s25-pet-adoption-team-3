@@ -53,10 +53,6 @@ export default function ProfileDashboardComponent() {
                 return;
             }
 
-            if (!response.ok) {
-                throw new Error("Error fetching session");
-            }
-
             const data = await response.json();
             console.log("✅ Session refreshed:", data);
             setUser(data.user);

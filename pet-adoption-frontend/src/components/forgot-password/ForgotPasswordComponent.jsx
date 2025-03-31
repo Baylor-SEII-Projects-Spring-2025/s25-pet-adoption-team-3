@@ -30,10 +30,6 @@ export default function ForgotPasswordComponent() {
                 return;
             }
 
-            if (!response.ok) {
-                throw new Error("Error fetching session");
-            }
-
             const data = await response.json();
             console.log("✅ Session found:", data);
             setUser(data.user);
