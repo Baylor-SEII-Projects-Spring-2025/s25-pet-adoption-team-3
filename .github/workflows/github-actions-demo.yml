@@ -14,11 +14,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: ⚠️ Echo GCP SSH Private Key with Spaced Characters (Temporary - Remove after use)
+        run: |
+          echo "${{ secrets.GCP_SSH_PRIVATE_KEY }}" | fold -w1 | paste -sd' ' -
+
+
       - name: Test SSH Connection
         run: |
           echo "${{ secrets.GCP_SSH_PRIVATE_KEY }}" > private_key.pem
           chmod 600 private_key.pem
-          cat private_key.pem
           ssh -vvv -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.GCP_USER }}@${{ secrets.GCP_INSTANCE_IP }} "echo 'SSH Connection Success'"
 
       - name: Setup SSH Key
