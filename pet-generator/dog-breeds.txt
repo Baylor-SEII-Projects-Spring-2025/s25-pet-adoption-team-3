@@ -1,0 +1,87 @@
+Labrador Retriever
+German Shepherd
+Golden Retriever
+Bulldog
+Beagle
+Poodle
+Rottweiler
+Yorkshire Terrier
+Boxer
+Dachshund
+Siberian Husky
+Shih Tzu
+Doberman Pinscher
+Australian Shepherd
+Chihuahua
+Cocker Spaniel
+Pembroke Welsh Corgi
+Great Dane
+Miniature Schnauzer
+Boston Terrier
+Pomeranian
+Bichon Frise
+Border Collie
+French Bulldog
+Shetland Sheepdog
+Cavalier King Charles Spaniel
+Maltese
+Akita
+Saint Bernard
+Havanese
+Weimaraner
+Bernese Mountain Dog
+English Springer Spaniel
+Newfoundland
+Collie
+Bloodhound
+Jack Russell Terrier
+Alaskan Malamute
+Samoyed
+Australian Cattle Dog
+Pug
+Papillon
+Soft Coated Wheaten Terrier
+Bull Terrier
+German Shorthaired Pointer
+Chinese Shar-Pei
+Rhodesian Ridgeback
+Lhasa Apso
+Italian Greyhound
+Whippet
+King Charles Spaniel
+Australian Terrier
+Irish Setter
+Keeshond
+Scottish Terrier
+Tibetan Terrier
+Chesapeake Bay Retriever
+Basenji
+Rat Terrier
+West Highland White Terrier
+Schnauzer
+Belgian Malinois
+Basset Hound
+Shiba Inu
+American Pit Bull Terrier
+Vizsla
+Hound
+Australian Silky Terrier
+Sealyham Terrier
+American Bulldog
+Italian Spinone
+Tibetan Mastiff
+Finnish Spitz
+Saluki
+Irish Wolfhound
+American Staffordshire Terrier
+Leonberger
+Jack Russell Terrier
+Norfolk Terrier
+Tervuren
+Clumber Spaniel
+Japanese Chin
+American Eskimo Dog
+Manchester Terrier
+American Water Spaniel
+Pharaoh Hound
+Norwegian Elkhound

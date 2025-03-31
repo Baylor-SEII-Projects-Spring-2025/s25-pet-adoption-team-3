@@ -52,6 +52,9 @@ public class Pet {
     @Column(nullable = false, columnDefinition="enum('AVAILABLE','ARCHIVED') default 'AVAILABLE'")
     private PetStatus availabilityStatus;
 
+    @ManyToMany
+    private List<Characteristic> petCharacteristics;
+
     public enum PetStatus {
         AVAILABLE,
         ARCHIVED

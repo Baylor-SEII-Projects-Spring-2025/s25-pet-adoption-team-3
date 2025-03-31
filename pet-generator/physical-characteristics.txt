@@ -1,0 +1,63 @@
+Fluffy
+Short-haired
+Long-haired
+Curly-haired
+Wavy coat
+Sleek coat
+Shiny coat
+Thick coat
+Thin coat
+Double-coated
+Smooth coat
+Spotted
+Striped
+Solid-colored
+Multicolored
+Brindle
+Tri-colored
+Bicolor
+Fur pattern
+Mottled
+Feathery tail
+Bushy tail
+Short tail
+Long tail
+Pointed ears
+Floppy ears
+Small-sized
+Medium-sized
+Large-sized
+Stocky build
+Lean build
+Muscular
+Chubby
+Sleek physique
+Graceful
+Compact body
+Tall
+Broad-shouldered
+Round face
+Square face
+Flat-faced
+Snout
+Large paws
+Small paws
+Big eyes
+Bright eyes
+Almond-shaped eyes
+Round eyes
+Light-colored eyes
+Dark-colored eyes
+Shiny nose
+Pink nose
+Black nose
+Wet nose
+Chiseled features
+Puffy cheeks
+Big ears
+Short legs
+Long legs
+Long neck
+Short neck
+Rough coat
+Soft coat

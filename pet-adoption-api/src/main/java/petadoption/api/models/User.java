@@ -1,15 +1,10 @@
 package petadoption.api.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -54,6 +49,15 @@ public class User {
 
     @Column(name = "website", nullable = true)
     private String website;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Pet> recommendedPets;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Pet> savedPets;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Weight> weights;
 
     public enum Role {
         ADOPTER,
