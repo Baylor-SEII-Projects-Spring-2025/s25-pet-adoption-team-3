@@ -73,6 +73,7 @@ export function SwipeComponent() {
                 else if (!res.ok) {
                     alert(`HTTP error! status: ${res.status}`);
                     router.push("/");
+                    return;
                 }
                 const data = await res.json();
                 setPets(data);
@@ -222,7 +223,7 @@ export function SwipeComponent() {
                                                     </button>
                                                     <button
                                                         className={`${styles.carouselButton} ${styles.nextButton}`}
-                                                        onClick={(e) => {   
+                                                        onClick={(e) => {
                                                             handleCarouselClick(
                                                                 e,
                                                             );
@@ -245,30 +246,121 @@ export function SwipeComponent() {
                                     )}
                                 </div>
                                 <div className={styles.petInfo}>
-                                    <h2>{pet.name}</h2>
+                                    <h2 className={styles.petName}>
+                                        {pet.name}
+                                    </h2>
                                     <p>
-                                        <strong>Status:</strong>{" "}
-                                        {pet.spayedStatus}
-                                    </p>
-                                    <p>
-                                        <strong>Birthdate:</strong>{" "}
-                                        {pet.birthdate}
-                                    </p>
-                                    <p>
-                                        <strong>About Me:</strong> {pet.aboutMe}
-                                    </p>
-                                    <p>
-                                        <strong>Extras:</strong> {pet.extra1},{" "}
-                                        {pet.extra2}, {pet.extra3}
-                                    </p>
-                                    <p>
-                                        <strong>Location:</strong>{" "}
+                                        <img
+                                            src="/icons/location_icon.png"
+                                            alt="Location"
+                                            className={styles.icon}
+                                        />
                                         {pet.location}
                                     </p>
                                     <p>
-                                        <strong>Adoption Center:</strong>{" "}
+                                        <img
+                                            src="/icons/adoption_location_icon.png"
+                                            alt="Adoption Center"
+                                            className={styles.icon}
+                                        />
                                         {pet.adoptionCenterName}
                                     </p>
+                                    <p>
+                                        <img
+                                            src="/icons/breed_icon.png"
+                                            alt="Breed"
+                                            className={styles.icon}
+                                        />
+                                        {pet.breed}
+                                    </p>
+                                    <p>
+                                        <img
+                                            src="/icons/fertile_status_icon.png"
+                                            alt="Fertility Status"
+                                            className={styles.icon}
+                                        />
+                                        {pet.spayedStatus}
+                                    </p>
+                                    <p>
+                                        <img
+                                            src="/icons/birthday_icon.png"
+                                            alt="Birthdate"
+                                            className={styles.iconBirthdate}
+                                        />
+                                        {(() => {
+                                            const birthDate = new Date(
+                                                pet.birthdate,
+                                            );
+                                            const now = new Date();
+
+                                            // Format birthdate as "Month day, year"
+                                            const options = {
+                                                year: "numeric",
+                                                month: "long",
+                                                day: "numeric",
+                                            };
+                                            const formattedDate =
+                                                birthDate.toLocaleDateString(
+                                                    "en-US",
+                                                    options,
+                                                );
+
+                                            // Calculate age
+                                            let age =
+                                                now.getFullYear() -
+                                                birthDate.getFullYear();
+                                            const hasHadBirthdayThisYear =
+                                                now.getMonth() >
+                                                    birthDate.getMonth() ||
+                                                (now.getMonth() ===
+                                                    birthDate.getMonth() &&
+                                                    now.getDate() >=
+                                                        birthDate.getDate());
+
+                                            if (!hasHadBirthdayThisYear) {
+                                                age -= 1;
+                                            }
+
+                                            return `${formattedDate} - (${age} years old)`;
+                                        })()}
+                                    </p>
+
+                                    <h3 className={styles.aboutMe}>
+                                        About Me
+                                        <br></br>
+                                        <span className={styles.aboutMeText}>
+                                            {pet.aboutMe}
+                                        </span>
+                                    </h3>
+
+                                    <div className={styles.extraCardContainer}>
+                                        <div className={styles.extraCard}>
+                                            <p className={styles.extraTitle}>
+                                                I go crazy for
+                                            </p>
+                                            <p className={styles.extraContent}>
+                                                {pet.extra1}
+                                            </p>
+                                        </div>
+
+                                        <div className={styles.extraCard}>
+                                            <p className={styles.extraTitle}>
+                                                My favorite toy is
+                                            </p>
+                                            <p className={styles.extraContent}>
+                                                {pet.extra2}
+                                            </p>
+                                        </div>
+
+                                        <div className={styles.extraCard}>
+                                            <p className={styles.extraTitle}>
+                                                The way to win me over is
+                                            </p>
+                                            <p className={styles.extraContent}>
+                                                {pet.extra3}
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div className={styles.swipeHint}>
