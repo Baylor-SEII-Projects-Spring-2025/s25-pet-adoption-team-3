@@ -58,14 +58,14 @@ export default function ProfileDashboardComponent() {
             setUser(data.user);
         } catch (error) {
             console.error("Error fetching session:", error);
-            alert("⚠️ Failed to fetch your session. Please refresh or log in again.");
+            alert(
+                "⚠️ Failed to fetch your session. Please refresh or log in again.",
+            );
         }
     };
 
     useEffect(() => {
-        if (!user) {
-            fetchUserSession();
-        }
+        fetchUserSession();
     }, []);
 
     useEffect(() => {

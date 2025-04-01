@@ -118,15 +118,16 @@ export default function ProfileDashboardComponent() {
             console.log("User session data:", data);
 
             const fetchedUser = data.user;
-            setUser(fetchedUser); // triggers the [user] effect too
 
-            // ✅ Immediately act on the user role
             if (fetchedUser.role === "ADOPTER") {
                 Router.push("/profile");
+                return;
             } else if (fetchedUser.role !== "ADOPTION_CENTER") {
                 Router.push("/");
+                return;
             }
 
+            setUser(fetchedUser);
             setIsPageLoading(false);
         } catch (error) {
             console.error("Error fetching session:", error);
@@ -135,18 +136,8 @@ export default function ProfileDashboardComponent() {
     };
 
     useEffect(() => {
-        if (!user) return;
-
-        if (user.role === "ADOPTER") {
-            console.log("User is an adopter");
-            Router.push("/profile");
-        } else if (user.role !== "ADOPTION_CENTER") {
-            Router.push("/");
-        }
-
-        // ✅ Always stop the loading indicator
-        setIsPageLoading(false);
-    }, [user]);
+        fetchUserSession();
+    }, []);
 
     const handleDeletePhoto = async () => {
         try {
