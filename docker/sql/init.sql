@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS users (
     adoption_center_name VARCHAR(255),
     bio                  TEXT,
     phone_number         VARCHAR(255),
-    website              VARCHAR(255)
+    website              VARCHAR(255),
+    address              VARCHAR(255)
 
 );
 

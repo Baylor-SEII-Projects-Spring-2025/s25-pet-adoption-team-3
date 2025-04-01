@@ -13,5 +13,6 @@ public class AdoptionCenterDTO {
     private String bio;
     private String phoneNumber;
     private String website;
+    private String address;
     private User.Role role;
 }

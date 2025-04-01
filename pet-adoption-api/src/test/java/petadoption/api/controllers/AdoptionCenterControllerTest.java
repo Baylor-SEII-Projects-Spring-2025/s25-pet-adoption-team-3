@@ -50,6 +50,8 @@ class AdoptionCenterControllerTest {
         testUser.setWebsite("http://oldsite.com");
         testUser.setBio("Old bio");
         testUser.setPhoneNumber("1234567890");
+        testUser.setAddress("Old address");
+
 
         dto = new AdoptionCenterDTO();
         when(request.getSession()).thenReturn(session);
@@ -148,4 +150,31 @@ class AdoptionCenterControllerTest {
         assertEquals(400, response.getStatusCodeValue());
         assertEquals("User not found.", response.getBody());
     }
+
+    @Test
+    void testUpdateAddress_Success() {
+        dto.setAddress("456 New Shelter Lane");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser)).thenReturn(Optional.of(testUser));
+
+        ResponseEntity<String> response = controller.updateAddress(1L, dto, request);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Address updated to: " + dto.getAddress(), response.getBody());
+
+        verify(userRepository).saveAndFlush(any(User.class));
+        verify(session).invalidate();
+        verify(session).setAttribute(eq("user"), any(User.class));
+    }
+
+    @Test
+    void testUpdateAddress_UserNotFound() {
+        dto.setAddress("456 New Shelter Lane");
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        ResponseEntity<String> response = controller.updateAddress(1L, dto, request);
+
+        assertEquals(400, response.getStatusCodeValue());
+        assertEquals("User not found.", response.getBody());
+    }
+
 }
