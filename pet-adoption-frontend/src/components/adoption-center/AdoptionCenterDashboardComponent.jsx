@@ -115,38 +115,38 @@ export default function ProfileDashboardComponent() {
             }
 
             const data = await response.json();
+            console.log("User session data:", data);
 
-            if (data.user.role === "ADOPTER") {
+            const fetchedUser = data.user;
+            setUser(fetchedUser); // triggers the [user] effect too
+
+            // ✅ Immediately act on the user role
+            if (fetchedUser.role === "ADOPTER") {
                 Router.push("/profile");
-            }
-            else if (data.user.role === "ADOPTION_CENTER") {
-                Router.push("/adoption-center/dashboard");
-            }
-            else {
+            } else if (fetchedUser.role !== "ADOPTION_CENTER") {
                 Router.push("/");
             }
 
-            setUser(data.user);
+            setIsPageLoading(false);
         } catch (error) {
             console.error("Error fetching session:", error);
             alert("❌ Error fetching session.");
-        } finally {
-            setIsPageLoading(false);
         }
     };
 
     useEffect(() => {
-        if (!user) {
-            fetchUserSession();
-        }
-    }, []);
+        if (!user) return;
 
-    useEffect(() => {
-        if (user && user.role === "ADOPTER") {
+        if (user.role === "ADOPTER") {
+            console.log("User is an adopter");
             Router.push("/profile");
+        } else if (user.role !== "ADOPTION_CENTER") {
+            Router.push("/");
         }
-    }, [user]);
 
+        // ✅ Always stop the loading indicator
+        setIsPageLoading(false);
+    }, [user]);
 
     const handleDeletePhoto = async () => {
         try {
