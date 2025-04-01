@@ -37,6 +37,8 @@ public class SwipePetDTO {
 
     private String location;
 
+    private String breed;
+
     public SwipePetDTO(Pet pet) {
         this.id = pet.getId();
         this.name = pet.getName();
@@ -50,6 +52,7 @@ public class SwipePetDTO {
         this.image = pet.getImage();
         this.adoptionCenterName = pet.getAdoptionCenter().getAdoptionCenterName();
         this.location = "placeholder";
+        this.breed = pet.getBreed();
     }
 
 }
