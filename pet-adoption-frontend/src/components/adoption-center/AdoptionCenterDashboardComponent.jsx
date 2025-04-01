@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
 import React, { useEffect, useState, useRef, Suspense } from "react";
+import React, { useEffect, useState, useRef, Suspense } from "react";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -16,6 +17,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { extractImageFiles } from "@/utils/extractImageFiles";
 import { CircularProgress } from "@mui/material";
+import Loading from "@/components/adoption-center/Loading";
 import Loading from "@/components/adoption-center/Loading";
 
 dayjs.extend(isSameOrAfter);
@@ -83,6 +85,7 @@ export default function ProfileDashboardComponent() {
     const [availableEvents, setAvailableEvents] = useState([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [isPageLoading, setIsPageLoading] = useState(true);
+    const [isPageLoading, setIsPageLoading] = useState(true);
 
     const handleModalOpen = () => {
         setOpenModal(true);
@@ -112,6 +115,9 @@ export default function ProfileDashboardComponent() {
                 alert(
                     "⚠️ Failed to load user session. Please refresh or log in again.",
                 );
+                alert(
+                    "⚠️ Failed to load user session. Please refresh or log in again.",
+                );
                 throw new Error("Error fetching session");
             }
 
@@ -120,10 +126,13 @@ export default function ProfileDashboardComponent() {
 
             const fetchedUser = data.user;
 
-            if (fetchedUser.role === "ADOPTER") {
+            if (data.user.role === "ADOPTER") {
                 Router.push("/profile");
-                return;
-            } else if (fetchedUser.role !== "ADOPTION_CENTER") {
+            }
+            else if (data.user.role === "ADOPTION_CENTER") {
+                Router.push("/adoption-center/dashboard");
+            }
+            else {
                 Router.push("/");
                 return;
             }
@@ -133,12 +142,21 @@ export default function ProfileDashboardComponent() {
         } catch (error) {
             console.error("Error fetching session:", error);
             alert("❌ Error fetching session.");
+        } finally {
+            setIsPageLoading(false);
         }
     };
 
     useEffect(() => {
         fetchUserSession();
     }, []);
+
+    useEffect(() => {
+        if (user && user.role === "ADOPTER") {
+            Router.push("/profile");
+        }
+    }, [user]);
+
 
     const handleDeletePhoto = async () => {
         try {
@@ -241,6 +259,8 @@ export default function ProfileDashboardComponent() {
 
         const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
+        const maxSize = 5 * 1024 * 1024;
+        if (file.size > maxSize) {
             alert("❌ File size exceeds 5MB. Please upload a smaller file.");
             return;
         }
@@ -286,6 +306,7 @@ export default function ProfileDashboardComponent() {
         }
         console.log("📤 Submitting pet data:", petData);
 
+
         try {
             const formData = new FormData();
             extractImageFiles(petData, formData);
@@ -315,6 +336,9 @@ export default function ProfileDashboardComponent() {
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error("❌ Server response:", errorText);
+                throw new Error(
+                    `Failed to upload pet details: ${response.status} ${errorText}`,
+                );
                 throw new Error(
                     `Failed to upload pet details: ${response.status} ${errorText}`,
                 );
@@ -714,7 +738,50 @@ export default function ProfileDashboardComponent() {
         return <Loading />;
     }
 
+    if (isPageLoading) {
+        return <Loading />;
+    }
+
     return (
+        <Suspense fallback={<Loading />}>
+            <div className={styles.container}>
+                <div className={styles.profileLeftSection}>
+                    <div className={styles.profileNavbarLeft}>
+                        <h1>{selectedNav}</h1>
+                        <p
+                            onClick={() => setSelectedNav("Dashboard")}
+                            className={
+                                selectedNav === "Dashboard" ? styles.active : ""
+                            }
+                        >
+                            Dashboard
+                        </p>
+                        <p
+                            onClick={() => setSelectedNav("My Pets")}
+                            className={
+                                selectedNav === "My Pets" ? styles.active : ""
+                            }
+                        >
+                            My Pets
+                        </p>
+                        <p
+                            onClick={() => setSelectedNav("My Events")}
+                            className={
+                                selectedNav === "My Events" ? styles.active : ""
+                            }
+                        >
+                            My Events
+                        </p>
+                        <p
+                            onClick={() => setSelectedNav("Settings")}
+                            className={
+                                selectedNav === "Settings" ? styles.active : ""
+                            }
+                        >
+                            Settings
+                        </p>
+                    </div>
+                </div>
         <Suspense fallback={<Loading />}>
             <div className={styles.container}>
                 <div className={styles.profileLeftSection}>
@@ -756,7 +823,32 @@ export default function ProfileDashboardComponent() {
                 </div>
 
                 <div className={styles.divider}></div>
+                <div className={styles.divider}></div>
 
+                <div className={styles.profileRightSection}>
+                    <div className={styles.profileNavbarRight}>
+                        <div className={styles.dashboardHeader}>
+                            {selectedNav === "Dashboard" && (
+                                <div className={styles.dashboard}>
+                                    <div
+                                        className={
+                                            styles.dashboardHeaderContent
+                                        }
+                                    >
+                                        <div
+                                            className={styles.dashboardWrapper}
+                                        >
+                                            <div
+                                                className={
+                                                    styles.dashboardWrapperHeader
+                                                }
+                                            >
+                                                <h1>
+                                                    {user?.adoptionCenterName ||
+                                                        ""}
+                                                </h1>
+                                            </div>
+                                        </div>
                 <div className={styles.profileRightSection}>
                     <div className={styles.profileNavbarRight}>
                         <div className={styles.dashboardHeader}>
@@ -786,7 +878,42 @@ export default function ProfileDashboardComponent() {
                                             className={styles.profileMessaging}
                                         >
                                             <p>My Messages</p>
+                                        <div
+                                            className={styles.profileMessaging}
+                                        >
+                                            <p>My Messages</p>
 
+                                            {user?.messages?.length === 0 ||
+                                            !user?.messages ? (
+                                                <div
+                                                    className={
+                                                        styles.noMessages
+                                                    }
+                                                >
+                                                    <img
+                                                        src="/icons/no_messages.png"
+                                                        alt="No messages"
+                                                    />
+                                                    <p>
+                                                        No messages found, check
+                                                        back later.
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                <ul>
+                                                    {user?.messages?.map(
+                                                        (message, index) => (
+                                                            <li key={index}>
+                                                                {message}
+                                                            </li>
+                                                        ),
+                                                    )}
+                                                </ul>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className={styles.profileMatches}>
+                                        <p>My Pets</p>
                                             {user?.messages?.length === 0 ||
                                             !user?.messages ? (
                                                 <div
@@ -846,7 +973,50 @@ export default function ProfileDashboardComponent() {
                                 </div>
                             )}
                         </div>
+                                        {user?.matches?.length === 0 ||
+                                        !user?.matches ? (
+                                            <div className={styles.noMatches}>
+                                                <img
+                                                    src="/icons/no_matches.png"
+                                                    alt="No matches"
+                                                />
+                                                <p>
+                                                    No pets found, add some
+                                                    pets!
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            <ul>
+                                                {user?.matches?.map(
+                                                    (matches, index) => (
+                                                        <li key={index}>
+                                                            {matches}
+                                                        </li>
+                                                    ),
+                                                )}
+                                            </ul>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
 
+                        {selectedNav === "My Pets" && (
+                            <div className={styles.likesContent}>
+                                <div className={styles.petsHeader}>
+                                    <div className={styles.likesNavbar}>
+                                        <p
+                                            onClick={() =>
+                                                setSelectedPets("My Pets")
+                                            }
+                                            className={
+                                                selectedPets === "My Pets"
+                                                    ? styles.likesActive
+                                                    : ""
+                                            }
+                                        >
+                                            My Pets
+                                        </p>
                         {selectedNav === "My Pets" && (
                             <div className={styles.likesContent}>
                                 <div className={styles.petsHeader}>
@@ -869,7 +1039,72 @@ export default function ProfileDashboardComponent() {
                                                 styles.likesNavbarDivider
                                             }
                                         ></div>
+                                        <div
+                                            className={
+                                                styles.likesNavbarDivider
+                                            }
+                                        ></div>
 
+                                        <p
+                                            onClick={() =>
+                                                setSelectedPets("Archived Pets")
+                                            }
+                                            className={
+                                                selectedPets === "Archived Pets"
+                                                    ? styles.likesActive
+                                                    : ""
+                                            }
+                                        >
+                                            Archived Pets
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className={styles.likesContent}>
+                                    {selectedPets === "My Pets" && (
+                                        <div>
+                                            <div
+                                                className={styles.addPetButton}
+                                            >
+                                                <TextField
+                                                    label="Search Pets"
+                                                    variant="outlined"
+                                                    fullWidth
+                                                    value={searchQuery}
+                                                    onChange={
+                                                        handleSearchChange
+                                                    }
+                                                    className={
+                                                        styles.searchField
+                                                    }
+                                                    size="small"
+                                                    sx={{ mb: 2 }}
+                                                />
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    className={
+                                                        styles.addPetButtonClass
+                                                    }
+                                                    onClick={handleModalOpen}
+                                                >
+                                                    <img
+                                                        src="/icons/plus_icon.png"
+                                                        alt="Add"
+                                                    />
+                                                    New Pet
+                                                </Button>
+                                                <Modal
+                                                    open={openModal}
+                                                    onClose={handleModalClose}
+                                                    aria-labelledby="add-pet-modal"
+                                                >
+                                                    <Box sx={modalStyle}>
+                                                        <Typography
+                                                            variant="h5"
+                                                            sx={{ mb: 2 }}
+                                                        >
+                                                            Add New Pet
+                                                        </Typography>
                                         <p
                                             onClick={() =>
                                                 setSelectedPets("Archived Pets")
@@ -979,7 +1214,85 @@ export default function ProfileDashboardComponent() {
                                                                                 }
                                                                                 id={`file-input-${index}`}
                                                                             />
+                                                        <form
+                                                            onSubmit={
+                                                                handleFormSubmit
+                                                            }
+                                                            className={
+                                                                styles.form
+                                                            }
+                                                        >
+                                                            <h3>
+                                                                {" "}
+                                                                Upload photos
+                                                            </h3>
+                                                            {/* Image Upload Grid */}
+                                                            <Box
+                                                                className={
+                                                                    styles.imagePreviewContainer
+                                                                }
+                                                            >
+                                                                {petData.images.map(
+                                                                    (
+                                                                        imgObj,
+                                                                        index,
+                                                                    ) => (
+                                                                        <Box
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className={
+                                                                                styles.imageWrapper
+                                                                            }
+                                                                        >
+                                                                            {/* Hidden File Input */}
+                                                                            <input
+                                                                                type="file"
+                                                                                accept="image/*"
+                                                                                onChange={(
+                                                                                    event,
+                                                                                ) =>
+                                                                                    handleImageUpload(
+                                                                                        index,
+                                                                                        event,
+                                                                                    )
+                                                                                }
+                                                                                className={
+                                                                                    styles.fileInput
+                                                                                }
+                                                                                id={`file-input-${index}`}
+                                                                            />
 
+                                                                            {/* Remove Button */}
+                                                                            {imgObj &&
+                                                                                imgObj.preview && (
+                                                                                    <button
+                                                                                        className={
+                                                                                            styles.removeButton
+                                                                                        }
+                                                                                        onClick={(
+                                                                                            e,
+                                                                                        ) => {
+                                                                                            e.preventDefault();
+                                                                                            const newImages =
+                                                                                                [
+                                                                                                    ...petData.images,
+                                                                                                ];
+                                                                                            newImages[
+                                                                                                index
+                                                                                            ] =
+                                                                                                null;
+                                                                                            setPetData(
+                                                                                                {
+                                                                                                    ...petData,
+                                                                                                    images: newImages,
+                                                                                                },
+                                                                                            );
+                                                                                        }}
+                                                                                    >
+                                                                                        ✕
+                                                                                    </button>
+                                                                                )}
                                                                             {/* Remove Button */}
                                                                             {imgObj &&
                                                                                 imgObj.preview && (
@@ -1043,7 +1356,165 @@ export default function ProfileDashboardComponent() {
                                                                     ),
                                                                 )}
                                                             </Box>
+                                                                            {/* Image Preview */}
+                                                                            {imgObj &&
+                                                                            imgObj.preview ? (
+                                                                                <img
+                                                                                    src={
+                                                                                        imgObj.preview
+                                                                                    }
+                                                                                    className={
+                                                                                        styles.previewImage
+                                                                                    }
+                                                                                    alt={`Uploaded ${index}`}
+                                                                                />
+                                                                            ) : (
+                                                                                <Box
+                                                                                    className={
+                                                                                        styles.placeholder
+                                                                                    }
+                                                                                    onClick={() =>
+                                                                                        document
+                                                                                            .getElementById(
+                                                                                                `file-input-${index}`,
+                                                                                            )
+                                                                                            .click()
+                                                                                    }
+                                                                                >
+                                                                                    +
+                                                                                </Box>
+                                                                            )}
+                                                                        </Box>
+                                                                    ),
+                                                                )}
+                                                            </Box>
 
+                                                            {/* Text Fields */}
+                                                            <TextField
+                                                                label="Name"
+                                                                name="name"
+                                                                value={
+                                                                    petData.name
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                sx={{ mb: 2 }}
+                                                            />
+                                                            <TextField
+                                                                label="Breed"
+                                                                name="breed"
+                                                                value={
+                                                                    petData.breed
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                sx={{ mb: 2 }}
+                                                            />
+                                                            <TextField
+                                                                select
+                                                                label="Spayed/Neutered Status"
+                                                                name="spayedStatus"
+                                                                value={
+                                                                    petData.spayedStatus
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                sx={{ mb: 2 }}
+                                                            >
+                                                                {petStatuses.map(
+                                                                    (
+                                                                        status,
+                                                                    ) => (
+                                                                        <MenuItem
+                                                                            key={
+                                                                                status
+                                                                            }
+                                                                            value={
+                                                                                status
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                status
+                                                                            }
+                                                                        </MenuItem>
+                                                                    ),
+                                                                )}
+                                                            </TextField>
+                                                            <LocalizationProvider
+                                                                dateAdapter={
+                                                                    AdapterDayjs
+                                                                }
+                                                            >
+                                                                <DatePicker
+                                                                    label="Birthdate"
+                                                                    value={
+                                                                        petData.birthdate
+                                                                            ? dayjs(
+                                                                                  petData.birthdate,
+                                                                              )
+                                                                            : null
+                                                                    }
+                                                                    onChange={(
+                                                                        newValue,
+                                                                    ) => {
+                                                                        if (
+                                                                            newValue
+                                                                        ) {
+                                                                            setPetData(
+                                                                                {
+                                                                                    ...petData,
+                                                                                    birthdate:
+                                                                                        newValue.format(
+                                                                                            "YYYY-MM-DD",
+                                                                                        ),
+                                                                                },
+                                                                            );
+                                                                        }
+                                                                    }}
+                                                                    format="YYYY-MM-DD"
+                                                                    shouldDisableDate={(
+                                                                        date,
+                                                                    ) =>
+                                                                        date.isAfter(
+                                                                            dayjs(),
+                                                                        )
+                                                                    }
+                                                                    slotProps={{
+                                                                        textField:
+                                                                            {
+                                                                                fullWidth: true,
+                                                                                required: true,
+                                                                                sx: {
+                                                                                    mb: 2,
+                                                                                },
+                                                                            },
+                                                                    }}
+                                                                />
+                                                            </LocalizationProvider>
+                                                            <TextField
+                                                                label="About Me"
+                                                                name="aboutMe"
+                                                                value={
+                                                                    petData.aboutMe
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                multiline
+                                                                rows={3}
+                                                                sx={{ mb: 2 }}
+                                                            />
                                                             {/* Text Fields */}
                                                             <TextField
                                                                 label="Name"
@@ -1217,7 +1688,174 @@ export default function ProfileDashboardComponent() {
                                                                 required
                                                                 sx={{ mb: 2 }}
                                                             />
+                                                            {/* Extra Sections */}
+                                                            <Typography
+                                                                variant="subtitle1"
+                                                                sx={{ mt: 2 }}
+                                                            >
+                                                                Additional Info:
+                                                            </Typography>
+                                                            <TextField
+                                                                label="I go crazy for..."
+                                                                name="extra1"
+                                                                value={
+                                                                    petData.extra1
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                sx={{ mb: 2 }}
+                                                            />
+                                                            <TextField
+                                                                label="My favorite toy is..."
+                                                                name="extra2"
+                                                                value={
+                                                                    petData.extra2
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                sx={{ mb: 2 }}
+                                                            />
+                                                            <TextField
+                                                                label="The way to win me over is..."
+                                                                name="extra3"
+                                                                value={
+                                                                    petData.extra3
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                sx={{ mb: 2 }}
+                                                            />
 
+                                                            {/* Buttons */}
+                                                            <Box
+                                                                sx={{
+                                                                    display:
+                                                                        "flex",
+                                                                    justifyContent:
+                                                                        "space-between",
+                                                                    mt: 3,
+                                                                }}
+                                                            >
+                                                                <Button
+                                                                    onClick={
+                                                                        handleModalClose
+                                                                    }
+                                                                    variant="outlined"
+                                                                >
+                                                                    Cancel
+                                                                </Button>
+                                                                <Button
+                                                                    type="submit"
+                                                                    variant="contained"
+                                                                    color="primary"
+                                                                    disabled={
+                                                                        !isFormValid()
+                                                                    }
+                                                                    onClick={
+                                                                        handleAddPetSubmit
+                                                                    }
+                                                                    startIcon={
+                                                                        loading ? (
+                                                                            <CircularProgress
+                                                                                size={
+                                                                                    20
+                                                                                }
+                                                                                color="inherit"
+                                                                            />
+                                                                        ) : null
+                                                                    }
+                                                                >
+                                                                    {loading
+                                                                        ? "Adding Pet..."
+                                                                        : "Add Pet"}
+                                                                </Button>
+                                                            </Box>
+                                                        </form>
+                                                    </Box>
+                                                </Modal>
+                                            </div>
+                                            <div className={styles.petsText}>
+                                                {filteredPets.length > 0 ? (
+                                                    <div
+                                                        className={
+                                                            styles.petsGrid
+                                                        }
+                                                    >
+                                                        {filteredPets.map(
+                                                            (pet) => (
+                                                                <div
+                                                                    key={pet.id}
+                                                                    className={
+                                                                        styles.petCard
+                                                                    }
+                                                                >
+                                                                    <img
+                                                                        src={
+                                                                            pet
+                                                                                .image[0]
+                                                                        }
+                                                                        alt={
+                                                                            pet.name
+                                                                        }
+                                                                        className={
+                                                                            styles.petImage
+                                                                        }
+                                                                    />
+                                                                    <div
+                                                                        className={
+                                                                            styles.petDetails
+                                                                        }
+                                                                    >
+                                                                        <div>
+                                                                            <p
+                                                                                className={
+                                                                                    styles.petName
+                                                                                }
+                                                                            >
+                                                                                {
+                                                                                    pet.name
+                                                                                }
+                                                                            </p>
+                                                                            <p>
+                                                                                Breed:{" "}
+                                                                                {
+                                                                                    pet.breed
+                                                                                }
+                                                                            </p>
+                                                                            <p>
+                                                                                {
+                                                                                    pet.spayedStatus
+                                                                                }
+                                                                            </p>
+                                                                            <p>
+                                                                                Born:{" "}
+                                                                                {dayjs(
+                                                                                    pet.birthdate,
+                                                                                ).format(
+                                                                                    "MMMM D, YYYY",
+                                                                                )}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ),
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <p>No pets found.</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
                                                             {/* Buttons */}
                                                             <Box
                                                                 sx={{
@@ -1360,7 +1998,43 @@ export default function ProfileDashboardComponent() {
                                 </div>
                             </div>
                         )}
+                                    {selectedPets === "Archived Pets" && (
+                                        <div className={styles.archivedPets}>
+                                            {user?.superLikes?.length > 0 ? (
+                                                <ul>
+                                                    {user.superLikes.map(
+                                                        (superLike, index) => (
+                                                            <li key={index}>
+                                                                {superLike}
+                                                            </li>
+                                                        ),
+                                                    )}
+                                                </ul>
+                                            ) : (
+                                                <p>No archived pets found.</p>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
 
+                        {selectedNav === "My Events" && (
+                            <div className={styles.likesContent}>
+                                <div className={styles.petsHeader}>
+                                    <div className={styles.likesNavbar}>
+                                        <p
+                                            onClick={() =>
+                                                setSelectedEvents("My Events")
+                                            }
+                                            className={
+                                                selectedEvents === "My Events"
+                                                    ? styles.likesActive
+                                                    : ""
+                                            }
+                                        >
+                                            My Events
+                                        </p>
                         {selectedNav === "My Events" && (
                             <div className={styles.likesContent}>
                                 <div className={styles.petsHeader}>
@@ -1383,7 +2057,29 @@ export default function ProfileDashboardComponent() {
                                                 styles.likesNavbarDivider
                                             }
                                         ></div>
+                                        <div
+                                            className={
+                                                styles.likesNavbarDivider
+                                            }
+                                        ></div>
 
+                                        <p
+                                            onClick={() =>
+                                                setSelectedEvents(
+                                                    "Archived Events",
+                                                )
+                                            }
+                                            className={
+                                                selectedEvents ===
+                                                "Archived Events"
+                                                    ? styles.likesActive
+                                                    : ""
+                                            }
+                                        >
+                                            Archived Events
+                                        </p>
+                                    </div>
+                                </div>
                                         <p
                                             onClick={() =>
                                                 setSelectedEvents(
@@ -1452,7 +2148,68 @@ export default function ProfileDashboardComponent() {
                                                         >
                                                             Add New Event
                                                         </Typography>
+                                <div className={styles.likesContent}>
+                                    {selectedEvents === "My Events" && (
+                                        <div>
+                                            <div
+                                                className={
+                                                    styles.addEventButton
+                                                }
+                                            >
+                                                <TextField
+                                                    label="Search Events"
+                                                    variant="outlined"
+                                                    fullWidth
+                                                    value={searchQuery}
+                                                    onChange={
+                                                        handleEventSearchChange
+                                                    }
+                                                    className={
+                                                        styles.searchField
+                                                    }
+                                                    size="small"
+                                                    sx={{ mb: 2 }}
+                                                />
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    className={
+                                                        styles.addEventButtonClass
+                                                    }
+                                                    onClick={() =>
+                                                        setOpenModal(true)
+                                                    }
+                                                >
+                                                    <img
+                                                        src="/icons/plus_icon.png"
+                                                        alt="Add"
+                                                    />
+                                                    New Event
+                                                </Button>
+                                                <Modal
+                                                    open={openModal}
+                                                    onClose={handleModalClose}
+                                                    aria-labelledby="add-event-modal"
+                                                >
+                                                    <Box sx={modalStyle}>
+                                                        <Typography
+                                                            variant="h5"
+                                                            sx={{ mb: 2 }}
+                                                        >
+                                                            Add New Event
+                                                        </Typography>
 
+                                                        <form
+                                                            onSubmit={
+                                                                handleEventSubmit
+                                                            }
+                                                            className={
+                                                                styles.form
+                                                            }
+                                                        >
+                                                            <h3>
+                                                                Upload Photo
+                                                            </h3>
                                                         <form
                                                             onSubmit={
                                                                 handleEventSubmit
@@ -1482,7 +2239,80 @@ export default function ProfileDashboardComponent() {
                                                                     }
                                                                     id="event-file-input"
                                                                 />
+                                                            {/* Image Upload Box */}
+                                                            <Box
+                                                                className={
+                                                                    styles.eventImagePreviewContainer
+                                                                }
+                                                            >
+                                                                <input
+                                                                    type="file"
+                                                                    accept="image/*"
+                                                                    onChange={
+                                                                        handleEventImageUpload
+                                                                    }
+                                                                    className={
+                                                                        styles.fileInput
+                                                                    }
+                                                                    id="event-file-input"
+                                                                />
 
+                                                                {eventData
+                                                                    .images[0] ? (
+                                                                    <div
+                                                                        className={
+                                                                            styles.eventImageWrapper
+                                                                        }
+                                                                    >
+                                                                        <img
+                                                                            src={
+                                                                                eventData
+                                                                                    .images[0]
+                                                                                    .preview
+                                                                            }
+                                                                            className={
+                                                                                styles.previewImageEvent
+                                                                            }
+                                                                            alt="Uploaded Event"
+                                                                        />
+                                                                        <button
+                                                                            className={
+                                                                                styles.removeButton
+                                                                            }
+                                                                            onClick={(
+                                                                                e,
+                                                                            ) => {
+                                                                                e.preventDefault();
+                                                                                setEventData(
+                                                                                    {
+                                                                                        ...eventData,
+                                                                                        images: [
+                                                                                            null,
+                                                                                        ],
+                                                                                    },
+                                                                                );
+                                                                            }}
+                                                                        >
+                                                                            ✕
+                                                                        </button>
+                                                                    </div>
+                                                                ) : (
+                                                                    <Box
+                                                                        className={
+                                                                            styles.eventPlaceholder
+                                                                        }
+                                                                        onClick={() =>
+                                                                            document
+                                                                                .getElementById(
+                                                                                    "event-file-input",
+                                                                                )
+                                                                                .click()
+                                                                        }
+                                                                    >
+                                                                        +
+                                                                    </Box>
+                                                                )}
+                                                            </Box>
                                                                 {eventData
                                                                     .images[0] ? (
                                                                     <div
@@ -1611,6 +2441,77 @@ export default function ProfileDashboardComponent() {
                                                                             },
                                                                     }}
                                                                 />
+                                                            {/* Text Fields */}
+                                                            <TextField
+                                                                label="Event Title"
+                                                                name="title"
+                                                                value={
+                                                                    eventData.title
+                                                                }
+                                                                onChange={
+                                                                    handleEventChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                sx={{ mb: 2 }}
+                                                            />
+                                                            <TextField
+                                                                label="Event Description"
+                                                                name="description"
+                                                                value={
+                                                                    eventData.description
+                                                                }
+                                                                onChange={
+                                                                    handleEventChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                multiline
+                                                                rows={3}
+                                                                sx={{ mb: 2 }}
+                                                            />
+                                                            <LocalizationProvider
+                                                                dateAdapter={
+                                                                    AdapterDayjs
+                                                                }
+                                                            >
+                                                                {/* Start Date Picker */}
+                                                                <DatePicker
+                                                                    label="Start Date"
+                                                                    value={
+                                                                        eventData.startDate
+                                                                            ? dayjs(
+                                                                                  eventData.startDate,
+                                                                              )
+                                                                            : null
+                                                                    }
+                                                                    onChange={(
+                                                                        newValue,
+                                                                    ) =>
+                                                                        handleEventDateChange(
+                                                                            "startDate",
+                                                                            newValue,
+                                                                        )
+                                                                    }
+                                                                    format="YYYY-MM-DD"
+                                                                    shouldDisableDate={(
+                                                                        date,
+                                                                    ) =>
+                                                                        date.isBefore(
+                                                                            dayjs(),
+                                                                        )
+                                                                    } // Disable past dates
+                                                                    slotProps={{
+                                                                        textField:
+                                                                            {
+                                                                                fullWidth: true,
+                                                                                required: true,
+                                                                                sx: {
+                                                                                    mb: 2,
+                                                                                },
+                                                                            },
+                                                                    }}
+                                                                />
 
                                                                 {/* End Date Picker */}
                                                                 <DatePicker
@@ -1657,7 +2558,97 @@ export default function ProfileDashboardComponent() {
                                                                     }}
                                                                 />
                                                             </LocalizationProvider>
+                                                                {/* End Date Picker */}
+                                                                <DatePicker
+                                                                    label="End Date"
+                                                                    value={
+                                                                        eventData.endDate
+                                                                            ? dayjs(
+                                                                                  eventData.endDate,
+                                                                              )
+                                                                            : null
+                                                                    }
+                                                                    onChange={(
+                                                                        newValue,
+                                                                    ) =>
+                                                                        handleEventDateChange(
+                                                                            "endDate",
+                                                                            newValue,
+                                                                        )
+                                                                    }
+                                                                    format="YYYY-MM-DD"
+                                                                    shouldDisableDate={
+                                                                        (
+                                                                            date,
+                                                                        ) =>
+                                                                            date.isBefore(
+                                                                                dayjs(),
+                                                                            ) || // Prevent selecting past dates
+                                                                            (eventData.startDate &&
+                                                                                date.isBefore(
+                                                                                    dayjs(
+                                                                                        eventData.startDate,
+                                                                                    ),
+                                                                                )) // Prevent selecting before start date
+                                                                    }
+                                                                    slotProps={{
+                                                                        textField:
+                                                                            {
+                                                                                fullWidth: true,
+                                                                                required: true,
+                                                                                sx: {
+                                                                                    mb: 2,
+                                                                                },
+                                                                            },
+                                                                    }}
+                                                                />
+                                                            </LocalizationProvider>
 
+                                                            {/* Buttons */}
+                                                            <Box
+                                                                sx={{
+                                                                    display:
+                                                                        "flex",
+                                                                    justifyContent:
+                                                                        "space-between",
+                                                                    mt: 3,
+                                                                }}
+                                                            >
+                                                                <Button
+                                                                    onClick={
+                                                                        handleModalClose
+                                                                    }
+                                                                    variant="outlined"
+                                                                >
+                                                                    Cancel
+                                                                </Button>
+                                                                <Button
+                                                                    type="submit"
+                                                                    variant="contained"
+                                                                    color="primary"
+                                                                    disabled={
+                                                                        !isEventFormValid()
+                                                                    }
+                                                                    startIcon={
+                                                                        loading ? (
+                                                                            <CircularProgress
+                                                                                size={
+                                                                                    20
+                                                                                }
+                                                                                color="inherit"
+                                                                            />
+                                                                        ) : null
+                                                                    }
+                                                                >
+                                                                    {loading
+                                                                        ? "Creating Event..."
+                                                                        : "Create Event"}
+                                                                </Button>
+                                                            </Box>
+                                                        </form>
+                                                    </Box>
+                                                </Modal>
+                                            </div>
                                                             {/* Buttons */}
                                                             <Box
                                                                 sx={{
@@ -1789,7 +2780,113 @@ export default function ProfileDashboardComponent() {
                                             </div>
                                         </div>
                                     )}
+                                            <div className={styles.petsText}>
+                                                {filteredEvents.length > 0 ? (
+                                                    <div
+                                                        className={
+                                                            styles.eventsGrid
+                                                        }
+                                                    >
+                                                        {filteredEvents.map(
+                                                            (event) => (
+                                                                <div
+                                                                    key={
+                                                                        event.id
+                                                                    }
+                                                                    className={
+                                                                        styles.eventCard
+                                                                    }
+                                                                >
+                                                                    <img
+                                                                        src={
+                                                                            event.image
+                                                                        }
+                                                                        alt={
+                                                                            event.title
+                                                                        }
+                                                                        className={
+                                                                            styles.eventImage
+                                                                        }
+                                                                    />
+                                                                    <div
+                                                                        className={
+                                                                            styles.eventDetails
+                                                                        }
+                                                                    >
+                                                                        <p
+                                                                            className={
+                                                                                styles.eventTitle
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                event.title
+                                                                            }
+                                                                        </p>
+                                                                        <p
+                                                                            className={
+                                                                                styles.eventDescription
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                event.description
+                                                                            }
+                                                                        </p>
+                                                                        <p
+                                                                            className={
+                                                                                styles.eventDate
+                                                                            }
+                                                                        >
+                                                                            {dayjs(
+                                                                                event.startDate,
+                                                                            ).format(
+                                                                                "MMMM D, YYYY",
+                                                                            )}{" "}
+                                                                            -{" "}
+                                                                            {dayjs(
+                                                                                event.endDate,
+                                                                            ).format(
+                                                                                "MMMM D, YYYY",
+                                                                            )}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            ),
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <p
+                                                        className={
+                                                            styles.noEventsMessage
+                                                        }
+                                                    >
+                                                        No events found.
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
 
+                                    {selectedEvents === "Archived Events" && (
+                                        <div className={styles.archivedPets}>
+                                            {user?.archivedEvents?.length >
+                                            0 ? (
+                                                <ul>
+                                                    {user.archivedEvents.map(
+                                                        (event, index) => (
+                                                            <li key={index}>
+                                                                {event.title}
+                                                            </li>
+                                                        ),
+                                                    )}
+                                                </ul>
+                                            ) : (
+                                                <p>No archived events found.</p>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                                     {selectedEvents === "Archived Events" && (
                                         <div className={styles.archivedPets}>
                                             {user?.archivedEvents?.length >
@@ -1842,7 +2939,114 @@ export default function ProfileDashboardComponent() {
                                             </>
                                         )}
                                     </Avatar>
+                        {selectedNav === "Settings" && (
+                            <div className={styles.settingsWrapper}>
+                                <div className={styles.dashboardWrapperHeader}>
+                                    <Avatar
+                                        ref={anchorRef}
+                                        sx={{
+                                            background: user?.profilePhoto
+                                                ? "transparent"
+                                                : generateGradient(
+                                                      user?.firstName +
+                                                          (user?.lastName ||
+                                                              ""),
+                                                  ),
+                                            cursor: "pointer",
+                                            color: "#fff",
+                                            width: 100,
+                                            height: 100,
+                                            border: "1px solid black",
+                                        }}
+                                        src={user?.profilePhoto || undefined}
+                                    >
+                                        {!user?.profilePhoto && (
+                                            <>
+                                                {user?.firstName?.charAt(0)}
+                                                {user?.lastName
+                                                    ? user?.lastName.charAt(0)
+                                                    : ""}
+                                            </>
+                                        )}
+                                    </Avatar>
 
+                                    <div
+                                        className={
+                                            styles.settingsChangeProfilePhoto
+                                        }
+                                    >
+                                        <div
+                                            className={
+                                                styles.settingsChangePhotoButtons
+                                            }
+                                        >
+                                            <input
+                                                type="file"
+                                                accept=".png, .jpg, .jpeg"
+                                                onChange={handleUploadPhoto}
+                                                style={{ display: "none" }}
+                                                id="upload-photo"
+                                            />
+                                            <Button
+                                                variant="contained"
+                                                onClick={() =>
+                                                    document
+                                                        .getElementById(
+                                                            "upload-photo",
+                                                        )
+                                                        .click()
+                                                }
+                                            >
+                                                Upload Photo
+                                            </Button>
+                                            <Button
+                                                type="submit"
+                                                variant="outlined"
+                                                color="error"
+                                                disabled={!user?.profilePhoto}
+                                                onClick={handleOpen}
+                                            >
+                                                Delete Photo
+                                            </Button>
+                                            <Modal
+                                                open={open}
+                                                onClose={handleClose}
+                                                aria-labelledby="modal-modal-title"
+                                                aria-describedby="modal-modal-description"
+                                            >
+                                                <Box sx={style}>
+                                                    <Typography
+                                                        id="modal-modal-title"
+                                                        variant="h6"
+                                                        component="h2"
+                                                    >
+                                                        Are you sure you want to
+                                                        delete your profile
+                                                        photo?
+                                                    </Typography>
+                                                    <Typography
+                                                        id="modal-modal-description"
+                                                        sx={{ mt: 2 }}
+                                                    >
+                                                        The photo will be
+                                                        permanently deleted and
+                                                        cannot be recovered.
+                                                    </Typography>
+                                                    <Button
+                                                        type="submit"
+                                                        variant="outlined"
+                                                        color="error"
+                                                        sx="margin-top: 20px"
+                                                        onClick={() => {
+                                                            handleDeletePhoto();
+                                                            handleClose();
+                                                        }}
+                                                    >
+                                                        Yes, I&apos;m Sure
+                                                    </Button>
+                                                </Box>
+                                            </Modal>
+                                        </div>
                                     <div
                                         className={
                                             styles.settingsChangeProfilePhoto
@@ -1952,83 +3156,107 @@ export default function ProfileDashboardComponent() {
                                             size="small"
                                         />
                                     </div>
+                                        <div
+                                            className={
+                                                styles.settingsUploadError
+                                            }
+                                        >
+                                            {uploadError && (
+                                                <p
+                                                    style={{
+                                                        color: "red",
+                                                        marginTop: "10px",
+                                                        fontSize: "14px",
+                                                    }}
+                                                >
+                                                    {uploadError}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className={styles.dashboardContent}>
+                                    <div className={styles.dashboardContentTop}>
+                                        <TextField
+                                            label="Adoption Center Name"
+                                            value={adoptionCenterName}
+                                            onChange={
+                                                handleAdoptionCenterNameChange
+                                            }
+                                            id="firstName"
+                                            size="small"
+                                        />
+                                    </div>
 
-                                <TextField
-                                    disabled
-                                    label="Email"
-                                    value={user?.email || ""}
-                                    id="email"
-                                    size="small"
-                                />
-                                <TextField
-                                    disabled
-                                    label="Password"
-                                    value="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
-                                    id="password"
-                                    size="small"
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                />
-                                <TextField
-                                    label="Website Link"
-                                    value={websiteLink}
-                                    onChange={handleWebsiteChange}
-                                    fullWidth
-                                    id="website link"
-                                    size="small"
-                                />
-                                <TextField
-                                    disabled
-                                    label="Address"
-                                    value={address}
-                                    fullWidth
-                                    id="address"
-                                    size="small"
-                                />
-                                <TextField
-                                    label="Bio"
-                                    value={bio}
-                                    onChange={handleBioChange}
-                                    fullWidth
-                                    id="bio"
-                                    size="small"
-                                    multiline
-                                    rows={3}
-                                />
-                                <TextField
-                                    label="Phone Number"
-                                    value={phoneNumber}
-                                    onChange={handlePhoneNumberChange}
-                                    fullWidth
-                                    id="phone number"
-                                    size="small"
-                                />
+                                    <TextField
+                                        disabled
+                                        label="Email"
+                                        value={user?.email || ""}
+                                        id="email"
+                                        size="small"
+                                    />
+                                    <TextField
+                                        disabled
+                                        label="Password"
+                                        value="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
+                                        id="password"
+                                        size="small"
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                    />
+                                    <TextField
+                                        label="Website Link"
+                                        value={websiteLink}
+                                        onChange={handleWebsiteChange}
+                                        fullWidth
+                                        id="website link"
+                                        size="small"
+                                    />
+                                    <TextField
+                                        label="Bio"
+                                        value={bio}
+                                        onChange={handleBioChange}
+                                        fullWidth
+                                        id="bio"
+                                        size="small"
+                                        multiline
+                                        rows={3}
+                                    />
+                                    <TextField
+                                        label="Phone Number"
+                                        value={phoneNumber}
+                                        onChange={handlePhoneNumberChange}
+                                        fullWidth
+                                        id="phone number"
+                                        size="small"
+                                    />
 
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={handleUpdateProfile}
-                                    disabled={!isUpdated}
-                                    startIcon={
-                                        loading ? (
-                                            <CircularProgress
-                                                size={20}
-                                                color="inherit"
-                                            />
-                                        ) : null
-                                    }
-                                >
-                                    {loading
-                                        ? "Updating Profile..."
-                                        : "Update Profile"}
-                                </Button>
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={handleUpdateProfile}
+                                        disabled={!isUpdated}
+                                        startIcon={
+                                            loading ? (
+                                                <CircularProgress
+                                                    size={20}
+                                                    color="inherit"
+                                                />
+                                            ) : null
+                                        }
+                                    >
+                                        {loading
+                                            ? "Updating Profile..."
+                                            : "Update Profile"}
+                                    </Button>
+                                </div>
                             </div>
-                            </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
+        </Suspense>
     );
 }
 
