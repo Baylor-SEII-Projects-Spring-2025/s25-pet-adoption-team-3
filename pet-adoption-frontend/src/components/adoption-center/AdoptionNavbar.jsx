@@ -39,7 +39,6 @@ export default function AdoptionNavbar() {
             }
 
             const data = await response.json();
-            console.log("✅ Session found:", data);
             setUser(data.user);
 
             if (data.user.role != "ADOPTION_CENTER") {
