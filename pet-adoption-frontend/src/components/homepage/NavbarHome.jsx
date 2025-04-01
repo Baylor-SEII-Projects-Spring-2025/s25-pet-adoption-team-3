@@ -30,13 +30,17 @@ export default function Navbar() {
                 return;
             }
 
-            const data = await response.json();
-            console.log("✅ Session found:", data);
-            setUser(data.user);
-        } catch (error) {
-            console.error("Error fetching session:", error);
-        }
-    };
+                if (!response.ok) {
+                    throw new Error("Error fetching session");
+                }
+
+                const data = await response.json();
+                console.log("✅ Session found:", data);
+                setUser(data.user);
+            } catch (error) {
+                console.error("Error fetching session:", error);
+            }
+        };
 
     useEffect(() => {
         if (!user) {

@@ -1043,747 +1043,784 @@ export default function ProfileDashboardComponent() {
                                                                                 </button>
                                                                             )}
 
-                                                                        {/* Image Preview */}
-                                                                        {imgObj &&
-                                                                        imgObj.preview ? (
-                                                                            <img
-                                                                                src={
-                                                                                    imgObj.preview
-                                                                                }
-                                                                                className={
-                                                                                    styles.previewImage
-                                                                                }
-                                                                                alt={`Uploaded ${index}`}
-                                                                            />
-                                                                        ) : (
-                                                                            <Box
-                                                                                className={
-                                                                                    styles.placeholder
-                                                                                }
-                                                                                onClick={() =>
-                                                                                    document
-                                                                                        .getElementById(
-                                                                                            `file-input-${index}`,
-                                                                                        )
-                                                                                        .click()
-                                                                                }
-                                                                            >
-                                                                                +
-                                                                            </Box>
-                                                                        )}
-                                                                    </Box>
-                                                                ),
-                                                            )}
-                                                        </Box>
+                                                                            {/* Image Preview */}
+                                                                            {imgObj &&
+                                                                            imgObj.preview ? (
+                                                                                <img
+                                                                                    src={
+                                                                                        imgObj.preview
+                                                                                    }
+                                                                                    className={
+                                                                                        styles.previewImage
+                                                                                    }
+                                                                                    alt={`Uploaded ${index}`}
+                                                                                />
+                                                                            ) : (
+                                                                                <Box
+                                                                                    className={
+                                                                                        styles.placeholder
+                                                                                    }
+                                                                                    onClick={() =>
+                                                                                        document
+                                                                                            .getElementById(
+                                                                                                `file-input-${index}`,
+                                                                                            )
+                                                                                            .click()
+                                                                                    }
+                                                                                >
+                                                                                    +
+                                                                                </Box>
+                                                                            )}
+                                                                        </Box>
+                                                                    ),
+                                                                )}
+                                                            </Box>
 
-                                                        {/* Text Fields */}
-                                                        <TextField
-                                                            label="Name"
-                                                            name="name"
-                                                            value={petData.name}
-                                                            onChange={
-                                                                handleChange
-                                                            }
-                                                            fullWidth
-                                                            required
-                                                            sx={{ mb: 2 }}
-                                                        />
-                                                        <TextField
-                                                            label="Breed"
-                                                            name="breed"
-                                                            value={
-                                                                petData.breed
-                                                            }
-                                                            onChange={
-                                                                handleChange
-                                                            }
-                                                            fullWidth
-                                                            required
-                                                            sx={{ mb: 2 }}
-                                                        />
-                                                        <TextField
-                                                            select
-                                                            label="Spayed/Neutered Status"
-                                                            name="spayedStatus"
-                                                            value={
-                                                                petData.spayedStatus
-                                                            }
-                                                            onChange={
-                                                                handleChange
-                                                            }
-                                                            fullWidth
-                                                            required
-                                                            sx={{ mb: 2 }}
-                                                        >
-                                                            {petStatuses.map(
-                                                                (status) => (
-                                                                    <MenuItem
-                                                                        key={
-                                                                            status
-                                                                        }
-                                                                        value={
-                                                                            status
-                                                                        }
-                                                                    >
-                                                                        {status}
-                                                                    </MenuItem>
-                                                                ),
-                                                            )}
-                                                        </TextField>
-                                                        <LocalizationProvider
-                                                            dateAdapter={
-                                                                AdapterDayjs
-                                                            }
-                                                        >
-                                                            <DatePicker
-                                                                label="Birthdate"
+                                                            {/* Text Fields */}
+                                                            <TextField
+                                                                label="Name"
+                                                                name="name"
                                                                 value={
-                                                                    petData.birthdate
-                                                                        ? dayjs(
-                                                                              petData.birthdate,
-                                                                          )
-                                                                        : null
+                                                                    petData.name
                                                                 }
-                                                                onChange={(
-                                                                    newValue,
-                                                                ) => {
-                                                                    if (
-                                                                        newValue
-                                                                    ) {
-                                                                        setPetData(
-                                                                            {
-                                                                                ...petData,
-                                                                                birthdate:
-                                                                                    newValue.format(
-                                                                                        "YYYY-MM-DD",
-                                                                                    ),
-                                                                            },
-                                                                        );
-                                                                    }
-                                                                }}
-                                                                format="YYYY-MM-DD"
-                                                                shouldDisableDate={(
-                                                                    date,
-                                                                ) =>
-                                                                    date.isAfter(
-                                                                        dayjs(),
-                                                                    )
-                                                                }
-                                                                slotProps={{
-                                                                    textField: {
-                                                                        fullWidth: true,
-                                                                        required: true,
-                                                                        sx: {
-                                                                            mb: 2,
-                                                                        },
-                                                                    },
-                                                                }}
-                                                            />
-                                                        </LocalizationProvider>
-                                                        <TextField
-                                                            label="About Me"
-                                                            name="aboutMe"
-                                                            value={
-                                                                petData.aboutMe
-                                                            }
-                                                            onChange={
-                                                                handleChange
-                                                            }
-                                                            fullWidth
-                                                            required
-                                                            multiline
-                                                            rows={3}
-                                                            sx={{ mb: 2 }}
-                                                        />
-
-                                                        {/* Extra Sections */}
-                                                        <Typography
-                                                            variant="subtitle1"
-                                                            sx={{ mt: 2 }}
-                                                        >
-                                                            Additional Info:
-                                                        </Typography>
-                                                        <TextField
-                                                            label="I go crazy for..."
-                                                            name="extra1"
-                                                            value={
-                                                                petData.extra1
-                                                            }
-                                                            onChange={
-                                                                handleChange
-                                                            }
-                                                            fullWidth
-                                                            required
-                                                            sx={{ mb: 2 }}
-                                                        />
-                                                        <TextField
-                                                            label="My favorite toy is..."
-                                                            name="extra2"
-                                                            value={
-                                                                petData.extra2
-                                                            }
-                                                            onChange={
-                                                                handleChange
-                                                            }
-                                                            fullWidth
-                                                            required
-                                                            sx={{ mb: 2 }}
-                                                        />
-                                                        <TextField
-                                                            label="The way to win me over is..."
-                                                            name="extra3"
-                                                            value={
-                                                                petData.extra3
-                                                            }
-                                                            onChange={
-                                                                handleChange
-                                                            }
-                                                            fullWidth
-                                                            required
-                                                            sx={{ mb: 2 }}
-                                                        />
-
-                                                        {/* Buttons */}
-                                                        <Box
-                                                            sx={{
-                                                                display: "flex",
-                                                                justifyContent:
-                                                                    "space-between",
-                                                                mt: 3,
-                                                            }}
-                                                        >
-                                                            <Button
-                                                                onClick={
-                                                                    handleModalClose
-                                                                }
-                                                                variant="outlined"
-                                                            >
-                                                                Cancel
-                                                            </Button>
-                                                            <Button
-                                                                type="submit"
-                                                                variant="contained"
-                                                                color="primary"
-                                                                disabled={
-                                                                    !isFormValid()
-                                                                }
-                                                                onClick={
-                                                                    handleAddPetSubmit
-                                                                }
-                                                                startIcon={
-                                                                    loading ? (
-                                                                        <CircularProgress
-                                                                            size={
-                                                                                20
-                                                                            }
-                                                                            color="inherit"
-                                                                        />
-                                                                    ) : null
-                                                                }
-                                                            >
-                                                                {loading
-                                                                    ? "Adding Pet..."
-                                                                    : "Add Pet"}
-                                                            </Button>
-                                                        </Box>
-                                                    </form>
-                                                </Box>
-                                            </Modal>
-                                        </div>
-                                        <div className={styles.petsText}>
-                                            {filteredPets.length > 0 ? (
-                                                <div
-                                                    className={styles.petsGrid}
-                                                >
-                                                    {filteredPets.map((pet) => (
-                                                        <div
-                                                            key={pet.id}
-                                                            className={
-                                                                styles.petCard
-                                                            }
-                                                        >
-                                                            <img
-                                                                src={
-                                                                    pet.image[0]
-                                                                }
-                                                                alt={pet.name}
-                                                                className={
-                                                                    styles.petImage
-                                                                }
-                                                            />
-                                                            <div
-                                                                className={
-                                                                    styles.petDetails
-                                                                }
-                                                            >
-                                                                <div>
-                                                                    <p
-                                                                        className={
-                                                                            styles.petName
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            pet.name
-                                                                        }
-                                                                    </p>
-                                                                    <p>
-                                                                        Breed:{" "}
-                                                                        {
-                                                                            pet.breed
-                                                                        }
-                                                                    </p>
-                                                                    <p>
-                                                                        {
-                                                                            pet.spayedStatus
-                                                                        }
-                                                                    </p>
-                                                                    <p>
-                                                                        Born:{" "}
-                                                                        {dayjs(
-                                                                            pet.birthdate,
-                                                                        ).format(
-                                                                            "MMMM D, YYYY",
-                                                                        )}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <p>No pets found.</p>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {selectedPets === "Archived Pets" && (
-                                    <div className={styles.archivedPets}>
-                                        {user?.superLikes?.length > 0 ? (
-                                            <ul>
-                                                {user.superLikes.map(
-                                                    (superLike, index) => (
-                                                        <li key={index}>
-                                                            {superLike}
-                                                        </li>
-                                                    ),
-                                                )}
-                                            </ul>
-                                        ) : (
-                                            <p>No archived pets found.</p>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {selectedNav === "My Events" && (
-                        <div className={styles.likesContent}>
-                            <div className={styles.petsHeader}>
-                                <div className={styles.likesNavbar}>
-                                    <p
-                                        onClick={() =>
-                                            setSelectedEvents("My Events")
-                                        }
-                                        className={
-                                            selectedEvents === "My Events"
-                                                ? styles.likesActive
-                                                : ""
-                                        }
-                                    >
-                                        My Events
-                                    </p>
-
-                                    <div
-                                        className={styles.likesNavbarDivider}
-                                    ></div>
-
-                                    <p
-                                        onClick={() =>
-                                            setSelectedEvents("Archived Events")
-                                        }
-                                        className={
-                                            selectedEvents === "Archived Events"
-                                                ? styles.likesActive
-                                                : ""
-                                        }
-                                    >
-                                        Archived Events
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className={styles.likesContent}>
-                                {selectedEvents === "My Events" && (
-                                    <div>
-                                        <div className={styles.addEventButton}>
-                                            <TextField
-                                                label="Search Events"
-                                                variant="outlined"
-                                                fullWidth
-                                                value={searchQuery}
-                                                onChange={
-                                                    handleEventSearchChange
-                                                }
-                                                className={styles.searchField}
-                                                size="small"
-                                                sx={{ mb: 2 }}
-                                            />
-                                            <Button
-                                                variant="contained"
-                                                color="primary"
-                                                className={
-                                                    styles.addEventButtonClass
-                                                }
-                                                onClick={() =>
-                                                    setOpenModal(true)
-                                                }
-                                            >
-                                                <img
-                                                    src="/icons/plus_icon.png"
-                                                    alt="Add"
-                                                />
-                                                New Event
-                                            </Button>
-                                            <Modal
-                                                open={openModal}
-                                                onClose={handleModalClose}
-                                                aria-labelledby="add-event-modal"
-                                            >
-                                                <Box sx={modalStyle}>
-                                                    <Typography
-                                                        variant="h5"
-                                                        sx={{ mb: 2 }}
-                                                    >
-                                                        Add New Event
-                                                    </Typography>
-
-                                                    <form
-                                                        onSubmit={
-                                                            handleEventSubmit
-                                                        }
-                                                        className={styles.form}
-                                                    >
-                                                        <h3>Upload Photo</h3>
-
-                                                        {/* Image Upload Box */}
-                                                        <Box
-                                                            className={
-                                                                styles.eventImagePreviewContainer
-                                                            }
-                                                        >
-                                                            <input
-                                                                type="file"
-                                                                accept="image/*"
                                                                 onChange={
-                                                                    handleEventImageUpload
+                                                                    handleChange
                                                                 }
-                                                                className={
-                                                                    styles.fileInput
+                                                                fullWidth
+                                                                required
+                                                                sx={{ mb: 2 }}
+                                                            />
+                                                            <TextField
+                                                                label="Breed"
+                                                                name="breed"
+                                                                value={
+                                                                    petData.breed
                                                                 }
-                                                                id="event-file-input"
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                sx={{ mb: 2 }}
+                                                            />
+                                                            <TextField
+                                                                select
+                                                                label="Spayed/Neutered Status"
+                                                                name="spayedStatus"
+                                                                value={
+                                                                    petData.spayedStatus
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                sx={{ mb: 2 }}
+                                                            >
+                                                                {petStatuses.map(
+                                                                    (
+                                                                        status,
+                                                                    ) => (
+                                                                        <MenuItem
+                                                                            key={
+                                                                                status
+                                                                            }
+                                                                            value={
+                                                                                status
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                status
+                                                                            }
+                                                                        </MenuItem>
+                                                                    ),
+                                                                )}
+                                                            </TextField>
+                                                            <LocalizationProvider
+                                                                dateAdapter={
+                                                                    AdapterDayjs
+                                                                }
+                                                            >
+                                                                <DatePicker
+                                                                    label="Birthdate"
+                                                                    value={
+                                                                        petData.birthdate
+                                                                            ? dayjs(
+                                                                                  petData.birthdate,
+                                                                              )
+                                                                            : null
+                                                                    }
+                                                                    onChange={(
+                                                                        newValue,
+                                                                    ) => {
+                                                                        if (
+                                                                            newValue
+                                                                        ) {
+                                                                            setPetData(
+                                                                                {
+                                                                                    ...petData,
+                                                                                    birthdate:
+                                                                                        newValue.format(
+                                                                                            "YYYY-MM-DD",
+                                                                                        ),
+                                                                                },
+                                                                            );
+                                                                        }
+                                                                    }}
+                                                                    format="YYYY-MM-DD"
+                                                                    shouldDisableDate={(
+                                                                        date,
+                                                                    ) =>
+                                                                        date.isAfter(
+                                                                            dayjs(),
+                                                                        )
+                                                                    }
+                                                                    slotProps={{
+                                                                        textField:
+                                                                            {
+                                                                                fullWidth: true,
+                                                                                required: true,
+                                                                                sx: {
+                                                                                    mb: 2,
+                                                                                },
+                                                                            },
+                                                                    }}
+                                                                />
+                                                            </LocalizationProvider>
+                                                            <TextField
+                                                                label="About Me"
+                                                                name="aboutMe"
+                                                                value={
+                                                                    petData.aboutMe
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                multiline
+                                                                rows={3}
+                                                                sx={{ mb: 2 }}
                                                             />
 
-                                                            {eventData
-                                                                .images[0] ? (
+                                                            {/* Extra Sections */}
+                                                            <Typography
+                                                                variant="subtitle1"
+                                                                sx={{ mt: 2 }}
+                                                            >
+                                                                Additional Info:
+                                                            </Typography>
+                                                            <TextField
+                                                                label="I go crazy for..."
+                                                                name="extra1"
+                                                                value={
+                                                                    petData.extra1
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                sx={{ mb: 2 }}
+                                                            />
+                                                            <TextField
+                                                                label="My favorite toy is..."
+                                                                name="extra2"
+                                                                value={
+                                                                    petData.extra2
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                sx={{ mb: 2 }}
+                                                            />
+                                                            <TextField
+                                                                label="The way to win me over is..."
+                                                                name="extra3"
+                                                                value={
+                                                                    petData.extra3
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                sx={{ mb: 2 }}
+                                                            />
+
+                                                            {/* Buttons */}
+                                                            <Box
+                                                                sx={{
+                                                                    display:
+                                                                        "flex",
+                                                                    justifyContent:
+                                                                        "space-between",
+                                                                    mt: 3,
+                                                                }}
+                                                            >
+                                                                <Button
+                                                                    onClick={
+                                                                        handleModalClose
+                                                                    }
+                                                                    variant="outlined"
+                                                                >
+                                                                    Cancel
+                                                                </Button>
+                                                                <Button
+                                                                    type="submit"
+                                                                    variant="contained"
+                                                                    color="primary"
+                                                                    disabled={
+                                                                        !isFormValid()
+                                                                    }
+                                                                    onClick={
+                                                                        handleAddPetSubmit
+                                                                    }
+                                                                    startIcon={
+                                                                        loading ? (
+                                                                            <CircularProgress
+                                                                                size={
+                                                                                    20
+                                                                                }
+                                                                                color="inherit"
+                                                                            />
+                                                                        ) : null
+                                                                    }
+                                                                >
+                                                                    {loading
+                                                                        ? "Adding Pet..."
+                                                                        : "Add Pet"}
+                                                                </Button>
+                                                            </Box>
+                                                        </form>
+                                                    </Box>
+                                                </Modal>
+                                            </div>
+                                            <div className={styles.petsText}>
+                                                {filteredPets.length > 0 ? (
+                                                    <div
+                                                        className={
+                                                            styles.petsGrid
+                                                        }
+                                                    >
+                                                        {filteredPets.map(
+                                                            (pet) => (
                                                                 <div
+                                                                    key={pet.id}
                                                                     className={
-                                                                        styles.eventImageWrapper
+                                                                        styles.petCard
                                                                     }
                                                                 >
                                                                     <img
                                                                         src={
-                                                                            eventData
-                                                                                .images[0]
-                                                                                .preview
+                                                                            pet
+                                                                                .image[0]
+                                                                        }
+                                                                        alt={
+                                                                            pet.name
                                                                         }
                                                                         className={
-                                                                            styles.previewImageEvent
+                                                                            styles.petImage
                                                                         }
-                                                                        alt="Uploaded Event"
                                                                     />
-                                                                    <button
+                                                                    <div
                                                                         className={
-                                                                            styles.removeButton
+                                                                            styles.petDetails
                                                                         }
-                                                                        onClick={(
-                                                                            e,
-                                                                        ) => {
-                                                                            e.preventDefault();
-                                                                            setEventData(
+                                                                    >
+                                                                        <div>
+                                                                            <p
+                                                                                className={
+                                                                                    styles.petName
+                                                                                }
+                                                                            >
                                                                                 {
-                                                                                    ...eventData,
-                                                                                    images: [
-                                                                                        null,
-                                                                                    ],
-                                                                                },
-                                                                            );
-                                                                        }}
-                                                                    >
-                                                                        ✕
-                                                                    </button>
+                                                                                    pet.name
+                                                                                }
+                                                                            </p>
+                                                                            <p>
+                                                                                Breed:{" "}
+                                                                                {
+                                                                                    pet.breed
+                                                                                }
+                                                                            </p>
+                                                                            <p>
+                                                                                {
+                                                                                    pet.spayedStatus
+                                                                                }
+                                                                            </p>
+                                                                            <p>
+                                                                                Born:{" "}
+                                                                                {dayjs(
+                                                                                    pet.birthdate,
+                                                                                ).format(
+                                                                                    "MMMM D, YYYY",
+                                                                                )}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                            ) : (
-                                                                <Box
-                                                                    className={
-                                                                        styles.eventPlaceholder
-                                                                    }
-                                                                    onClick={() =>
-                                                                        document
-                                                                            .getElementById(
-                                                                                "event-file-input",
-                                                                            )
-                                                                            .click()
-                                                                    }
-                                                                >
-                                                                    +
-                                                                </Box>
-                                                            )}
-                                                        </Box>
-
-                                                        {/* Text Fields */}
-                                                        <TextField
-                                                            label="Event Title"
-                                                            name="title"
-                                                            value={
-                                                                eventData.title
-                                                            }
-                                                            onChange={
-                                                                handleEventChange
-                                                            }
-                                                            fullWidth
-                                                            required
-                                                            sx={{ mb: 2 }}
-                                                        />
-                                                        <TextField
-                                                            label="Event Description"
-                                                            name="description"
-                                                            value={
-                                                                eventData.description
-                                                            }
-                                                            onChange={
-                                                                handleEventChange
-                                                            }
-                                                            fullWidth
-                                                            required
-                                                            multiline
-                                                            rows={3}
-                                                            sx={{ mb: 2 }}
-                                                        />
-                                                        <LocalizationProvider
-                                                            dateAdapter={
-                                                                AdapterDayjs
-                                                            }
-                                                        >
-                                                            {/* Start Date Picker */}
-                                                            <DatePicker
-                                                                label="Start Date"
-                                                                value={
-                                                                    eventData.startDate
-                                                                        ? dayjs(
-                                                                              eventData.startDate,
-                                                                          )
-                                                                        : null
-                                                                }
-                                                                onChange={(
-                                                                    newValue,
-                                                                ) =>
-                                                                    handleEventDateChange(
-                                                                        "startDate",
-                                                                        newValue,
-                                                                    )
-                                                                }
-                                                                format="YYYY-MM-DD"
-                                                                shouldDisableDate={(
-                                                                    date,
-                                                                ) =>
-                                                                    date.isBefore(
-                                                                        dayjs(),
-                                                                    )
-                                                                } // Disable past dates
-                                                                slotProps={{
-                                                                    textField: {
-                                                                        fullWidth: true,
-                                                                        required: true,
-                                                                        sx: {
-                                                                            mb: 2,
-                                                                        },
-                                                                    },
-                                                                }}
-                                                            />
-
-                                                            {/* End Date Picker */}
-                                                            <DatePicker
-                                                                label="End Date"
-                                                                value={
-                                                                    eventData.endDate
-                                                                        ? dayjs(
-                                                                              eventData.endDate,
-                                                                          )
-                                                                        : null
-                                                                }
-                                                                onChange={(
-                                                                    newValue,
-                                                                ) =>
-                                                                    handleEventDateChange(
-                                                                        "endDate",
-                                                                        newValue,
-                                                                    )
-                                                                }
-                                                                format="YYYY-MM-DD"
-                                                                shouldDisableDate={
-                                                                    (date) =>
-                                                                        date.isBefore(
-                                                                            dayjs(),
-                                                                        ) || // Prevent selecting past dates
-                                                                        (eventData.startDate &&
-                                                                            date.isBefore(
-                                                                                dayjs(
-                                                                                    eventData.startDate,
-                                                                                ),
-                                                                            )) // Prevent selecting before start date
-                                                                }
-                                                                slotProps={{
-                                                                    textField: {
-                                                                        fullWidth: true,
-                                                                        required: true,
-                                                                        sx: {
-                                                                            mb: 2,
-                                                                        },
-                                                                    },
-                                                                }}
-                                                            />
-                                                        </LocalizationProvider>
-
-                                                        {/* Buttons */}
-                                                        <Box
-                                                            sx={{
-                                                                display: "flex",
-                                                                justifyContent:
-                                                                    "space-between",
-                                                                mt: 3,
-                                                            }}
-                                                        >
-                                                            <Button
-                                                                onClick={
-                                                                    handleModalClose
-                                                                }
-                                                                variant="outlined"
-                                                            >
-                                                                Cancel
-                                                            </Button>
-                                                            <Button
-                                                                type="submit"
-                                                                variant="contained"
-                                                                color="primary"
-                                                                disabled={
-                                                                    !isEventFormValid()
-                                                                }
-                                                                startIcon={
-                                                                    loading ? (
-                                                                        <CircularProgress
-                                                                            size={
-                                                                                20
-                                                                            }
-                                                                            color="inherit"
-                                                                        />
-                                                                    ) : null
-                                                                }
-                                                            >
-                                                                {loading
-                                                                    ? "Creating Event..."
-                                                                    : "Create Event"}
-                                                            </Button>
-                                                        </Box>
-                                                    </form>
-                                                </Box>
-                                            </Modal>
+                                                            ),
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <p>No pets found.</p>
+                                                )}
+                                            </div>
                                         </div>
+                                    )}
 
-                                        <div className={styles.petsText}>
-                                            {filteredEvents.length > 0 ? (
-                                                <div
-                                                    className={
-                                                        styles.eventsGrid
-                                                    }
-                                                >
-                                                    {filteredEvents.map(
-                                                        (event) => (
-                                                            <div
-                                                                key={event.id}
-                                                                className={
-                                                                    styles.eventCard
-                                                                }
-                                                            >
-                                                                <img
-                                                                    src={
-                                                                        event.image
-                                                                    }
-                                                                    alt={
-                                                                        event.title
-                                                                    }
-                                                                    className={
-                                                                        styles.eventImage
-                                                                    }
-                                                                />
-                                                                <div
-                                                                    className={
-                                                                        styles.eventDetails
-                                                                    }
-                                                                >
-                                                                    <p
-                                                                        className={
-                                                                            styles.eventTitle
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            event.title
-                                                                        }
-                                                                    </p>
-                                                                    <p
-                                                                        className={
-                                                                            styles.eventDescription
-                                                                        }
-                                                                    >
-                                                                        {
-                                                                            event.description
-                                                                        }
-                                                                    </p>
-                                                                    <p
-                                                                        className={
-                                                                            styles.eventDate
-                                                                        }
-                                                                    >
-                                                                        {dayjs(
-                                                                            event.startDate,
-                                                                        ).format(
-                                                                            "MMMM D, YYYY",
-                                                                        )}{" "}
-                                                                        -{" "}
-                                                                        {dayjs(
-                                                                            event.endDate,
-                                                                        ).format(
-                                                                            "MMMM D, YYYY",
-                                                                        )}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
+                                    {selectedPets === "Archived Pets" && (
+                                        <div className={styles.archivedPets}>
+                                            {user?.superLikes?.length > 0 ? (
+                                                <ul>
+                                                    {user.superLikes.map(
+                                                        (superLike, index) => (
+                                                            <li key={index}>
+                                                                {superLike}
+                                                            </li>
                                                         ),
                                                     )}
-                                                </div>
+                                                </ul>
                                             ) : (
-                                                <p
-                                                    className={
-                                                        styles.noEventsMessage
-                                                    }
-                                                >
-                                                    No events found.
-                                                </p>
+                                                <p>No archived pets found.</p>
                                             )}
                                         </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {selectedNav === "My Events" && (
+                            <div className={styles.likesContent}>
+                                <div className={styles.petsHeader}>
+                                    <div className={styles.likesNavbar}>
+                                        <p
+                                            onClick={() =>
+                                                setSelectedEvents("My Events")
+                                            }
+                                            className={
+                                                selectedEvents === "My Events"
+                                                    ? styles.likesActive
+                                                    : ""
+                                            }
+                                        >
+                                            My Events
+                                        </p>
+
+                                        <div
+                                            className={
+                                                styles.likesNavbarDivider
+                                            }
+                                        ></div>
+
+                                        <p
+                                            onClick={() =>
+                                                setSelectedEvents(
+                                                    "Archived Events",
+                                                )
+                                            }
+                                            className={
+                                                selectedEvents ===
+                                                "Archived Events"
+                                                    ? styles.likesActive
+                                                    : ""
+                                            }
+                                        >
+                                            Archived Events
+                                        </p>
                                     </div>
-                                )}
+                                </div>
+
+                                <div className={styles.likesContent}>
+                                    {selectedEvents === "My Events" && (
+                                        <div>
+                                            <div
+                                                className={
+                                                    styles.addEventButton
+                                                }
+                                            >
+                                                <TextField
+                                                    label="Search Events"
+                                                    variant="outlined"
+                                                    fullWidth
+                                                    value={searchQuery}
+                                                    onChange={
+                                                        handleEventSearchChange
+                                                    }
+                                                    className={
+                                                        styles.searchField
+                                                    }
+                                                    size="small"
+                                                    sx={{ mb: 2 }}
+                                                />
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    className={
+                                                        styles.addEventButtonClass
+                                                    }
+                                                    onClick={() =>
+                                                        setOpenModal(true)
+                                                    }
+                                                >
+                                                    <img
+                                                        src="/icons/plus_icon.png"
+                                                        alt="Add"
+                                                    />
+                                                    New Event
+                                                </Button>
+                                                <Modal
+                                                    open={openModal}
+                                                    onClose={handleModalClose}
+                                                    aria-labelledby="add-event-modal"
+                                                >
+                                                    <Box sx={modalStyle}>
+                                                        <Typography
+                                                            variant="h5"
+                                                            sx={{ mb: 2 }}
+                                                        >
+                                                            Add New Event
+                                                        </Typography>
+
+                                                        <form
+                                                            onSubmit={
+                                                                handleEventSubmit
+                                                            }
+                                                            className={
+                                                                styles.form
+                                                            }
+                                                        >
+                                                            <h3>
+                                                                Upload Photo
+                                                            </h3>
+
+                                                            {/* Image Upload Box */}
+                                                            <Box
+                                                                className={
+                                                                    styles.eventImagePreviewContainer
+                                                                }
+                                                            >
+                                                                <input
+                                                                    type="file"
+                                                                    accept="image/*"
+                                                                    onChange={
+                                                                        handleEventImageUpload
+                                                                    }
+                                                                    className={
+                                                                        styles.fileInput
+                                                                    }
+                                                                    id="event-file-input"
+                                                                />
+
+                                                                {eventData
+                                                                    .images[0] ? (
+                                                                    <div
+                                                                        className={
+                                                                            styles.eventImageWrapper
+                                                                        }
+                                                                    >
+                                                                        <img
+                                                                            src={
+                                                                                eventData
+                                                                                    .images[0]
+                                                                                    .preview
+                                                                            }
+                                                                            className={
+                                                                                styles.previewImageEvent
+                                                                            }
+                                                                            alt="Uploaded Event"
+                                                                        />
+                                                                        <button
+                                                                            className={
+                                                                                styles.removeButton
+                                                                            }
+                                                                            onClick={(
+                                                                                e,
+                                                                            ) => {
+                                                                                e.preventDefault();
+                                                                                setEventData(
+                                                                                    {
+                                                                                        ...eventData,
+                                                                                        images: [
+                                                                                            null,
+                                                                                        ],
+                                                                                    },
+                                                                                );
+                                                                            }}
+                                                                        >
+                                                                            ✕
+                                                                        </button>
+                                                                    </div>
+                                                                ) : (
+                                                                    <Box
+                                                                        className={
+                                                                            styles.eventPlaceholder
+                                                                        }
+                                                                        onClick={() =>
+                                                                            document
+                                                                                .getElementById(
+                                                                                    "event-file-input",
+                                                                                )
+                                                                                .click()
+                                                                        }
+                                                                    >
+                                                                        +
+                                                                    </Box>
+                                                                )}
+                                                            </Box>
+
+                                                            {/* Text Fields */}
+                                                            <TextField
+                                                                label="Event Title"
+                                                                name="title"
+                                                                value={
+                                                                    eventData.title
+                                                                }
+                                                                onChange={
+                                                                    handleEventChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                sx={{ mb: 2 }}
+                                                            />
+                                                            <TextField
+                                                                label="Event Description"
+                                                                name="description"
+                                                                value={
+                                                                    eventData.description
+                                                                }
+                                                                onChange={
+                                                                    handleEventChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                multiline
+                                                                rows={3}
+                                                                sx={{ mb: 2 }}
+                                                            />
+                                                            <LocalizationProvider
+                                                                dateAdapter={
+                                                                    AdapterDayjs
+                                                                }
+                                                            >
+                                                                {/* Start Date Picker */}
+                                                                <DatePicker
+                                                                    label="Start Date"
+                                                                    value={
+                                                                        eventData.startDate
+                                                                            ? dayjs(
+                                                                                  eventData.startDate,
+                                                                              )
+                                                                            : null
+                                                                    }
+                                                                    onChange={(
+                                                                        newValue,
+                                                                    ) =>
+                                                                        handleEventDateChange(
+                                                                            "startDate",
+                                                                            newValue,
+                                                                        )
+                                                                    }
+                                                                    format="YYYY-MM-DD"
+                                                                    shouldDisableDate={(
+                                                                        date,
+                                                                    ) =>
+                                                                        date.isBefore(
+                                                                            dayjs(),
+                                                                        )
+                                                                    } // Disable past dates
+                                                                    slotProps={{
+                                                                        textField:
+                                                                            {
+                                                                                fullWidth: true,
+                                                                                required: true,
+                                                                                sx: {
+                                                                                    mb: 2,
+                                                                                },
+                                                                            },
+                                                                    }}
+                                                                />
+
+                                                                {/* End Date Picker */}
+                                                                <DatePicker
+                                                                    label="End Date"
+                                                                    value={
+                                                                        eventData.endDate
+                                                                            ? dayjs(
+                                                                                  eventData.endDate,
+                                                                              )
+                                                                            : null
+                                                                    }
+                                                                    onChange={(
+                                                                        newValue,
+                                                                    ) =>
+                                                                        handleEventDateChange(
+                                                                            "endDate",
+                                                                            newValue,
+                                                                        )
+                                                                    }
+                                                                    format="YYYY-MM-DD"
+                                                                    shouldDisableDate={
+                                                                        (
+                                                                            date,
+                                                                        ) =>
+                                                                            date.isBefore(
+                                                                                dayjs(),
+                                                                            ) || // Prevent selecting past dates
+                                                                            (eventData.startDate &&
+                                                                                date.isBefore(
+                                                                                    dayjs(
+                                                                                        eventData.startDate,
+                                                                                    ),
+                                                                                )) // Prevent selecting before start date
+                                                                    }
+                                                                    slotProps={{
+                                                                        textField:
+                                                                            {
+                                                                                fullWidth: true,
+                                                                                required: true,
+                                                                                sx: {
+                                                                                    mb: 2,
+                                                                                },
+                                                                            },
+                                                                    }}
+                                                                />
+                                                            </LocalizationProvider>
+
+                                                            {/* Buttons */}
+                                                            <Box
+                                                                sx={{
+                                                                    display:
+                                                                        "flex",
+                                                                    justifyContent:
+                                                                        "space-between",
+                                                                    mt: 3,
+                                                                }}
+                                                            >
+                                                                <Button
+                                                                    onClick={
+                                                                        handleModalClose
+                                                                    }
+                                                                    variant="outlined"
+                                                                >
+                                                                    Cancel
+                                                                </Button>
+                                                                <Button
+                                                                    type="submit"
+                                                                    variant="contained"
+                                                                    color="primary"
+                                                                    disabled={
+                                                                        !isEventFormValid()
+                                                                    }
+                                                                    startIcon={
+                                                                        loading ? (
+                                                                            <CircularProgress
+                                                                                size={
+                                                                                    20
+                                                                                }
+                                                                                color="inherit"
+                                                                            />
+                                                                        ) : null
+                                                                    }
+                                                                >
+                                                                    {loading
+                                                                        ? "Creating Event..."
+                                                                        : "Create Event"}
+                                                                </Button>
+                                                            </Box>
+                                                        </form>
+                                                    </Box>
+                                                </Modal>
+                                            </div>
+
+                                            <div className={styles.petsText}>
+                                                {filteredEvents.length > 0 ? (
+                                                    <div
+                                                        className={
+                                                            styles.eventsGrid
+                                                        }
+                                                    >
+                                                        {filteredEvents.map(
+                                                            (event) => (
+                                                                <div
+                                                                    key={
+                                                                        event.id
+                                                                    }
+                                                                    className={
+                                                                        styles.eventCard
+                                                                    }
+                                                                >
+                                                                    <img
+                                                                        src={
+                                                                            event.image
+                                                                        }
+                                                                        alt={
+                                                                            event.title
+                                                                        }
+                                                                        className={
+                                                                            styles.eventImage
+                                                                        }
+                                                                    />
+                                                                    <div
+                                                                        className={
+                                                                            styles.eventDetails
+                                                                        }
+                                                                    >
+                                                                        <p
+                                                                            className={
+                                                                                styles.eventTitle
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                event.title
+                                                                            }
+                                                                        </p>
+                                                                        <p
+                                                                            className={
+                                                                                styles.eventDescription
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                event.description
+                                                                            }
+                                                                        </p>
+                                                                        <p
+                                                                            className={
+                                                                                styles.eventDate
+                                                                            }
+                                                                        >
+                                                                            {dayjs(
+                                                                                event.startDate,
+                                                                            ).format(
+                                                                                "MMMM D, YYYY",
+                                                                            )}{" "}
+                                                                            -{" "}
+                                                                            {dayjs(
+                                                                                event.endDate,
+                                                                            ).format(
+                                                                                "MMMM D, YYYY",
+                                                                            )}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            ),
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <p
+                                                        className={
+                                                            styles.noEventsMessage
+                                                        }
+                                                    >
+                                                        No events found.
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
 
                                 {selectedEvents === "Archived Events" && (
                                     <div className={styles.archivedPets}>
