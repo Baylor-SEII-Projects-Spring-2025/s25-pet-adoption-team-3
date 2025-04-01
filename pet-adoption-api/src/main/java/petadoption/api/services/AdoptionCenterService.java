@@ -32,6 +32,7 @@ public class AdoptionCenterService {
         user.setBio(adoptionCenterDTO.getBio());
         user.setPhoneNumber(adoptionCenterDTO.getPhoneNumber());
         user.setWebsite(adoptionCenterDTO.getWebsite());
+        user.setAddress(adoptionCenterDTO.getAddress());
         user.setProfilePhoto(adoptionCenterDTO.getProfilePhoto());
 
         user.setEmailVerified(false);

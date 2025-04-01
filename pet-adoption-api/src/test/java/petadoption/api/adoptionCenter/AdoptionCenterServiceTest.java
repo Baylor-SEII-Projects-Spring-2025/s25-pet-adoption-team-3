@@ -75,6 +75,8 @@ class AdoptionCenterServiceTest {
         testCenterDTO.setWebsite("https://happypaws.org");
         testCenterDTO.setBio("We rescue abandoned pets and find them new homes.");
         testCenterDTO.setProfilePhoto("https://storage.example.com/happypaws-logo.png");
+        testCenterDTO.setAddress("123 Main Street");
+
 
         testUser = new User();
         testUser.setEmail(testCenterDTO.getEmail());
@@ -85,6 +87,8 @@ class AdoptionCenterServiceTest {
         testUser.setWebsite(testCenterDTO.getWebsite());
         testUser.setBio(testCenterDTO.getBio());
         testUser.setProfilePhoto(testCenterDTO.getProfilePhoto());
+        testUser.setAddress(testCenterDTO.getAddress());
+
     }
 
     @Test
@@ -125,6 +129,8 @@ class AdoptionCenterServiceTest {
         assertEquals("https://happypaws.org", registeredCenter.getWebsite());
         assertEquals("We rescue abandoned pets and find them new homes.", registeredCenter.getBio());
         assertEquals("https://storage.example.com/happypaws-logo.png", registeredCenter.getProfilePhoto());
+        assertEquals("123 Main Street", registeredCenter.getAddress());
+
 
         verify(emailService, times(1)).sendVerificationEmail(any(User.class));
     }

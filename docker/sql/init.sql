@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS users (
     adoption_center_name VARCHAR(255),
     bio                  TEXT,
     phone_number         VARCHAR(255),
-    website              VARCHAR(255)
+    website              VARCHAR(255),
+    address              VARCHAR(255)
 
 );
 INSERT INTO users(user_id, password, email, role, is_email_verified) VALUES(2, '$2a$10$rhxduNZL9EsagAP8ubcpWOrddEbkrJwa5R0ru2rIuH8tfNy6PUTLq', 'chase_crayne1@baylor.edu', 'ADOPTION_CENTER', 1);
