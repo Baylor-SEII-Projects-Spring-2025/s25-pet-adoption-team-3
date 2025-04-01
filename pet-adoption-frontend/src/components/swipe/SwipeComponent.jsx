@@ -6,29 +6,16 @@ import { useRouter } from "next/router";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-// Simplified animation helpers without drop-in effect
-const to = (i) => ({
-    x: 0,
-    y: i * -4,
-    scale: 1,
-});
-
-const from = (i) => ({
-    x: 0,
-    y: i * -4, // Start at final position, no drop-in
-    scale: 1, // No scale change
-});
+const to = (i) => ({ x: 0, y: i * -4, scale: 1 });
+const from = (i) => ({ x: 0, y: i * -4, scale: 1 });
 
 export function SwipeComponent() {
     const [pets, setPets] = useState([]);
-    const [gone] = useState(() => new Set()); // Track cards that have been swiped away
+    const [gone] = useState(() => new Set());
     const [user, setUser] = useState(null);
     const router = useRouter();
-
-    // Track current image index for each pet
     const [currentImageIndices, setCurrentImageIndices] = useState({});
 
-    // Function to navigate to next or previous image
     const navigateImage = (petId, direction) => {
         setCurrentImageIndices((prev) => {
             const pet = pets.find((p) => p.id === petId);
@@ -36,14 +23,10 @@ export function SwipeComponent() {
 
             const currentIndex = prev[petId] || 0;
             const totalImages = pet.image.length;
-
-            // Calculate new index with wrapping
-            let newIndex;
-            if (direction === "next") {
-                newIndex = (currentIndex + 1) % totalImages;
-            } else {
-                newIndex = (currentIndex - 1 + totalImages) % totalImages;
-            }
+            let newIndex =
+                direction === "next"
+                    ? (currentIndex + 1) % totalImages
+                    : (currentIndex - 1 + totalImages) % totalImages;
 
             return { ...prev, [petId]: newIndex };
         });
@@ -59,26 +42,19 @@ export function SwipeComponent() {
                     "Cache-Control": "no-cache",
                 },
             });
-
-            if (response.status === 401) {
-                router.push("/login");
-                return;
-            }
-
+            if (response.status === 401) return router.push("/login");
             if (!response.ok) throw new Error("Error fetching session");
             const data = await response.json();
             setUser(data.user);
-        } catch (error) {
-            console.error("Session fetch error:", error);
+        } catch (err) {
+            console.error("Session fetch error:", err);
         }
     };
 
-    // Fetch user session on component mount
     useEffect(() => {
         if (!user) fetchUserSession();
     }, []);
 
-    // Fetch pets data
     useEffect(() => {
         async function fetchPets() {
             try {
@@ -93,50 +69,40 @@ export function SwipeComponent() {
                         },
                     },
                 );
-
-                if (!res.ok)
-                    throw new Error(`HTTP error! status: ${res.status}`);
+                if (res.status === 401) return router.push("/login");
+                else if (!res.ok) {
+                    alert(`HTTP error! status: ${res.status}`);
+                    router.push("/");
+                }
                 const data = await res.json();
                 setPets(data);
-
-                // Initialize currentImageIndices for all pets
                 const initialIndices = {};
-                data.forEach((pet) => {
-                    initialIndices[pet.id] = 0;
-                });
+                data.forEach((pet) => (initialIndices[pet.id] = 0));
                 setCurrentImageIndices(initialIndices);
-            } catch (error) {
-                console.error("Fetch pets error:", error);
+            } catch (err) {
+                console.error("Fetch pets error:", err);
             }
         }
-
         fetchPets();
     }, []);
 
-    // Create springs for each pet card
-    const [props, api] = useSprings(pets.length || 0, (i) => ({
+    const [springs, api] = useSprings(pets.length || 0, (i) => ({
         ...to(i),
         from: from(i),
     }));
 
-    // Update springs when pets data changes
     useEffect(() => {
-        if (pets.length > 0) {
-            api.start((i) => ({ ...to(i), from: from(i) }));
-        }
+        if (pets.length > 0) api.start((i) => ({ ...to(i), from: from(i) }));
     }, [pets, api]);
 
-    // Handle swipe event for a pet
     const handleSwipe = async (petId, liked) => {
         try {
-            // Implement your swipe API call here if needed
             console.log(`Swiped ${liked ? "right" : "left"} on pet ${petId}`);
-        } catch (error) {
-            console.error("Error recording swipe:", error);
+        } catch (err) {
+            console.error("Swipe error:", err);
         }
     };
 
-    // Use useDrag hook for swipe functionality but without scaling effect
     const bind = useDrag(
         ({
             args: [index],
@@ -145,34 +111,25 @@ export function SwipeComponent() {
             direction: [xDir],
             velocity,
         }) => {
-            const trigger = velocity > 0.2; // Velocity threshold for swipe
-            const dir = xDir < 0 ? -1 : 1; // Direction of swipe
-
+            const trigger = velocity > 0.2;
+            const dir = xDir < 0 ? -1 : 1;
             if (!down && trigger) {
-                gone.add(index); // Mark card as gone if swiped
-
-                // Call API when card is swiped
-                if (pets[index] && pets[index].id) {
+                gone.add(index);
+                if (pets[index] && pets[index].id)
                     handleSwipe(pets[index].id, dir === 1);
-                }
             }
 
-            // Update card position without scale change
             api.start((i) => {
-                if (index !== i) return; // Only affect current card
+                if (index !== i) return;
                 const isGone = gone.has(index);
-
-                // X position calculation
                 const x = isGone
                     ? (200 + window.innerWidth) * dir
                     : down
                       ? mx
                       : 0;
-
-                // Return animation properties without scale change
                 return {
                     x,
-                    scale: 1, // Keep scale constant
+                    scale: 1,
                     config: {
                         friction: 50,
                         tension: down ? 800 : isGone ? 200 : 500,
@@ -180,7 +137,6 @@ export function SwipeComponent() {
                 };
             });
 
-            // Reset all cards if all have been swiped
             if (!down && gone.size === pets.length) {
                 setTimeout(() => {
                     gone.clear();
@@ -190,25 +146,18 @@ export function SwipeComponent() {
         },
     );
 
-    // Event handler to stop propagation for carousel buttons
-    const handleCarouselClick = (e) => {
-        e.stopPropagation();
-    };
+    const handleCarouselClick = (e) => e.stopPropagation();
 
-    // Don't render if no pets yet
-    if (pets.length === 0) {
+    if (pets.length === 0)
         return <div className={styles.loading}>Loading pets...</div>;
-    }
 
     return (
         <div className={styles.swipeContainer}>
-            {props.map(({ x, y, scale }, i) => {
-                // Skip rendering if we don't have pet data for this index
+            {springs.map(({ x, y }, i) => {
                 if (!pets[i]) return null;
-
                 const pet = pets[i];
                 const currentImageIndex = currentImageIndices[pet.id] || 0;
-                const hasMultipleImages = pet?.image && pet.image.length > 1;
+                const hasMultipleImages = pet?.image?.length > 1;
 
                 return (
                     <animated.div
@@ -225,7 +174,7 @@ export function SwipeComponent() {
                             {...bind(i)}
                             className={styles.card}
                             style={{
-                                touchAction: "none", // Important for touch devices
+                                touchAction: "none",
                                 opacity: x.to((x) =>
                                     Math.abs(x) > window.innerWidth / 2 ? 0 : 1,
                                 ),
@@ -233,7 +182,7 @@ export function SwipeComponent() {
                         >
                             <div className={styles.cardContent}>
                                 <div className={styles.carousel}>
-                                    {pet?.image && pet.image.length > 0 ? (
+                                    {pet.image?.length ? (
                                         <div
                                             className={styles.carouselContainer}
                                         >
@@ -241,11 +190,9 @@ export function SwipeComponent() {
                                                 src={
                                                     pet.image[currentImageIndex]
                                                 }
-                                                alt={`${pet.name}`}
+                                                alt={pet.name}
                                                 className={styles.carouselImage}
                                             />
-
-                                            {/* Image counter indicator */}
                                             {hasMultipleImages && (
                                                 <div
                                                     className={
@@ -256,8 +203,6 @@ export function SwipeComponent() {
                                                     {pet.image.length}
                                                 </div>
                                             )}
-
-                                            {/* Navigation arrows */}
                                             {hasMultipleImages && (
                                                 <>
                                                     <button
@@ -277,7 +222,7 @@ export function SwipeComponent() {
                                                     </button>
                                                     <button
                                                         className={`${styles.carouselButton} ${styles.nextButton}`}
-                                                        onClick={(e) => {
+                                                        onClick={(e) => {   
                                                             handleCarouselClick(
                                                                 e,
                                                             );
