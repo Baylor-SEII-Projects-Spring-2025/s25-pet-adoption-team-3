@@ -35,7 +35,12 @@ export default function AdoptionCenterRegisterComponent() {
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
+        const maxSize = 5*1024*1024;
         if (file) {
+            if(file.size > maxSize){
+                alert("❌ File size exceeds 5MB. Please upload a smaller file.");
+                return;
+            }
             setFormData((prev) => ({ ...prev, photo: file }));
             const reader = new FileReader();
             reader.onloadend = () => setPreviewImage(reader.result);
