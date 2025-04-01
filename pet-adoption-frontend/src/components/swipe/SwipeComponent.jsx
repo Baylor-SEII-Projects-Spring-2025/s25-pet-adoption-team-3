@@ -83,6 +83,7 @@ export function SwipeComponent() {
                 else if (!res.ok) {
                     alert(`HTTP error! status: ${res.status}`);
                     router.push("/");
+                    return;
                 }
                 const data = await res.json();
                 setPets(data);
@@ -305,7 +306,7 @@ export function SwipeComponent() {
                                                     </button>
                                                     <button
                                                         className={`${styles.carouselButton} ${styles.nextButton}`}
-                                                        onClick={(e) => {   
+                                                        onClick={(e) => {
                                                             handleCarouselClick(
                                                                 e,
                                                             );
