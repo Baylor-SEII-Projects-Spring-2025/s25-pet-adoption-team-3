@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -51,7 +52,7 @@ public class User {
     private String website;
 
     @OneToMany(cascade = CascadeType.ALL)
-    private List<Pet> recommendedPets;
+    private Set<Pet> recommendedPets;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Pet> savedPets;
