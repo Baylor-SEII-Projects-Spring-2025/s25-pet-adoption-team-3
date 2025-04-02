@@ -19,6 +19,7 @@ public class UserDTO {
     private String adoptionCenterName;
     private boolean isEmailVerified = false;
     private String address;
+    private String phoneNumber;
 
 
 
@@ -38,5 +39,6 @@ public class UserDTO {
         this.isEmailVerified = user.isEmailVerified();
         this.id = user.getId();
         this.address = user.getAddress();
+        this.phoneNumber = user.getPhoneNumber();
     }
 }
