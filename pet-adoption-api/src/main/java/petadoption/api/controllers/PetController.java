@@ -91,10 +91,10 @@ public class PetController {
 
     @PostMapping("/add-pet")
     public ResponseEntity<String> addPet(HttpSession session, @RequestBody @Valid PetRequestDTO petRequestDTO) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) return ResponseEntity.status(401).body("No active session.");
-        if (user.getRole() != User.Role.ADOPTION_CENTER) return ResponseEntity.status(403).body("Unauthorized action.");
-        //User user = userRepository.getOne(1L);
+//        User user = (User) session.getAttribute("user");
+//        if (user == null) return ResponseEntity.status(401).body("No active session.");
+//        if (user.getRole() != User.Role.ADOPTION_CENTER) return ResponseEntity.status(403).body("Unauthorized action.");
+        User user = userRepository.getOne(1L);
 
         petService.addPet(user, petRequestDTO);
         return ResponseEntity.status(201).body(petRequestDTO.getName() + " was successfully added.");
