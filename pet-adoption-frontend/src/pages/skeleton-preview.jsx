@@ -1,10 +1,10 @@
 import React from "react";
-import AdoptionCenterSkeleton from "@/components/adoption-center/Loading";
+import SwipeSkeleton from "@/components/swipe/Loading";
 
 export default function SkeletonPreview() {
     return (
         <div style={{ padding: "2rem" }}>
-            <AdoptionCenterSkeleton />
+            <SwipeSkeleton />
         </div>
     );
 }
