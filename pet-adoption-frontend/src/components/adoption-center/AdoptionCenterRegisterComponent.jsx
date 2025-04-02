@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import Router from "next/router";
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, CircularProgress } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import PasswordStrengthBar from "react-password-strength-bar";
+import { LoadScript } from "@react-google-maps/api";
 import { theme } from "@/utils/theme";
 import styles from "@/styles/AdoptionCenterRegisterComponent.module.css";
-import { CircularProgress } from "@mui/material";
 
 export default function AdoptionCenterRegisterComponent() {
+    const autoCompleteRef = useRef(null);
+    const inputRef = useRef(null);
     const [step, setStep] = useState(1);
+    const libraries = ["places"];
     const [formData, setFormData] = useState({
         adoptionCenterName: "",
         email: "",
@@ -18,6 +21,7 @@ export default function AdoptionCenterRegisterComponent() {
         website: "",
         bio: "",
         photo: null,
+        address: "",
     });
 
     const [passwordScore, setPasswordScore] = useState(0);
@@ -35,10 +39,12 @@ export default function AdoptionCenterRegisterComponent() {
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        const maxSize = 5*1024*1024;
+        const maxSize = 5 * 1024 * 1024;
         if (file) {
-            if(file.size > maxSize){
-                alert("❌ File size exceeds 5MB. Please upload a smaller file.");
+            if (file.size > maxSize) {
+                alert(
+                    "❌ File size exceeds 5MB. Please upload a smaller file.",
+                );
                 return;
             }
             setFormData((prev) => ({ ...prev, photo: file }));
@@ -65,6 +71,7 @@ export default function AdoptionCenterRegisterComponent() {
             website: formData.website,
             bio: formData.bio,
             photo: placeholderPhotoUrl,
+            address: formData.address,
         };
 
         try {
@@ -89,12 +96,6 @@ export default function AdoptionCenterRegisterComponent() {
             }
 
             const userId = registeredUser.id;
-            alert(
-                "Registration successful! User ID: " +
-                    userId +
-                    " 🎉" +
-                    formData.photo,
-            );
 
             if (formData.photo && userId) {
                 const photoFormData = new FormData();
@@ -104,7 +105,7 @@ export default function AdoptionCenterRegisterComponent() {
                     `${API_URL}/api/users/${userId}/uploadProfilePhoto`,
                     {
                         method: "POST",
-                        body: photoFormData
+                        body: photoFormData,
                     },
                 );
 
@@ -114,7 +115,9 @@ export default function AdoptionCenterRegisterComponent() {
                 }
             }
 
-            Router.push(`/email-sent?email=${encodeURIComponent(formData.email)}`);
+            Router.push(
+                `/email-sent?email=${encodeURIComponent(formData.email)}`,
+            );
         } catch (error) {
             console.error("Registration failed:", error.message);
             alert("Registration failed: " + error.message);
@@ -131,9 +134,61 @@ export default function AdoptionCenterRegisterComponent() {
         passwordScore >= 2 &&
         isPasswordSame;
 
-    const isStep2Valid = formData.phoneNumber.trim() && formData.website.trim();
+    const isStep2Valid =
+        formData.phoneNumber.trim() &&
+        formData.website.trim() &&
+        formData.address.trim();
 
     const isStep3Valid = formData.bio.trim() && formData.photo;
+
+    // Single function to initialize Google Places Autocomplete
+    const initializeAutocomplete = () => {
+        if (!inputRef.current || autoCompleteRef.current) return;
+
+        try {
+            // Check if Google API is available
+            if (
+                !window.google ||
+                !window.google.maps ||
+                !window.google.maps.places
+            ) {
+                console.log("Google Maps API not loaded yet");
+                return;
+            }
+
+            autoCompleteRef.current =
+                new window.google.maps.places.Autocomplete(inputRef.current, {
+                    types: ["geocode"],
+                    fields: [
+                        "formatted_address",
+                        "address_components",
+                        "geometry",
+                    ],
+                });
+
+            autoCompleteRef.current.addListener("place_changed", () => {
+                const place = autoCompleteRef.current.getPlace();
+                if (place && place.formatted_address) {
+                    setFormData((prev) => ({
+                        ...prev,
+                        address: place.formatted_address,
+                    }));
+                }
+            });
+
+            console.log("Autocomplete initialized successfully");
+        } catch (error) {
+            console.error("Error initializing autocomplete:", error);
+        }
+    };
+
+    // Single useEffect to initialize Autocomplete when component mounts or Google API loads
+    useEffect(() => {
+        // Only try to initialize if we're on step 2 and the input ref exists
+        if (step === 2 && inputRef.current) {
+            initializeAutocomplete();
+        }
+    }, [step, inputRef.current]);
 
     return (
         <ThemeProvider theme={theme}>
@@ -225,37 +280,72 @@ export default function AdoptionCenterRegisterComponent() {
                         )}
 
                         {step === 2 && (
-                            <>
-                                <TextField
-                                    label="Phone Number"
-                                    name="phoneNumber"
-                                    size="small"
-                                    value={formData.phoneNumber}
-                                    onChange={handleChange}
-                                />
-                                <TextField
-                                    label="Website Link"
-                                    name="website"
-                                    size="small"
-                                    value={formData.website}
-                                    onChange={handleChange}
-                                />
-                                <section className={styles.navigationButtons}>
-                                    <Button
-                                        variant="outlined"
-                                        onClick={handleBack}
+                            <LoadScript
+                                googleMapsApiKey={
+                                    process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+                                }
+                                libraries={libraries}
+                                onLoad={initializeAutocomplete}
+                                onError={(error) =>
+                                    console.error(
+                                        "Google Maps failed to load:",
+                                        error,
+                                    )
+                                }
+                            >
+                                <>
+                                    <TextField
+                                        label="Phone Number"
+                                        name="phoneNumber"
+                                        size="small"
+                                        value={formData.phoneNumber}
+                                        onChange={handleChange}
+                                        fullWidth
+                                        margin="dense"
+                                    />
+
+                                    <TextField
+                                        label="Website Link"
+                                        name="website"
+                                        size="small"
+                                        value={formData.website}
+                                        onChange={handleChange}
+                                        fullWidth
+                                        margin="dense"
+                                    />
+                                    <TextField
+                                        label="Address"
+                                        id="address-autocomplete"
+                                        name="address"
+                                        size="small"
+                                        fullWidth
+                                        margin="dense"
+                                        value={formData.address}
+                                        onChange={handleChange}
+                                        inputRef={inputRef}
+                                        inputProps={{
+                                            autoComplete: "off",
+                                        }}
+                                    />
+                                    <section
+                                        className={styles.navigationButtons}
                                     >
-                                        Back
-                                    </Button>
-                                    <Button
-                                        variant="contained"
-                                        onClick={handleNext}
-                                        disabled={!isStep2Valid}
-                                    >
-                                        Next
-                                    </Button>
-                                </section>
-                            </>
+                                        <Button
+                                            variant="outlined"
+                                            onClick={handleBack}
+                                        >
+                                            Back
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            onClick={handleNext}
+                                            disabled={!isStep2Valid}
+                                        >
+                                            Next
+                                        </Button>
+                                    </section>
+                                </>
+                            </LoadScript>
                         )}
 
                         {step === 3 && (

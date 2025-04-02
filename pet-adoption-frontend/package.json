@@ -17,6 +17,7 @@
     "@mui/material": "^6.4.1",
     "@mui/material-nextjs": "^6.3.1",
     "@mui/x-date-pickers": "^7.28.0",
+    "@react-google-maps/api": "^2.20.6",
     "@reduxjs/toolkit": "^2.5.0",
     "appwrite": "^17.0.0",
     "axios": "^1.7.9",
