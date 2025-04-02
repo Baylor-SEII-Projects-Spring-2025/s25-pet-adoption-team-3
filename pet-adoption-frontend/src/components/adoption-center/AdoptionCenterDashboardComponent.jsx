@@ -531,7 +531,6 @@ export default function ProfileDashboardComponent() {
             setBio(user.bio || "");
             setPhoneNumber(user.phoneNumber || "");
             setAddress(user.address || "");
-
         }
     }, [user]);
 
@@ -1952,7 +1951,6 @@ export default function ProfileDashboardComponent() {
                                             size="small"
                                         />
                                     </div>
-
                                     <TextField
                                         disabled
                                         label="Email"
@@ -1979,6 +1977,14 @@ export default function ProfileDashboardComponent() {
                                         size="small"
                                     />
                                     <TextField
+                                        disabled
+                                        label="Address"
+                                        value={address}
+                                        fullWidth
+                                        id="address"
+                                        size="small"
+                                    />
+                                    <TextField
                                         label="Bio"
                                         value={bio}
                                         onChange={handleBioChange}
@@ -1997,76 +2003,25 @@ export default function ProfileDashboardComponent() {
                                         size="small"
                                     />
 
-                                <TextField
-                                    disabled
-                                    label="Email"
-                                    value={user?.email || ""}
-                                    id="email"
-                                    size="small"
-                                />
-                                <TextField
-                                    disabled
-                                    label="Password"
-                                    value="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
-                                    id="password"
-                                    size="small"
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                />
-                                <TextField
-                                    label="Website Link"
-                                    value={websiteLink}
-                                    onChange={handleWebsiteChange}
-                                    fullWidth
-                                    id="website link"
-                                    size="small"
-                                />
-                                <TextField
-                                    disabled
-                                    label="Address"
-                                    value={address}
-                                    fullWidth
-                                    id="address"
-                                    size="small"
-                                />
-                                <TextField
-                                    label="Bio"
-                                    value={bio}
-                                    onChange={handleBioChange}
-                                    fullWidth
-                                    id="bio"
-                                    size="small"
-                                    multiline
-                                    rows={3}
-                                />
-                                <TextField
-                                    label="Phone Number"
-                                    value={phoneNumber}
-                                    onChange={handlePhoneNumberChange}
-                                    fullWidth
-                                    id="phone number"
-                                    size="small"
-                                />
-
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={handleUpdateProfile}
-                                    disabled={!isUpdated}
-                                    startIcon={
-                                        loading ? (
-                                            <CircularProgress
-                                                size={20}
-                                                color="inherit"
-                                            />
-                                        ) : null
-                                    }
-                                >
-                                    {loading
-                                        ? "Updating Profile..."
-                                        : "Update Profile"}
-                                </Button>
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={handleUpdateProfile}
+                                        disabled={!isUpdated}
+                                        startIcon={
+                                            loading ? (
+                                                <CircularProgress
+                                                    size={20}
+                                                    color="inherit"
+                                                />
+                                            ) : null
+                                        }
+                                    >
+                                        {loading
+                                            ? "Updating Profile..."
+                                            : "Update Profile"}
+                                    </Button>
+                                </div>
                             </div>
                         )}
                     </div>
