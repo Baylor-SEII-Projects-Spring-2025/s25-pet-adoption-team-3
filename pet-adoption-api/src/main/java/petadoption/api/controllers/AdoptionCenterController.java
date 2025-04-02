@@ -119,4 +119,28 @@ public class AdoptionCenterController {
 
         return ResponseEntity.ok("Phone number updated to: " + adoptionCenterDTO.getPhoneNumber());
     }
+
+    @PutMapping("/update-address/{adoptionCenterId}")
+    public ResponseEntity<String> updateAddress(@PathVariable Long adoptionCenterId, @RequestBody AdoptionCenterDTO adoptionCenterDTO, HttpServletRequest request) {
+        if(adoptionCenterDTO.getAddress() == null || adoptionCenterDTO.getAddress().isEmpty()) {
+            return ResponseEntity.badRequest().body("Adoption center address cannot be empty.");
+        }
+
+        Optional<User> userOptional = userRepository.findById(adoptionCenterId);
+        if(userOptional.isEmpty()) {
+            return ResponseEntity.badRequest().body("User not found.");
+        }
+
+        User user = userOptional.get();
+        user.setAddress(adoptionCenterDTO.getAddress());
+        userRepository.saveAndFlush(user);
+
+        User updatedUser = userRepository.findById(adoptionCenterId).orElseThrow(() -> new RuntimeException("User not found after update"));
+        request.getSession().invalidate();
+        HttpSession newSession = request.getSession(true);
+        newSession.setAttribute("user", updatedUser);
+
+        return ResponseEntity.ok("Address updated to: " + adoptionCenterDTO.getAddress());
+    }
+
 }
