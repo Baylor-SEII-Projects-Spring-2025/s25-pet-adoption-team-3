@@ -231,6 +231,6 @@ public class PetController {
         }
         User user = (User) validationResponse.getBody();
 
-        return ResponseEntity.status(200).body(recEngineService.getPets(user));
+        return ResponseEntity.status(200).body(recEngineService.getSwipePets(user));
     }
 }

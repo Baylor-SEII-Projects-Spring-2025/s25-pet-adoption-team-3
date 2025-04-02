@@ -1,3 +1,5 @@
+// TODO: Auto add weights to users on account creation
+
 package petadoption.api.services;
 
 import jakarta.transaction.Transactional;
@@ -11,10 +13,7 @@ import petadoption.api.models.Weight;
 import petadoption.api.repository.PetRepository;
 import petadoption.api.repository.UserRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +25,13 @@ public class RecEngineService {
     public RecEngineService(UserRepository userRepository, PetRepository petRepository) {
         this.userRepository = userRepository;
         this.petRepository = petRepository;
+    }
+
+    public void addWeight(List<Weight> weights, Characteristic characteristic){
+        Weight weight = new Weight();
+        weight.setCharacteristic(characteristic);
+        weight.setWeight(1);
+        weights.add(weight);
     }
 
     public void addWeight(List<Weight> weights, Characteristic characteristic, boolean liked){
@@ -114,15 +120,49 @@ public class RecEngineService {
         return "Successfully disliked pet " + pet.getName();
     }
 
+    public double calculateScore(User user, Pet pet){
+        Map<Characteristic, Weight> weightMap = convertListToWeightMap(user.getWeights());
+        double score = 0;
+
+        for (Characteristic characteristic : pet.getPetCharacteristics()) {
+            Weight weight = weightMap.get(characteristic);
+            if (weight != null) {
+                score += weight.getWeight();
+            }else {
+                addWeight(user.getWeights(), characteristic);
+                score += 1;
+            }
+        }
+
+        return score / 100;
+    }
+
     // Temp get swipe pets
-    public List<SwipePetDTO> getPets(User user) {
-        List<Pet> pets = petRepository.getFivePets();
+    public List<SwipePetDTO> getSwipePets(User user) {
+        List<Pet> pets = petRepository.getAllPets();
         List<SwipePetDTO> swipePetDTOs = new ArrayList<>();
+        Map<Pet, Double> petScoreMap = new HashMap<>();
+        Set<Pet> alrRecPets = user.getRecommendedPets();
+
+        if(pets.size() == alrRecPets.size()){
+            alrRecPets.clear();
+        }
 
         for(Pet pet : pets){
-            SwipePetDTO swipePetDTO = new SwipePetDTO(pet);
+            if(!alrRecPets.contains(pet)) {
+                petScoreMap.put(pet, calculateScore(user, pet));
+            }
+        }
+
+        List<Map.Entry<Pet, Double>> sortedPetScores = petScoreMap.entrySet().stream().sorted(Map.Entry.comparingByValue()).toList();
+
+        for(Map.Entry<Pet, Double> pet : sortedPetScores.subList(0,5)){
+            alrRecPets.add(pet.getKey());
+            SwipePetDTO swipePetDTO = new SwipePetDTO(pet.getKey());
             swipePetDTOs.add(swipePetDTO);
         }
+
+        userRepository.save(user);
 
         return swipePetDTOs;
     }
