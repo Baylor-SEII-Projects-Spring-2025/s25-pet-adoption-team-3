@@ -12,7 +12,6 @@ const from = (i) => ({ x: 0, y: i * -4, scale: 1 });
 export function SwipeComponent() {
     const [pets, setPets] = useState([]);
     const [gone] = useState(() => new Set());
-    const [user, setUser] = useState(null);
     const router = useRouter();
     const [currentImageIndices, setCurrentImageIndices] = useState({});
 
@@ -32,9 +31,9 @@ export function SwipeComponent() {
         });
     };
 
-    const fetchUserSession = async () => {
+    const fetchPets = async () => {
         try {
-            const response = await fetch(`${API_URL}/auth/session`, {
+            const res = await fetch(`${API_URL}/api/pet/swipe/temp-get-pets`, {
                 method: "GET",
                 credentials: "include",
                 headers: {
@@ -42,49 +41,57 @@ export function SwipeComponent() {
                     "Cache-Control": "no-cache",
                 },
             });
-            if (response.status === 401) return router.push("/login");
-            if (!response.ok) throw new Error("Error fetching session");
-            const data = await response.json();
-            setUser(data.user);
+            if (res.status === 401) return router.push("/login");
+            else if (!res.ok) {
+                alert(`HTTP error! status: ${res.status}`);
+                router.push("/");
+                return;
+            }
+            const data = await res.json();
+            setPets(data);
+            const initialIndices = {};
+            data.forEach((pet) => (initialIndices[pet.id] = 0));
+            setCurrentImageIndices(initialIndices);
         } catch (err) {
-            console.error("Session fetch error:", err);
+            console.error("Fetch pets error:", err);
         }
     };
 
     useEffect(() => {
-        if (!user) fetchUserSession();
-    }, []);
-
-    useEffect(() => {
-        async function fetchPets() {
+        const initialize = async () => {
             try {
-                const res = await fetch(
-                    `${API_URL}/api/pet/swipe/temp-get-pets`,
-                    {
-                        method: "GET",
-                        credentials: "include",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Cache-Control": "no-cache",
-                        },
+                // Fetch user session first
+                const response = await fetch(`${API_URL}/auth/session`, {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Cache-Control": "no-cache",
                     },
-                );
-                if (res.status === 401) return router.push("/login");
-                else if (!res.ok) {
-                    alert(`HTTP error! status: ${res.status}`);
-                    router.push("/");
+                });
+
+                if (response.status === 401) return router.push("/login");
+                if (!response.ok) {
+                    console.log("Error fetching session");
                     return;
                 }
-                const data = await res.json();
-                setPets(data);
-                const initialIndices = {};
-                data.forEach((pet) => (initialIndices[pet.id] = 0));
-                setCurrentImageIndices(initialIndices);
+
+                const data = await response.json();
+
+                if (data.user.role === "ADOPTION_CENTER") {
+                    return router.push("/adoption-center/dashboard");
+                }
+
+                // Now that we have the user, fetch pets if role is ADOPTER
+                if (data.user.role === "ADOPTER") {
+                    await fetchPets();
+                }
             } catch (err) {
-                console.error("Fetch pets error:", err);
+                console.error("Session fetch error:", err);
             }
-        }
-        fetchPets();
+        };
+
+        initialize();
     }, []);
 
     const [springs, api] = useSprings(pets.length || 0, (i) => ({
