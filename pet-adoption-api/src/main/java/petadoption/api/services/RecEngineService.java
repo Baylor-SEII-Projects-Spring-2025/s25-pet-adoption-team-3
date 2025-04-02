@@ -138,11 +138,18 @@ public class RecEngineService {
     }
 
     // Temp get swipe pets
-    public List<SwipePetDTO> getSwipePets(User user) {
+    @Transactional
+    public List<SwipePetDTO> getSwipePets(User userFromSession) {
+        User user = userRepository.findById(userFromSession.getId()).orElseThrow(() -> new RuntimeException("User not found"));
         List<Pet> pets = petRepository.getAllPets();
         List<SwipePetDTO> swipePetDTOs = new ArrayList<>();
         Map<Pet, Double> petScoreMap = new HashMap<>();
         Set<Pet> alrRecPets = user.getRecommendedPets();
+
+        if(alrRecPets == null){
+            alrRecPets = new HashSet<>();
+            user.setRecommendedPets(alrRecPets);
+        }
 
         if(pets.size() == alrRecPets.size()){
             alrRecPets.clear();
@@ -156,12 +163,11 @@ public class RecEngineService {
 
         List<Map.Entry<Pet, Double>> sortedPetScores = petScoreMap.entrySet().stream().sorted(Map.Entry.comparingByValue()).toList();
 
-        for(Map.Entry<Pet, Double> pet : sortedPetScores.subList(0,5)){
+        for(Map.Entry<Pet, Double> pet : sortedPetScores.subList(0,5)) {
             alrRecPets.add(pet.getKey());
             SwipePetDTO swipePetDTO = new SwipePetDTO(pet.getKey());
             swipePetDTOs.add(swipePetDTO);
         }
-
         userRepository.save(user);
 
         return swipePetDTOs;
