@@ -14,4 +14,22 @@ public class Characteristic {
     private Long id;
 
     private String name;
+
+    @Override
+    public boolean equals(Object obj){
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Characteristic characteristic = (Characteristic) obj;
+        return id.equals(characteristic.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
 }

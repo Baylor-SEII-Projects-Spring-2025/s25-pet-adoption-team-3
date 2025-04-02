@@ -126,9 +126,20 @@ public class RecEngineService {
 
         for (Characteristic characteristic : pet.getPetCharacteristics()) {
             Weight weight = weightMap.get(characteristic);
+            System.out.println("Map keys:");
+            for (Characteristic c : weightMap.keySet()) {
+                System.out.println("  -> " + c.getId());
+            }
+            System.out.println("Pet characteristics:");
+            for (Characteristic c : pet.getPetCharacteristics()) {
+                System.out.println("  -> " + c.getId());
+            }
+            System.out.println(characteristic.getId());
             if (weight != null) {
+                System.out.println(weight.getWeight());
                 score += weight.getWeight();
             }else {
+                System.out.println("Weight not found");
                 addWeight(user.getWeights(), characteristic);
                 score += 1;
             }
@@ -162,7 +173,6 @@ public class RecEngineService {
         }
 
         List<Map.Entry<Pet, Double>> sortedPetScores = petScoreMap.entrySet().stream().sorted(Map.Entry.comparingByValue()).toList();
-
         for(Map.Entry<Pet, Double> pet : sortedPetScores.subList(0,5)) {
             alrRecPets.add(pet.getKey());
             SwipePetDTO swipePetDTO = new SwipePetDTO(pet.getKey());
