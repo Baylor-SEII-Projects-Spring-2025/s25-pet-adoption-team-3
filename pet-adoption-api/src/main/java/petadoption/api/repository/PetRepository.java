@@ -35,4 +35,7 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
 
     @Query("SELECT p FROM Pet p ORDER BY p.id LIMIT 5")
     List<Pet> getFivePets();
+
+    @Query("SELECT p FROM Pet p")
+    List<Pet> getAllPets();
 }
