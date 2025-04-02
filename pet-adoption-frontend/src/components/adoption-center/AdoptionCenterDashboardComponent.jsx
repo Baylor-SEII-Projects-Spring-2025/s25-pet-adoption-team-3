@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, Suspense } from "react";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -38,66 +38,12 @@ const petStatuses = [
     "Unneutered Male",
 ];
 
-const furTypes = [
-    "Short fur",
-    "Medium fur",
-    "Long fur",
-    "Curly fur",
-    "Wavy fur",
-    "Straight fur",
-    "Hairless fur",
-    "Double coat fur",
-    "Silky fur",
-    "Wiry fur",
-];
-
-const tailTypes = [
-    "Short tail",
-    "Docked tail",
-    "Bobtail",
-    "Curled tail",
-    "Straight tail",
-    "Plumed tail",
-    "Whip-like tail",
-    "Kinked tail",
-    "Tufted tip tail",
-];
-
-const earTypes = [
-    "Erect ears",
-    "Droopy ears",
-    "Semi-erect ears",
-    "Folded ears",
-    "Floppy ears",
-    "Feathered ears",
-    "Bat ears",
-    "Cropped ears",
-    "Tufted ears",
-    "Button ears",
-];
-
-const bodyTypes = [
-    "Lean body",
-    "Muscular body",
-    "Stocky body",
-    "Slender body",
-    "Compact body",
-    "Elongated body",
-    "Cobby body",
-    "Athletic body",
-    "Heavy - boned body",
-];
-
 const initialPetData = {
     images: [null, null, null, null],
     name: "",
     breed: "",
     spayedStatus: "",
     birthdate: "",
-    furType: "",
-    tailType: "",
-    earType: "",
-    bodyType: "",
     aboutMe: "",
     extra1: "",
     extra2: "",
@@ -128,6 +74,7 @@ export default function ProfileDashboardComponent() {
     const handleClose = () => setOpen(false);
     const [adoptionCenterName, setAdoptionCenterName] = useState("");
     const [websiteLink, setWebsiteLink] = useState("");
+    const [address, setAddress] = useState("");
     const [bio, setBio] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState("");
     const [isUpdated, setIsUpdated] = useState(false);
@@ -326,11 +273,7 @@ export default function ProfileDashboardComponent() {
             petData.aboutMe.trim() !== "" &&
             petData.extra1.trim() !== "" &&
             petData.extra2.trim() !== "" &&
-            petData.extra3.trim() !== "" &&
-            petData.furType.trim() !== "" &&
-            petData.tailType.trim() !== "" &&
-            petData.earType.trim() !== "" &&
-            petData.bodyType.trim() !== ""
+            petData.extra3.trim() !== ""
         );
     };
 
@@ -355,17 +298,6 @@ export default function ProfileDashboardComponent() {
             formData.append("extra1", petData.extra1);
             formData.append("extra2", petData.extra2);
             formData.append("extra3", petData.extra3);
-
-            const characteristics = [
-                petData.furType,
-                petData.tailType,
-                petData.earType,
-                petData.bodyType,
-            ];
-
-            characteristics.forEach((ch) => {
-                formData.append("characteristics", ch);
-            });
 
             for (let [key, value] of formData.entries()) {
                 console.log(`${key}:`, value);
@@ -598,6 +530,8 @@ export default function ProfileDashboardComponent() {
             setWebsiteLink(user.website || "");
             setBio(user.bio || "");
             setPhoneNumber(user.phoneNumber || "");
+            setAddress(user.address || "");
+
         }
     }, [user]);
 
@@ -776,87 +710,133 @@ export default function ProfileDashboardComponent() {
         }
     };
 
+    if (isPageLoading) {
+        return <Loading />;
+    }
+
     return (
-        <div className={styles.container}>
-            <div className={styles.profileLeftSection}>
-                <div className={styles.profileNavbarLeft}>
-                    <h1>{selectedNav}</h1>
-                    <p
-                        onClick={() => setSelectedNav("Dashboard")}
-                        className={
-                            selectedNav === "Dashboard" ? styles.active : ""
-                        }
-                    >
-                        Dashboard
-                    </p>
-                    <p
-                        onClick={() => setSelectedNav("My Pets")}
-                        className={
-                            selectedNav === "My Pets" ? styles.active : ""
-                        }
-                    >
-                        My Pets
-                    </p>
-                    <p
-                        onClick={() => setSelectedNav("My Events")}
-                        className={
-                            selectedNav === "My Events" ? styles.active : ""
-                        }
-                    >
-                        My Events
-                    </p>
-                    <p
-                        onClick={() => setSelectedNav("Settings")}
-                        className={
-                            selectedNav === "Settings" ? styles.active : ""
-                        }
-                    >
-                        Settings
-                    </p>
+        <Suspense fallback={<Loading />}>
+            <div className={styles.container}>
+                <div className={styles.profileLeftSection}>
+                    <div className={styles.profileNavbarLeft}>
+                        <h1>{selectedNav}</h1>
+                        <p
+                            onClick={() => setSelectedNav("Dashboard")}
+                            className={
+                                selectedNav === "Dashboard" ? styles.active : ""
+                            }
+                        >
+                            Dashboard
+                        </p>
+                        <p
+                            onClick={() => setSelectedNav("My Pets")}
+                            className={
+                                selectedNav === "My Pets" ? styles.active : ""
+                            }
+                        >
+                            My Pets
+                        </p>
+                        <p
+                            onClick={() => setSelectedNav("My Events")}
+                            className={
+                                selectedNav === "My Events" ? styles.active : ""
+                            }
+                        >
+                            My Events
+                        </p>
+                        <p
+                            onClick={() => setSelectedNav("Settings")}
+                            className={
+                                selectedNav === "Settings" ? styles.active : ""
+                            }
+                        >
+                            Settings
+                        </p>
+                    </div>
                 </div>
-            </div>
 
-            <div className={styles.divider}></div>
+                <div className={styles.divider}></div>
 
-            <div className={styles.profileRightSection}>
-                <div className={styles.profileNavbarRight}>
-                    <div className={styles.dashboardHeader}>
-                        {selectedNav === "Dashboard" && (
-                            <div className={styles.dashboard}>
-                                <div className={styles.dashboardHeaderContent}>
-                                    <div className={styles.dashboardWrapper}>
+                <div className={styles.profileRightSection}>
+                    <div className={styles.profileNavbarRight}>
+                        <div className={styles.dashboardHeader}>
+                            {selectedNav === "Dashboard" && (
+                                <div className={styles.dashboard}>
+                                    <div
+                                        className={
+                                            styles.dashboardHeaderContent
+                                        }
+                                    >
                                         <div
-                                            className={
-                                                styles.dashboardWrapperHeader
-                                            }
+                                            className={styles.dashboardWrapper}
                                         >
-                                            <h1>
-                                                {user?.adoptionCenterName || ""}
-                                            </h1>
+                                            <div
+                                                className={
+                                                    styles.dashboardWrapperHeader
+                                                }
+                                            >
+                                                <h1>
+                                                    {user?.adoptionCenterName ||
+                                                        ""}
+                                                </h1>
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            className={styles.profileMessaging}
+                                        >
+                                            <p>My Messages</p>
+
+                                            {user?.messages?.length === 0 ||
+                                            !user?.messages ? (
+                                                <div
+                                                    className={
+                                                        styles.noMessages
+                                                    }
+                                                >
+                                                    <img
+                                                        src="/icons/no_messages.png"
+                                                        alt="No messages"
+                                                    />
+                                                    <p>
+                                                        No messages found, check
+                                                        back later.
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                <ul>
+                                                    {user?.messages?.map(
+                                                        (message, index) => (
+                                                            <li key={index}>
+                                                                {message}
+                                                            </li>
+                                                        ),
+                                                    )}
+                                                </ul>
+                                            )}
                                         </div>
                                     </div>
+                                    <div className={styles.profileMatches}>
+                                        <p>My Pets</p>
 
-                                    <div className={styles.profileMessaging}>
-                                        <p>My Messages</p>
-
-                                        {user?.messages?.length === 0 ||
-                                        !user?.messages ? (
-                                            <div className={styles.noMessages}>
+                                        {user?.matches?.length === 0 ||
+                                        !user?.matches ? (
+                                            <div className={styles.noMatches}>
                                                 <img
-                                                    src="/icons/no_messages.png"
-                                                    alt="No messages"
+                                                    src="/icons/no_matches.png"
+                                                    alt="No matches"
                                                 />
                                                 <p>
-                                                    No messages found, check
-                                                    back later.
+                                                    No pets found, add some
+                                                    pets!
                                                 </p>
                                             </div>
                                         ) : (
                                             <ul>
-                                                {user?.messages?.map(
-                                                    (message, index) => (
+                                                {user?.matches?.map(
+                                                    (matches, index) => (
                                                         <li key={index}>
-                                                            {message}
+                                                            {matches}
                                                         </li>
                                                     ),
                                                 )}
@@ -864,184 +844,172 @@ export default function ProfileDashboardComponent() {
                                         )}
                                     </div>
                                 </div>
-                                <div className={styles.profileMatches}>
-                                    <p>My Pets</p>
+                            )}
+                        </div>
 
-                                    {user?.matches?.length === 0 ||
-                                    !user?.matches ? (
-                                        <div className={styles.noMatches}>
-                                            <img
-                                                src="/icons/no_matches.png"
-                                                alt="No matches"
-                                            />
-                                            <p>No pets found, add some pets!</p>
-                                        </div>
-                                    ) : (
-                                        <ul>
-                                            {user?.matches?.map(
-                                                (matches, index) => (
-                                                    <li key={index}>
-                                                        {matches}
-                                                    </li>
-                                                ),
-                                            )}
-                                        </ul>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {selectedNav === "My Pets" && (
-                        <div className={styles.likesContent}>
-                            <div className={styles.petsHeader}>
-                                <div className={styles.likesNavbar}>
-                                    <p
-                                        onClick={() =>
-                                            setSelectedPets("My Pets")
-                                        }
-                                        className={
-                                            selectedPets === "My Pets"
-                                                ? styles.likesActive
-                                                : ""
-                                        }
-                                    >
-                                        My Pets
-                                    </p>
-
-                                    <div
-                                        className={styles.likesNavbarDivider}
-                                    ></div>
-
-                                    <p
-                                        onClick={() =>
-                                            setSelectedPets("Archived Pets")
-                                        }
-                                        className={
-                                            selectedPets === "Archived Pets"
-                                                ? styles.likesActive
-                                                : ""
-                                        }
-                                    >
-                                        Archived Pets
-                                    </p>
-                                </div>
-                            </div>
+                        {selectedNav === "My Pets" && (
                             <div className={styles.likesContent}>
-                                {selectedPets === "My Pets" && (
-                                    <div>
-                                        <div className={styles.addPetButton}>
-                                            <TextField
-                                                label="Search Pets"
-                                                variant="outlined"
-                                                fullWidth
-                                                value={searchQuery}
-                                                onChange={handleSearchChange}
-                                                className={styles.searchField}
-                                                size="small"
-                                                sx={{ mb: 2 }}
-                                            />
-                                            <Button
-                                                variant="contained"
-                                                color="primary"
-                                                className={
-                                                    styles.addPetButtonClass
-                                                }
-                                                onClick={handleModalOpen}
-                                            >
-                                                <img
-                                                    src="/icons/plus_icon.png"
-                                                    alt="Add"
-                                                />
-                                                New Pet
-                                            </Button>
-                                            <Modal
-                                                open={openModal}
-                                                onClose={handleModalClose}
-                                                aria-labelledby="add-pet-modal"
-                                            >
-                                                <Box sx={modalStyle}>
-                                                    <Typography
-                                                        variant="h5"
-                                                        sx={{ mb: 2 }}
-                                                    >
-                                                        Add New Pet
-                                                    </Typography>
+                                <div className={styles.petsHeader}>
+                                    <div className={styles.likesNavbar}>
+                                        <p
+                                            onClick={() =>
+                                                setSelectedPets("My Pets")
+                                            }
+                                            className={
+                                                selectedPets === "My Pets"
+                                                    ? styles.likesActive
+                                                    : ""
+                                            }
+                                        >
+                                            My Pets
+                                        </p>
 
-                                                    <form
-                                                        onSubmit={
-                                                            handleFormSubmit
-                                                        }
-                                                        className={styles.form}
-                                                    >
-                                                        <h3> Upload photos</h3>
-                                                        {/* Image Upload Grid */}
-                                                        <Box
+                                        <div
+                                            className={
+                                                styles.likesNavbarDivider
+                                            }
+                                        ></div>
+
+                                        <p
+                                            onClick={() =>
+                                                setSelectedPets("Archived Pets")
+                                            }
+                                            className={
+                                                selectedPets === "Archived Pets"
+                                                    ? styles.likesActive
+                                                    : ""
+                                            }
+                                        >
+                                            Archived Pets
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className={styles.likesContent}>
+                                    {selectedPets === "My Pets" && (
+                                        <div>
+                                            <div
+                                                className={styles.addPetButton}
+                                            >
+                                                <TextField
+                                                    label="Search Pets"
+                                                    variant="outlined"
+                                                    fullWidth
+                                                    value={searchQuery}
+                                                    onChange={
+                                                        handleSearchChange
+                                                    }
+                                                    className={
+                                                        styles.searchField
+                                                    }
+                                                    size="small"
+                                                    sx={{ mb: 2 }}
+                                                />
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    className={
+                                                        styles.addPetButtonClass
+                                                    }
+                                                    onClick={handleModalOpen}
+                                                >
+                                                    <img
+                                                        src="/icons/plus_icon.png"
+                                                        alt="Add"
+                                                    />
+                                                    New Pet
+                                                </Button>
+                                                <Modal
+                                                    open={openModal}
+                                                    onClose={handleModalClose}
+                                                    aria-labelledby="add-pet-modal"
+                                                >
+                                                    <Box sx={modalStyle}>
+                                                        <Typography
+                                                            variant="h5"
+                                                            sx={{ mb: 2 }}
+                                                        >
+                                                            Add New Pet
+                                                        </Typography>
+
+                                                        <form
+                                                            onSubmit={
+                                                                handleFormSubmit
+                                                            }
                                                             className={
-                                                                styles.imagePreviewContainer
+                                                                styles.form
                                                             }
                                                         >
-                                                            {petData.images.map(
-                                                                (
-                                                                    imgObj,
-                                                                    index,
-                                                                ) => (
-                                                                    <Box
-                                                                        key={
-                                                                            index
-                                                                        }
-                                                                        className={
-                                                                            styles.imageWrapper
-                                                                        }
-                                                                    >
-                                                                        {/* Hidden File Input */}
-                                                                        <input
-                                                                            type="file"
-                                                                            accept="image/*"
-                                                                            onChange={(
-                                                                                event,
-                                                                            ) =>
-                                                                                handleImageUpload(
-                                                                                    index,
-                                                                                    event,
-                                                                                )
+                                                            <h3>
+                                                                {" "}
+                                                                Upload photos
+                                                            </h3>
+                                                            {/* Image Upload Grid */}
+                                                            <Box
+                                                                className={
+                                                                    styles.imagePreviewContainer
+                                                                }
+                                                            >
+                                                                {petData.images.map(
+                                                                    (
+                                                                        imgObj,
+                                                                        index,
+                                                                    ) => (
+                                                                        <Box
+                                                                            key={
+                                                                                index
                                                                             }
                                                                             className={
-                                                                                styles.fileInput
+                                                                                styles.imageWrapper
                                                                             }
-                                                                            id={`file-input-${index}`}
-                                                                        />
+                                                                        >
+                                                                            {/* Hidden File Input */}
+                                                                            <input
+                                                                                type="file"
+                                                                                accept="image/*"
+                                                                                onChange={(
+                                                                                    event,
+                                                                                ) =>
+                                                                                    handleImageUpload(
+                                                                                        index,
+                                                                                        event,
+                                                                                    )
+                                                                                }
+                                                                                className={
+                                                                                    styles.fileInput
+                                                                                }
+                                                                                id={`file-input-${index}`}
+                                                                            />
 
-                                                                        {/* Remove Button */}
-                                                                        {imgObj &&
-                                                                            imgObj.preview && (
-                                                                                <button
-                                                                                    className={
-                                                                                        styles.removeButton
-                                                                                    }
-                                                                                    onClick={(
-                                                                                        e,
-                                                                                    ) => {
-                                                                                        e.preventDefault();
-                                                                                        const newImages =
-                                                                                            [
-                                                                                                ...petData.images,
-                                                                                            ];
-                                                                                        newImages[
-                                                                                            index
-                                                                                        ] =
-                                                                                            null;
-                                                                                        setPetData(
-                                                                                            {
-                                                                                                ...petData,
-                                                                                                images: newImages,
-                                                                                            },
-                                                                                        );
-                                                                                    }}
-                                                                                >
-                                                                                    ✕
-                                                                                </button>
-                                                                            )}
+                                                                            {/* Remove Button */}
+                                                                            {imgObj &&
+                                                                                imgObj.preview && (
+                                                                                    <button
+                                                                                        className={
+                                                                                            styles.removeButton
+                                                                                        }
+                                                                                        onClick={(
+                                                                                            e,
+                                                                                        ) => {
+                                                                                            e.preventDefault();
+                                                                                            const newImages =
+                                                                                                [
+                                                                                                    ...petData.images,
+                                                                                                ];
+                                                                                            newImages[
+                                                                                                index
+                                                                                            ] =
+                                                                                                null;
+                                                                                            setPetData(
+                                                                                                {
+                                                                                                    ...petData,
+                                                                                                    images: newImages,
+                                                                                                },
+                                                                                            );
+                                                                                        }}
+                                                                                    >
+                                                                                        ✕
+                                                                                    </button>
+                                                                                )}
 
                                                                             {/* Image Preview */}
                                                                             {imgObj &&
@@ -1822,133 +1790,136 @@ export default function ProfileDashboardComponent() {
                                         </div>
                                     )}
 
-                                {selectedEvents === "Archived Events" && (
-                                    <div className={styles.archivedPets}>
-                                        {user?.archivedEvents?.length > 0 ? (
-                                            <ul>
-                                                {user.archivedEvents.map(
-                                                    (event, index) => (
-                                                        <li key={index}>
-                                                            {event.title}
-                                                        </li>
-                                                    ),
-                                                )}
-                                            </ul>
-                                        ) : (
-                                            <p>No archived events found.</p>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {selectedNav === "Settings" && (
-                        <div className={styles.settingsWrapper}>
-                            <div className={styles.dashboardWrapperHeader}>
-                                <Avatar
-                                    ref={anchorRef}
-                                    sx={{
-                                        background: user?.profilePhoto
-                                            ? "transparent"
-                                            : generateGradient(
-                                                  user?.firstName +
-                                                      (user?.lastName || ""),
-                                              ),
-                                        cursor: "pointer",
-                                        color: "#fff",
-                                        width: 100,
-                                        height: 100,
-                                        border: "1px solid black",
-                                    }}
-                                    src={user?.profilePhoto || undefined}
-                                >
-                                    {!user?.profilePhoto && (
-                                        <>
-                                            {user?.firstName?.charAt(0)}
-                                            {user?.lastName
-                                                ? user?.lastName.charAt(0)
-                                                : ""}
-                                        </>
+                                    {selectedEvents === "Archived Events" && (
+                                        <div className={styles.archivedPets}>
+                                            {user?.archivedEvents?.length >
+                                            0 ? (
+                                                <ul>
+                                                    {user.archivedEvents.map(
+                                                        (event, index) => (
+                                                            <li key={index}>
+                                                                {event.title}
+                                                            </li>
+                                                        ),
+                                                    )}
+                                                </ul>
+                                            ) : (
+                                                <p>No archived events found.</p>
+                                            )}
+                                        </div>
                                     )}
-                                </Avatar>
+                                </div>
+                            </div>
+                        )}
 
-                                <div
-                                    className={
-                                        styles.settingsChangeProfilePhoto
-                                    }
-                                >
+                        {selectedNav === "Settings" && (
+                            <div className={styles.settingsWrapper}>
+                                <div className={styles.dashboardWrapperHeader}>
+                                    <Avatar
+                                        ref={anchorRef}
+                                        sx={{
+                                            background: user?.profilePhoto
+                                                ? "transparent"
+                                                : generateGradient(
+                                                      user?.firstName +
+                                                          (user?.lastName ||
+                                                              ""),
+                                                  ),
+                                            cursor: "pointer",
+                                            color: "#fff",
+                                            width: 100,
+                                            height: 100,
+                                            border: "1px solid black",
+                                        }}
+                                        src={user?.profilePhoto || undefined}
+                                    >
+                                        {!user?.profilePhoto && (
+                                            <>
+                                                {user?.firstName?.charAt(0)}
+                                                {user?.lastName
+                                                    ? user?.lastName.charAt(0)
+                                                    : ""}
+                                            </>
+                                        )}
+                                    </Avatar>
+
                                     <div
                                         className={
-                                            styles.settingsChangePhotoButtons
+                                            styles.settingsChangeProfilePhoto
                                         }
                                     >
-                                        <input
-                                            type="file"
-                                            accept=".png, .jpg, .jpeg"
-                                            onChange={handleUploadPhoto}
-                                            style={{ display: "none" }}
-                                            id="upload-photo"
-                                        />
-                                        <Button
-                                            variant="contained"
-                                            onClick={() =>
-                                                document
-                                                    .getElementById(
-                                                        "upload-photo",
-                                                    )
-                                                    .click()
+                                        <div
+                                            className={
+                                                styles.settingsChangePhotoButtons
                                             }
                                         >
-                                            Upload Photo
-                                        </Button>
-                                        <Button
-                                            type="submit"
-                                            variant="outlined"
-                                            color="error"
-                                            disabled={!user?.profilePhoto}
-                                            onClick={handleOpen}
-                                        >
-                                            Delete Photo
-                                        </Button>
-                                        <Modal
-                                            open={open}
-                                            onClose={handleClose}
-                                            aria-labelledby="modal-modal-title"
-                                            aria-describedby="modal-modal-description"
-                                        >
-                                            <Box sx={style}>
-                                                <Typography
-                                                    id="modal-modal-title"
-                                                    variant="h6"
-                                                    component="h2"
-                                                >
-                                                    Are you sure you want to
-                                                    delete your profile photo?
-                                                </Typography>
-                                                <Typography
-                                                    id="modal-modal-description"
-                                                    sx={{ mt: 2 }}
-                                                >
-                                                    The photo will be
-                                                    permanently deleted and
-                                                    cannot be recovered.
-                                                </Typography>
-                                                <Button
-                                                    type="submit"
-                                                    variant="outlined"
-                                                    color="error"
-                                                    sx="margin-top: 20px"
-                                                    onClick={() => {
-                                                        handleDeletePhoto();
-                                                        handleClose();
-                                                    }}
-                                                >
-                                                    Yes, I&apos;m Sure
-                                                </Button>
-                                            </Box>
-                                        </Modal>
-                                    </div>
+                                            <input
+                                                type="file"
+                                                accept=".png, .jpg, .jpeg"
+                                                onChange={handleUploadPhoto}
+                                                style={{ display: "none" }}
+                                                id="upload-photo"
+                                            />
+                                            <Button
+                                                variant="contained"
+                                                onClick={() =>
+                                                    document
+                                                        .getElementById(
+                                                            "upload-photo",
+                                                        )
+                                                        .click()
+                                                }
+                                            >
+                                                Upload Photo
+                                            </Button>
+                                            <Button
+                                                type="submit"
+                                                variant="outlined"
+                                                color="error"
+                                                disabled={!user?.profilePhoto}
+                                                onClick={handleOpen}
+                                            >
+                                                Delete Photo
+                                            </Button>
+                                            <Modal
+                                                open={open}
+                                                onClose={handleClose}
+                                                aria-labelledby="modal-modal-title"
+                                                aria-describedby="modal-modal-description"
+                                            >
+                                                <Box sx={style}>
+                                                    <Typography
+                                                        id="modal-modal-title"
+                                                        variant="h6"
+                                                        component="h2"
+                                                    >
+                                                        Are you sure you want to
+                                                        delete your profile
+                                                        photo?
+                                                    </Typography>
+                                                    <Typography
+                                                        id="modal-modal-description"
+                                                        sx={{ mt: 2 }}
+                                                    >
+                                                        The photo will be
+                                                        permanently deleted and
+                                                        cannot be recovered.
+                                                    </Typography>
+                                                    <Button
+                                                        type="submit"
+                                                        variant="outlined"
+                                                        color="error"
+                                                        sx="margin-top: 20px"
+                                                        onClick={() => {
+                                                            handleDeletePhoto();
+                                                            handleClose();
+                                                        }}
+                                                    >
+                                                        Yes, I&apos;m Sure
+                                                    </Button>
+                                                </Box>
+                                            </Modal>
+                                        </div>
 
                                     <div className={styles.settingsUploadError}>
                                         {uploadError && (
@@ -2030,25 +2001,24 @@ export default function ProfileDashboardComponent() {
                                     size="small"
                                 />
 
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        onClick={handleUpdateProfile}
-                                        disabled={!isUpdated}
-                                        startIcon={
-                                            loading ? (
-                                                <CircularProgress
-                                                    size={20}
-                                                    color="inherit"
-                                                />
-                                            ) : null
-                                        }
-                                    >
-                                        {loading
-                                            ? "Updating Profile..."
-                                            : "Update Profile"}
-                                    </Button>
-                                </div>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={handleUpdateProfile}
+                                    disabled={!isUpdated}
+                                    startIcon={
+                                        loading ? (
+                                            <CircularProgress
+                                                size={20}
+                                                color="inherit"
+                                            />
+                                        ) : null
+                                    }
+                                >
+                                    {loading
+                                        ? "Updating Profile..."
+                                        : "Update Profile"}
+                                </Button>
                             </div>
                         )}
                     </div>
