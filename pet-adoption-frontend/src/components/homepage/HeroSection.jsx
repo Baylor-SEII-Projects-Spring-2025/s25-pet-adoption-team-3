@@ -29,7 +29,7 @@ export default function HeroSection() {
                 <h1 className={styles.heroText}>
                     Ready to Meet Your Furry Friend?
                 </h1>
-                <Link href="/find-friends" className={styles.ctaButton}>
+                <Link href="/swipe" className={styles.ctaButton}>
                     <strong>Start Swiping Now</strong>
                 </Link>
             </div>
