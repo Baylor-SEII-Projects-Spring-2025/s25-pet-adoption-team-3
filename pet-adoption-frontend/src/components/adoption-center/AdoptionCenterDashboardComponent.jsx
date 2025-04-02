@@ -75,6 +75,7 @@ export default function ProfileDashboardComponent() {
 
     const [adoptionCenterName, setAdoptionCenterName] = useState("");
     const [websiteLink, setWebsiteLink] = useState("");
+    const [address, setAddress] = useState("");
     const [bio, setBio] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState("");
     const [isUpdated, setIsUpdated] = useState(false);
@@ -528,6 +529,8 @@ export default function ProfileDashboardComponent() {
             setWebsiteLink(user.website || "");
             setBio(user.bio || "");
             setPhoneNumber(user.phoneNumber || "");
+            setAddress(user.address || "");
+
         }
     }, [user]);
 
@@ -1897,6 +1900,14 @@ export default function ProfileDashboardComponent() {
                                     size="small"
                                 />
                                 <TextField
+                                    disabled
+                                    label="Address"
+                                    value={address}
+                                    fullWidth
+                                    id="address"
+                                    size="small"
+                                />
+                                <TextField
                                     label="Bio"
                                     value={bio}
                                     onChange={handleBioChange}
@@ -1929,7 +1940,9 @@ export default function ProfileDashboardComponent() {
                                         ) : null
                                     }
                                 >
-                                    {loading ? "Updating Profile..." : "Update Profile"}
+                                    {loading
+                                        ? "Updating Profile..."
+                                        : "Update Profile"}
                                 </Button>
                             </div>
                         </div>
