@@ -100,3 +100,7 @@
     width: 100%;
     margin-top: 20px;
 }
+
+.pac-container {
+    z-index: 1300 !important;
+}
