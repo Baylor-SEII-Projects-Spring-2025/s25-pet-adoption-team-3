@@ -14,6 +14,7 @@ import petadoption.api.repository.PetRepository;
 import petadoption.api.repository.UserRepository;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,14 +42,18 @@ public class RecEngineService {
         weights.add(weight);
     }
 
-    public Map<Characteristic, Weight> convertListToWeightMap(List<Weight> weights){
-        Map<Characteristic, Weight> weightMap = weights.stream()
+    public Map<Characteristic, Weight> convertListToWeightMap(List<Weight> weights) {
+        return weights.stream()
                 .collect(Collectors.toMap(
                         Weight::getCharacteristic,
-                        weight -> weight
+                        Function.identity(),
+                        (existing, replacement) -> existing //keeps the first entry encountered
                 ));
+    }
 
-        return weightMap;
+    public void deduplicateUserWeights(User user) {
+        Map<Characteristic, Weight> weightMap = convertListToWeightMap(user.getWeights());
+        user.setWeights(new ArrayList<>(weightMap.values()));
     }
 
     @Transactional
@@ -82,6 +87,7 @@ public class RecEngineService {
         //System.out.println("printing weights");
         //user.getWeights().forEach(System.out::println);
 
+        deduplicateUserWeights(user);
         userRepository.save(user);
         return "Successfully liked pet " + pet.getName();
     }
@@ -145,6 +151,7 @@ public class RecEngineService {
             }
         }
 
+        deduplicateUserWeights(user);
         return score / 100;
     }
 
