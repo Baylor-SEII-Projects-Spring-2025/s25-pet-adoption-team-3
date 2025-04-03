@@ -34,7 +34,7 @@ def generateCharacteristics(personalities, physicalChars):
     for i in range(numPersonalities):
         output.append({"id": personalitiesIdx[i] + 1, "name": personalities[personalitiesIdx[i]]})
     for i in range(numPersonalities):
-        output.append({"id": physicalCharsIdx[i] + 1, "name": physicalChars[physicalCharsIdx[i]]})
+        output.append({"id": physicalCharsIdx[i] + 1 + 51, "name": physicalChars[physicalCharsIdx[i]]})
 
     return output
         
