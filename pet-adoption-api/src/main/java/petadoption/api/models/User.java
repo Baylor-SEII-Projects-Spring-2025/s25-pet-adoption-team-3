@@ -57,7 +57,7 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL)
     private List<Pet> savedPets;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Weight> weights;
 
     public enum Role {

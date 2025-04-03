@@ -55,35 +55,33 @@ export function SwipeComponent() {
         if (!user) fetchUserSession();
     }, []);
 
-    useEffect(() => {
-        async function fetchPets() {
-            try {
-                const res = await fetch(
-                    `${API_URL}/api/pet/swipe/temp-get-pets`,
-                    {
-                        method: "GET",
-                        credentials: "include",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Cache-Control": "no-cache",
-                        },
-                    },
-                );
-                if (res.status === 401) return router.push("/login");
-                else if (!res.ok) {
-                    alert(`HTTP error! status: ${res.status}`);
-                    router.push("/");
-                    return;
-                }
-                const data = await res.json();
-                setPets(data);
-                const initialIndices = {};
-                data.forEach((pet) => (initialIndices[pet.id] = 0));
-                setCurrentImageIndices(initialIndices);
-            } catch (err) {
-                console.error("Fetch pets error:", err);
+    const fetchPets = async () => {
+        try {
+            const res = await fetch(`${API_URL}/api/pet/swipe/temp-get-pets`, {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Cache-Control": "no-cache",
+                },
+            });
+            if (res.status === 401) return router.push("/login");
+            if (!res.ok) {
+                alert(`HTTP error! status: ${res.status}`);
+                router.push("/");
+                return;
             }
+            const data = await res.json();
+            setPets((prev) => [...prev, ...data]);
+            const newIndices = {};
+            data.forEach((pet) => (newIndices[pet.id] = 0));
+            setCurrentImageIndices((prev) => ({ ...prev, ...newIndices }));
+        } catch (err) {
+            console.error("Fetch pets error:", err);
         }
+    };
+
+    useEffect(() => {
         fetchPets();
     }, []);
 
@@ -99,6 +97,20 @@ export function SwipeComponent() {
     const handleSwipe = async (petId, liked) => {
         try {
             console.log(`Swiped ${liked ? "right" : "left"} on pet ${petId}`);
+            const response = await fetch(
+                `${API_URL}/api/pet/${liked ? "like" : "dislike"}-pet/${petId}`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Cache-Control": "no-cache",
+                    },
+                    body: JSON.stringify({ petId }),
+                },
+            );
+
+            console.log("Response status:", response.status);
         } catch (err) {
             console.error("Swipe error:", err);
         }
@@ -143,6 +155,10 @@ export function SwipeComponent() {
                     gone.clear();
                     api.start((i) => to(i));
                 }, 600);
+            }
+
+            if (!down && pets.length - gone.size <= 2) {
+                fetchPets();
             }
         },
     );
