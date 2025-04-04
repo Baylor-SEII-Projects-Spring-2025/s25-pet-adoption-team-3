@@ -81,8 +81,15 @@ export function SwipeComponent() {
         }
     };
 
+    // pos fix for Strict Mode causing useEffects to trigger twice in dev environments.
+    // how tf else are we supposed to have an async call that modifies data?????
+    // the greatest minds at facebook ladies/gents.
+    let initialized = false;
     useEffect(() => {
-        fetchPets();
+        if(!initialized){
+            initialized = true;
+            fetchPets();
+        }
     }, []);
 
     const [springs, api] = useSprings(pets.length || 0, (i) => ({
