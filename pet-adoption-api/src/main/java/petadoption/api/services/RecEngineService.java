@@ -3,24 +3,27 @@
 package petadoption.api.services;
 
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import petadoption.api.DTO.SwipePetDTO;
-import petadoption.api.models.Characteristic;
-import petadoption.api.models.Pet;
-import petadoption.api.models.User;
-import petadoption.api.models.Weight;
+import petadoption.api.models.*;
 import petadoption.api.repository.PetRepository;
 import petadoption.api.repository.UserRepository;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
 public class RecEngineService {
     private final UserRepository userRepository;
     private final PetRepository petRepository;
+    private static final Logger logger = LoggerFactory.getLogger(RecEngineService.class);
+
 
     @Autowired
     public RecEngineService(UserRepository userRepository, PetRepository petRepository) {
@@ -126,69 +129,66 @@ public class RecEngineService {
         return "Successfully disliked pet " + pet.getName();
     }
 
-    public double calculateScore(User user, Pet pet){
-        Map<Characteristic, Weight> weightMap = convertListToWeightMap(user.getWeights());
-        double score = 0;
-
-        for (Characteristic characteristic : pet.getPetCharacteristics()) {
-            Weight weight = weightMap.get(characteristic);
-            System.out.println("Map keys:");
-            for (Characteristic c : weightMap.keySet()) {
-                System.out.println("  -> " + c.getId());
-            }
-            System.out.println("Pet characteristics:");
-            for (Characteristic c : pet.getPetCharacteristics()) {
-                System.out.println("  -> " + c.getId());
-            }
-            System.out.println(characteristic.getId());
-            if (weight != null) {
-                System.out.println(weight.getWeight());
-                score += weight.getWeight();
-            }else {
-                System.out.println("Weight not found");
-                addWeight(user.getWeights(), characteristic);
-                score += 1;
-            }
-        }
-
-        deduplicateUserWeights(user);
-        return score / 100;
-    }
-
-    // Temp get swipe pets
-    @Transactional
-    public List<SwipePetDTO> getSwipePets(User userFromSession) {
+    public List<SwipePetDTO> getSwipePetsV2(User userFromSession){
         User user = userRepository.findById(userFromSession.getId()).orElseThrow(() -> new RuntimeException("User not found"));
-        List<Pet> pets = petRepository.getAllPets();
-        List<SwipePetDTO> swipePetDTOs = new ArrayList<>();
-        Map<Pet, Double> petScoreMap = new HashMap<>();
-        Set<Pet> alrRecPets = user.getRecommendedPets();
+        List<Pet> potentialRecs = petRepository.getAllPets();
 
-        if(alrRecPets == null){
-            alrRecPets = new HashSet<>();
-            user.setRecommendedPets(alrRecPets);
-        }
-
-        if(pets.size() == alrRecPets.size()){
-            alrRecPets.clear();
-        }
-
-        for(Pet pet : pets){
-            if(!alrRecPets.contains(pet)) {
-                petScoreMap.put(pet, calculateScore(user, pet));
+        // Filter out already reccomended pets
+        List<PetRecommendation> alreadyShownPets = user.getRecommendedPets();
+        logger.info("alrshown: "+alreadyShownPets.size()+" | total: "+potentialRecs.size());
+        potentialRecs = potentialRecs.stream().filter(p -> {
+            for(PetRecommendation pr : alreadyShownPets){
+                if(pr.getPet().equals(p))
+                    return false;
             }
+            return true;
+        }).toList();
+
+//        if(potentialRecs.isEmpty()){
+//            // TODO: Recs should be time based. This is a hack
+//            logger.info("Already recommended every possible pet to this user. Clearing previous recs");
+//            user.setRecommendedPets(new ArrayList<>());
+//        }
+
+        List<Pair<Double, Pet>> petScores = new ArrayList<>();
+        // Calculate scores.
+        for(Pet pet : potentialRecs){
+            double score = 0;
+            for(Characteristic ch : pet.getPetCharacteristics()){
+                List<Weight> results = user.getWeights().stream().filter(w -> w.getCharacteristic().equals(ch)).toList();
+                if(results.size() != 1)
+                    continue;
+                score += results.get(0).getWeight();
+            }
+
+            // Scores need to be normalized against the fact that some pets may have more listed traits than others.
+            // this makes score the avg of all the pet's characteristics
+            score /= pet.getPetCharacteristics().size();
+            petScores.add(Pair.of(score, pet));
         }
 
-        List<Map.Entry<Pet, Double>> sortedPetScores = petScoreMap.entrySet().stream().sorted(Map.Entry.comparingByValue()).toList();
-        for(Map.Entry<Pet, Double> pet : sortedPetScores.subList(0,5)) {
-            alrRecPets.add(pet.getKey());
-            SwipePetDTO swipePetDTO = new SwipePetDTO(pet.getKey());
-            swipePetDTOs.add(swipePetDTO);
-        }
-        userRepository.save(user);
+        // sort by scores
+        petScores.sort(Comparator.comparingDouble(Pair<Double, Pet>::getFirst));
 
-        return swipePetDTOs;
+        // pull out the winners
+        List<SwipePetDTO> finalPetRecs = new ArrayList<>();
+        for(int i = 0; i < petScores.size() && i < 5; i++){
+            Pet pet = petScores.get(i).getSecond();
+            finalPetRecs.add(new SwipePetDTO(pet));
+
+            // log the winners
+            PetRecommendation rec = new PetRecommendation();
+            rec.setPet(pet);
+            rec.setUser(user);
+            rec.setDate(new Date());
+            user.getRecommendedPets().add(rec);
+        }
+
+
+        this.userRepository.save(user);
+
+
+        return finalPetRecs;
+
     }
-
-    // TODO: RecEngine functions
 }

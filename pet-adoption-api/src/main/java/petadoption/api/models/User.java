@@ -52,7 +52,8 @@ public class User {
     private String website;
 
     @OneToMany(cascade = CascadeType.ALL)
-    private Set<Pet> recommendedPets;
+    @JoinColumn(name = "user_id")
+    private List<PetRecommendation> recommendedPets;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Pet> savedPets;

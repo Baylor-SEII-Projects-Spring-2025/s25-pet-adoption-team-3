@@ -4,6 +4,8 @@ import com.google.api.Http;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +40,8 @@ public class PetController {
     private final UserRepository userRepository;
     private final CharacteristicRepository CharacteristicRepository;
     private final CharacteristicRepository characteristicRepository;
+    private static final Logger logger = LoggerFactory.getLogger(PetService.class);
+
 
     @Autowired
     public PetController(PetService petService, PetRepository petRepository, SessionValidation sessionValidation, RecEngineService recEngineService, GCSStorageServicePets gcsStorageServicePets, UserRepository userRepository, CharacteristicRepository characteristicRepository) {
@@ -95,6 +99,10 @@ public class PetController {
 //        if (user == null) return ResponseEntity.status(401).body("No active session.");
 //        if (user.getRole() != User.Role.ADOPTION_CENTER) return ResponseEntity.status(403).body("Unauthorized action.");
         User user = userRepository.getOne(2L);
+        logger.info("adding pet "+petRequestDTO.getName());
+        for(Characteristic ch : petRequestDTO.getCharacteristics()){
+            logger.info("  - char "+ch.getId() + ": "+ch.getName());
+        }
         petService.addPet(user, petRequestDTO);
         return ResponseEntity.status(201).body(petRequestDTO.getName() + " was successfully added.");
     }
@@ -230,6 +238,6 @@ public class PetController {
         }
         User user = (User) validationResponse.getBody();
 
-        return ResponseEntity.status(200).body(recEngineService.getSwipePets(user));
+        return ResponseEntity.status(200).body(recEngineService.getSwipePetsV2(user));
     }
 }
