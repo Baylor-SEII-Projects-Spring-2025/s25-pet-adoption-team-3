@@ -21,5 +21,6 @@ public class Weight {
     private User user;
 
     @OneToOne
+    @JoinColumn(name = "characterstic_characteristic_id", unique = true)
     private Characteristic characteristic;
 }
