@@ -125,6 +125,7 @@ export default function ProfileDashboardComponent() {
                 return;
             } else if (fetchedUser.role !== "ADOPTION_CENTER") {
                 Router.push("/");
+                return;
             }
 
             setUser(fetchedUser);
@@ -529,6 +530,7 @@ export default function ProfileDashboardComponent() {
             setWebsiteLink(user.website || "");
             setBio(user.bio || "");
             setPhoneNumber(user.phoneNumber || "");
+            setAddress(user.address || "");
         }
     }, [user]);
 
@@ -752,7 +754,7 @@ export default function ProfileDashboardComponent() {
                     </div>
                 </div>
 
-            <div className={styles.divider}></div>
+                <div className={styles.divider}></div>
 
                 <div className={styles.profileRightSection}>
                     <div className={styles.profileNavbarRight}>
