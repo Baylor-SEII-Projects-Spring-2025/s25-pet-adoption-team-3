@@ -12,6 +12,7 @@ import petadoption.api.models.Pet;
 import petadoption.api.models.User;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -39,6 +40,8 @@ public class SwipePetDTO {
 
     private String breed;
 
+    private List<String> characteristics;
+
     public SwipePetDTO(Pet pet) {
         this.id = pet.getId();
         this.name = pet.getName();
@@ -53,6 +56,10 @@ public class SwipePetDTO {
         this.adoptionCenterName = pet.getAdoptionCenter().getAdoptionCenterName();
         this.location = "placeholder";
         this.breed = pet.getBreed();
+        this.characteristics = new ArrayList<>();
+        for(Characteristic ch : pet.getPetCharacteristics()){
+            this.characteristics.add(ch.getName());
+        }
     }
 
 }
