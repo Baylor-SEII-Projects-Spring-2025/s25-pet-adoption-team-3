@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSprings, animated } from "react-spring";
 import { useDrag } from "react-use-gesture";
 import styles from "@/styles/SwipeComponent.module.css";
@@ -15,6 +15,7 @@ export function SwipeComponent() {
     const [user, setUser] = useState(null);
     const router = useRouter();
     const [currentImageIndices, setCurrentImageIndices] = useState({});
+    const swipedPetIds = useRef(new Set());
 
     const navigateImage = (petId, direction) => {
         setCurrentImageIndices((prev) => {
@@ -72,9 +73,28 @@ export function SwipeComponent() {
                 return;
             }
             const data = await res.json();
-            setPets((prev) => [...prev, ...data]);
+            console.log("Fetched pets:", data);
+
+            // Filter out any pets that have already been swiped by ID
+            const filteredPets = data.filter(
+                (pet) => !swipedPetIds.current.has(pet.id),
+            );
+            console.log(
+                "Filtered pets (removing already swiped):",
+                filteredPets,
+            );
+
+            // Get pets that haven't been swiped yet
+            const remainingPets = pets.filter((_, i) => !gone.has(i));
+
+            // Set the new pets array
+            setPets([...remainingPets, ...filteredPets]);
+
+            // Reset the gone set since we're rebuilding the array
+            gone.clear();
+
             const newIndices = {};
-            data.forEach((pet) => (newIndices[pet.id] = 0));
+            filteredPets.forEach((pet) => (newIndices[pet.id] = 0));
             setCurrentImageIndices((prev) => ({ ...prev, ...newIndices }));
         } catch (err) {
             console.error("Fetch pets error:", err);
@@ -173,7 +193,7 @@ export function SwipeComponent() {
     const handleCarouselClick = (e) => e.stopPropagation();
 
     if (pets.length === 0)
-        return <div className={styles.loading}>Loading pets...</div>;
+        return <div className={styles.loading}>No more pets</div>;
 
     return (
         <div className={styles.swipeContainer}>

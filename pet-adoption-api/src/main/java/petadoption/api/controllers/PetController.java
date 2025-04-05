@@ -25,6 +25,7 @@ import petadoption.api.services.RecEngineService;
 import petadoption.api.services.SessionValidation;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -90,7 +91,11 @@ public class PetController {
             if(ch.isEmpty()){
                 return ResponseEntity.status(400).body("Invalid characteristic: "+chStr);
             }
+            if (petRequestDTO.getCharacteristics() == null) {
+                petRequestDTO.setCharacteristics(new ArrayList<>());
+            }
             petRequestDTO.getCharacteristics().add(ch.get());
+
         }
 
         Pet pet = petService.addPetWithImages(user, petRequestDTO, files);
