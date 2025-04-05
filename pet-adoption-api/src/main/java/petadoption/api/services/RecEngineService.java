@@ -115,7 +115,7 @@ public class RecEngineService {
         logger.info("alrshown: "+alreadyShownPets.size()+" | total: "+potentialRecs.size());
         potentialRecs = potentialRecs.stream().filter(p -> {
             for(PetRecommendation pr : alreadyShownPets){
-                if(pr.getPet().equals(p))
+                if(pr.getPet().getId() == p.getId())
                     return false;
             }
             return true;
