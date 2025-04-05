@@ -107,7 +107,7 @@ public class PetController {
 //        User user = (User) session.getAttribute("user");
 //        if (user == null) return ResponseEntity.status(401).body("No active session.");
 //        if (user.getRole() != User.Role.ADOPTION_CENTER) return ResponseEntity.status(403).body("Unauthorized action.");
-        User user = userRepository.getOne(2L);
+        User user = userRepository.getOne(1L);
         logger.info("adding pet "+petRequestDTO.getName());
         for(Characteristic ch : petRequestDTO.getCharacteristics()){
             logger.info("  - char "+ch.getId() + ": "+ch.getName());

@@ -1,63 +1,39 @@
-Fluffy
-Short-haired
-Long-haired
-Curly-haired
-Wavy coat
-Sleek coat
-Shiny coat
-Thick coat
-Thin coat
-Double-coated
-Smooth coat
-Spotted
-Striped
-Solid-colored
-Multicolored
-Brindle
-Tri-colored
-Bicolor
-Fur pattern
-Mottled
-Feathery tail
-Bushy tail
-Short tail
+Short fur
+Medium fur
+Long fur
+Curly fur
+Wavy fur
+Straight fur
+Hairless fur
+Double coat fur
+Silky fur
+Wiry fur
 Long tail
-Pointed ears
+Short tail
+Docked tail
+Bobtail
+Curled tail
+Straight tail
+Plumed tail
+Whip-like tail
+Kinked tail
+Tufted tip tail
+Erect ears
+Droopy ears
+Semi-erect ears
+Folded ears
 Floppy ears
-Small-sized
-Medium-sized
-Large-sized
-Stocky build
-Lean build
-Muscular
-Chubby
-Sleek physique
-Graceful
+Feathered ears
+Bat ears
+Cropped ears
+Tufted ears
+Button ears
+Lean body
+Muscular body
+Stocky body
+Slender body
 Compact body
-Tall
-Broad-shouldered
-Round face
-Square face
-Flat-faced
-Snout
-Large paws
-Small paws
-Big eyes
-Bright eyes
-Almond-shaped eyes
-Round eyes
-Light-colored eyes
-Dark-colored eyes
-Shiny nose
-Pink nose
-Black nose
-Wet nose
-Chiseled features
-Puffy cheeks
-Big ears
-Short legs
-Long legs
-Long neck
-Short neck
-Rough coat
-Soft coat
+Elongated body
+Cobby body
+Athletic body
+Heavy-boned body
