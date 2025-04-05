@@ -16,6 +16,10 @@ public class Weight {
 
     private Integer weight;
 
+    @ManyToOne()
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @OneToOne
     private Characteristic characteristic;
 }

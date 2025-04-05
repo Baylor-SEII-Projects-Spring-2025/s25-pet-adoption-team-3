@@ -38,11 +38,12 @@ public class RecEngineService {
         weights.add(weight);
     }
 
-    public void addWeight(List<Weight> weights, Characteristic characteristic, boolean liked){
+    public void addWeight(Characteristic characteristic, boolean liked, User user){
         Weight weight = new Weight();
         weight.setCharacteristic(characteristic);
         weight.setWeight(liked ? 2 : -1); // if liked, 2 and if disliked, -1
-        weights.add(weight);
+        weight.setUser(user);
+        user.getWeights().add(weight);
     }
 
     public Map<Characteristic, Weight> convertListToWeightMap(List<Weight> weights) {
@@ -54,76 +55,52 @@ public class RecEngineService {
                 ));
     }
 
-    public void deduplicateUserWeights(User user) {
-        Map<Characteristic, Weight> weightMap = convertListToWeightMap(user.getWeights());
-        user.setWeights(new ArrayList<>(weightMap.values()));
-    }
 
     @Transactional
-    public String likePet(User user, Optional<Pet> petDetail) {
+    public String likePet(User userFromSession, Optional<Pet> petDetail) {
+        User user = userRepository.findById(userFromSession.getId()).orElseThrow(() -> new RuntimeException("User not found"));
+
         if (petDetail.isEmpty()) {
             return "Error: Pet not found";
         }
 
         Pet pet = petDetail.get();
-        List<Weight> userWeights = user.getWeights();
-
-        Map<Characteristic, Weight> weightMap = convertListToWeightMap(userWeights);
-
-        /*
-        System.out.println("printing user weights");
-        user.getWeights().forEach(System.out::println);
-
-        System.out.println("printing pet chars");
-        pet.getPetCharacteristics().forEach(System.out::println);
-        */
 
         for (Characteristic characteristic : pet.getPetCharacteristics()) {
-            Weight weight = weightMap.get(characteristic);
-            if (weight != null) {
+            List<Weight> wlist = user.getWeights().stream().filter(e -> e.getCharacteristic().equals(characteristic)).toList();
+
+            if (!wlist.isEmpty()) {
+                Weight weight = wlist.getFirst();
                 weight.setWeight(weight.getWeight() + 1);
             } else {
-                addWeight(userWeights, characteristic, true);
+                addWeight(characteristic, true, user);
             }
         }
 
-        //System.out.println("printing weights");
-        //user.getWeights().forEach(System.out::println);
-
-        deduplicateUserWeights(user);
         userRepository.save(user);
         return "Successfully liked pet " + pet.getName();
     }
     @Transactional
-    public String dislikePet(User user, Optional<Pet> petDetail) {
+    public String dislikePet(User userFromSession, Optional<Pet> petDetail) {
+        User user = userRepository.findById(userFromSession.getId()).orElseThrow(() -> new RuntimeException("User not found"));
+
         if (petDetail.isEmpty()) {
             return "Error: Pet not found";
         }
 
         Pet pet = petDetail.get();
-        List<Weight> userWeights = user.getWeights();
-
-        Map<Characteristic, Weight> weightMap = convertListToWeightMap(userWeights);
-
-        /*
-        System.out.println("printing user weights");
-        user.getWeights().forEach(System.out::println);
-
-        System.out.println("printing pet chars");
-        pet.getPetCharacteristics().forEach(System.out::println);
-        */
 
         for (Characteristic characteristic : pet.getPetCharacteristics()) {
-            Weight weight = weightMap.get(characteristic);
-            if (weight != null) {
+            List<Weight> wlist = user.getWeights().stream().filter(e -> e.getCharacteristic().equals(characteristic)).toList();
+
+            if (!wlist.isEmpty()) {
+                Weight weight = wlist.getFirst();
                 weight.setWeight(weight.getWeight() - 1);
             } else {
-                addWeight(userWeights, characteristic, false);
+                addWeight(characteristic, false, user);
+                logger.info("char: "+characteristic.getName()+" - wgt: <didn't exist>");
             }
         }
-
-        //System.out.println("printing weights");
-        //user.getWeights().forEach(System.out::println);
 
         userRepository.save(user);
         return "Successfully disliked pet " + pet.getName();
