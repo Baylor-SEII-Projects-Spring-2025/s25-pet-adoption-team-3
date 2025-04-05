@@ -6,6 +6,7 @@ import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Router from "next/router";
+import Loading from "../adoption-center/Loading";
 import styles from "@/styles/ProfileDashboardComponent.module.css";
 
 const style = {
@@ -27,6 +28,7 @@ export default function ProfileDashboardComponent() {
     const [user, setUser] = useState(null);
     const [uploadError, setUploadError] = useState("");
     const anchorRef = useRef(null);
+    const [isPageLoading, setIsPageLoading] = useState(true);
 
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
@@ -56,6 +58,7 @@ export default function ProfileDashboardComponent() {
             const data = await response.json();
             console.log("✅ Session refreshed:", data);
             setUser(data.user);
+        setIsPageLoading(false);
         } catch (error) {
             console.error("Error fetching session:", error);
             alert(
@@ -246,6 +249,7 @@ export default function ProfileDashboardComponent() {
         setIsUpdated(false);
     };
 
+    if (isPageLoading) return <Loading />;
     return (
         <div className={styles.container}>
             <div className={styles.profileLeftSection}>
