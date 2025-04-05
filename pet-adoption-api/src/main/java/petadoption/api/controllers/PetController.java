@@ -56,7 +56,7 @@ public class PetController {
     }
 
     @PostMapping("/add-pet-with-images")
-    public ResponseEntity<PetRequestDTO> addPetWithImages(
+    public ResponseEntity<?> addPetWithImages(
             HttpSession session,
             @RequestParam("name") String name,
             @RequestParam("breed") String breed,
@@ -66,7 +66,8 @@ public class PetController {
             @RequestParam("extra1") String extra1,
             @RequestParam("extra2") String extra2,
             @RequestParam("extra3") String extra3,
-            @RequestParam("files") MultipartFile[] files) {
+            @RequestParam("files") MultipartFile[] files,
+            @RequestParam("characteristics") List<String> characteristics){
 
         ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
         if (!validationResponse.getStatusCode().is2xxSuccessful()) {
@@ -83,6 +84,14 @@ public class PetController {
         petRequestDTO.setExtra1(extra1);
         petRequestDTO.setExtra2(extra2);
         petRequestDTO.setExtra3(extra3);
+
+        for(String chStr : characteristics){
+            Optional<Characteristic> ch = characteristicRepository.findByName(chStr);
+            if(ch.isEmpty()){
+                return ResponseEntity.status(400).body("Invalid characteristic: "+chStr);
+            }
+            petRequestDTO.getCharacteristics().add(ch.get());
+        }
 
         Pet pet = petService.addPetWithImages(user, petRequestDTO, files);
 
