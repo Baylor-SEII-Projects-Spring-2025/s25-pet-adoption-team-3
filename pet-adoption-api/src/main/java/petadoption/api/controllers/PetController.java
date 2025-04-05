@@ -240,4 +240,12 @@ public class PetController {
 
         return ResponseEntity.status(200).body(recEngineService.getSwipePetsV2(user));
     }
+
+    @GetMapping("characteristics")
+    public ResponseEntity<List<String>> getCharacteristics(){
+        List<Characteristic> chars = characteristicRepository.getAll();
+        List<String> charStrings = chars.stream().map(Characteristic::getName).toList();
+
+        return ResponseEntity.status(200).body(charStrings);
+    }
 }
