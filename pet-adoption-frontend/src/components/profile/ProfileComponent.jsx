@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, Suspense } from "react";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -6,6 +6,7 @@ import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Router from "next/router";
+import Loading from "@/components/profile/Loading";
 import styles from "@/styles/ProfileDashboardComponent.module.css";
 
 const style = {
@@ -27,6 +28,7 @@ export default function ProfileDashboardComponent() {
     const [user, setUser] = useState(null);
     const [uploadError, setUploadError] = useState("");
     const anchorRef = useRef(null);
+    const [isPageLoading, setIsPageLoading] = useState(true);
 
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
@@ -46,37 +48,42 @@ export default function ProfileDashboardComponent() {
                     "Cache-Control": "no-cache",
                 },
             });
-
+    
             if (response.status === 401) {
                 console.warn("No active session.");
                 Router.push("/login");
                 return;
             }
-
+    
             if (!response.ok) {
+                alert("⚠️ Failed to load user session. Please refresh or log in again.");
                 throw new Error("Error fetching session");
             }
-
+    
             const data = await response.json();
-            console.log("✅ Session refreshed:", data);
-            setUser(data.user);
+            console.log("User session data:", data);
+    
+            const fetchedUser = data.user;
+    
+            if (fetchedUser.role === "ADOPTION_CENTER") {
+                Router.push("/adoption-center/dashboard");
+                return;
+            } else if (fetchedUser.role !== "ADOPTER") {
+                Router.push("/");
+                return;
+            }
+    
+            setUser(fetchedUser);
+            setIsPageLoading(false);
         } catch (error) {
             console.error("Error fetching session:", error);
-            alert(
-                "⚠️ Failed to fetch your session. Please refresh or log in again.",
-            );
+            alert("❌ Error fetching session.");
         }
     };
-
+    
     useEffect(() => {
         fetchUserSession();
     }, []);
-
-    useEffect(() => {
-        if (user && user.role === "ADOPTION_CENTER") {
-            Router.push("/adoption-center/dashboard");
-        }
-    }, [user]);
 
     const handleDeletePhoto = async () => {
         try {
@@ -250,8 +257,10 @@ export default function ProfileDashboardComponent() {
         setIsUpdated(false);
     };
 
+    if (isPageLoading) return <Loading />;
     return (
-        <div className={styles.container}>
+        <Suspense fallback={<Loading />}>
+            <div className={styles.container}>
             <div className={styles.profileLeftSection}>
                 <div className={styles.profileNavbarLeft}>
                     <h1>{selectedNav}</h1>
@@ -692,5 +701,6 @@ export default function ProfileDashboardComponent() {
                 </div>
             </div>
         </div>
+        </Suspense>
     );
 }
