@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -54,13 +57,14 @@ public class User {
     private String website;
 
     @OneToMany(cascade = CascadeType.ALL)
-    private List<Pet> recommendedPets;
+    @JoinColumn(name = "user_id")
+    private List<PetRecommendation> recommendedPets;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Pet> savedPets;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Weight> weights;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
+    private Set<Weight> weights = new HashSet<>();
 
     public enum Role {
         ADOPTER,

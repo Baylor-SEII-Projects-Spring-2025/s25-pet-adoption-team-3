@@ -48,23 +48,23 @@ export default function ProfileDashboardComponent() {
                     "Cache-Control": "no-cache",
                 },
             });
-    
+
             if (response.status === 401) {
                 console.warn("No active session.");
                 Router.push("/login");
                 return;
             }
-    
+
             if (!response.ok) {
                 alert("⚠️ Failed to load user session. Please refresh or log in again.");
                 throw new Error("Error fetching session");
             }
-    
+
             const data = await response.json();
             console.log("User session data:", data);
-    
+
             const fetchedUser = data.user;
-    
+
             if (fetchedUser.role === "ADOPTION_CENTER") {
                 Router.push("/adoption-center/dashboard");
                 return;
@@ -72,15 +72,17 @@ export default function ProfileDashboardComponent() {
                 Router.push("/");
                 return;
             }
-    
+
             setUser(fetchedUser);
             setIsPageLoading(false);
         } catch (error) {
             console.error("Error fetching session:", error);
-            alert("❌ Error fetching session.");
+            alert(
+                "⚠️ Failed to fetch your session. Please refresh or log in again.",
+            );
         }
     };
-    
+
     useEffect(() => {
         fetchUserSession();
     }, []);

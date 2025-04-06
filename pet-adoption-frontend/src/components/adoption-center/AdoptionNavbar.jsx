@@ -34,10 +34,6 @@ export default function AdoptionNavbar() {
                 return;
             }
 
-            if (!response.ok) {
-                throw new Error("Error fetching session");
-            }
-
             const data = await response.json();
             setUser(data.user);
 

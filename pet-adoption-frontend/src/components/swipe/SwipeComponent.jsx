@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Suspense } from "react";
+import React, { useEffect, useState, useRef, Suspense } from "react";
 import { useSprings, animated } from "react-spring";
 import { useDrag } from "react-use-gesture";
 import styles from "@/styles/SwipeComponent.module.css";
@@ -13,8 +13,10 @@ const from = (i) => ({ x: 0, y: i * -4, scale: 1 });
 export function SwipeComponent() {
     const [pets, setPets] = useState([]);
     const [gone] = useState(() => new Set());
+    const [user, setUser] = useState(null);
     const router = useRouter();
     const [currentImageIndices, setCurrentImageIndices] = useState({});
+    const swipedPetIds = useRef(new Set());
     const [isPageLoading, setIsPageLoading] = useState(true);
 
     const navigateImage = (petId, direction) => {
@@ -33,6 +35,29 @@ export function SwipeComponent() {
         });
     };
 
+    const fetchUserSession = async () => {
+        try {
+            const response = await fetch(`${API_URL}/auth/session`, {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Cache-Control": "no-cache",
+                },
+            });
+            if (response.status === 401) return router.push("/login");
+            if (!response.ok) throw new Error("Error fetching session");
+            const data = await response.json();
+            setUser(data.user);
+        } catch (err) {
+            console.error("Session fetch error:", err);
+        }
+    };
+
+    useEffect(() => {
+        if (!user) fetchUserSession();
+    }, []);
+
     const fetchPets = async () => {
         try {
             const res = await fetch(`${API_URL}/api/pet/swipe/temp-get-pets`, {
@@ -44,59 +69,50 @@ export function SwipeComponent() {
                 },
             });
             if (res.status === 401) return router.push("/login");
-            else if (!res.ok) {
+            if (!res.ok) {
                 alert(`HTTP error! status: ${res.status}`);
                 router.push("/");
                 return;
             }
             const data = await res.json();
-            setPets(data);
-            const initialIndices = {};
-            data.forEach((pet) => (initialIndices[pet.id] = 0));
-            setCurrentImageIndices(initialIndices);
+            console.log("Fetched pets:", data);
+
+            // Filter out any pets that have already been swiped by ID
+            const filteredPets = data.filter(
+                (pet) => !swipedPetIds.current.has(pet.id),
+            );
+            console.log(
+                "Filtered pets (removing already swiped):",
+                filteredPets,
+            );
+
+            // Get pets that haven't been swiped yet
+            const remainingPets = pets.filter((_, i) => !gone.has(i));
+
+            // Set the new pets array
+            setPets([...remainingPets, ...filteredPets]);
+            setIsPageLoading(false);
+
+            // Reset the gone set since we're rebuilding the array
+            gone.clear();
+
+            const newIndices = {};
+            filteredPets.forEach((pet) => (newIndices[pet.id] = 0));
+            setCurrentImageIndices((prev) => ({ ...prev, ...newIndices }));
         } catch (err) {
             console.error("Fetch pets error:", err);
         }
     };
 
+    // pos fix for Strict Mode causing useEffects to trigger twice in dev environments.
+    // how tf else are we supposed to have an async call that modifies data?????
+    // the greatest minds at facebook ladies/gents.
+    let initialized = false;
     useEffect(() => {
-        const initialize = async () => {
-            try {
-                // Fetch user session first
-                const response = await fetch(`${API_URL}/auth/session`, {
-                    method: "GET",
-                    credentials: "include",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Cache-Control": "no-cache",
-                    },
-                });
-
-                if (response.status === 401) return router.push("/login");
-                if (!response.ok) {
-                    console.log("Error fetching session");
-                    return;
-                }
-
-                const data = await response.json();
-
-                if (data.user.role === "ADOPTION_CENTER") {
-                    return router.push("/adoption-center/dashboard");
-                }
-
-                // Now that we have the user, fetch pets if role is ADOPTER
-                if (data.user.role === "ADOPTER") {
-                    await fetchPets();
-                }
-
-                // Set loading state to false after fetching
-                setIsPageLoading(false);
-            } catch (err) {
-                console.error("Session fetch error:", err);
-            }
-        };
-
-        initialize();
+        if(!initialized){
+            initialized = true;
+            fetchPets();
+        }
     }, []);
 
     const [springs, api] = useSprings(pets.length || 0, (i) => ({
@@ -111,6 +127,20 @@ export function SwipeComponent() {
     const handleSwipe = async (petId, liked) => {
         try {
             console.log(`Swiped ${liked ? "right" : "left"} on pet ${petId}`);
+            const response = await fetch(
+                `${API_URL}/api/pet/${liked ? "like" : "dislike"}-pet/${petId}`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Cache-Control": "no-cache",
+                    },
+                    body: JSON.stringify({ petId }),
+                },
+            );
+
+            console.log("Response status:", response.status);
         } catch (err) {
             console.error("Swipe error:", err);
         }
@@ -156,6 +186,10 @@ export function SwipeComponent() {
                     api.start((i) => to(i));
                 }, 600);
             }
+
+            if (!down && pets.length - gone.size <= 2) {
+                fetchPets();
+            }
         },
     );
 
@@ -164,6 +198,8 @@ export function SwipeComponent() {
     if (isPageLoading) {
         return <Loading />;
     }
+    if (pets.length === 0)
+        return <div className={styles.loading}>No more pets</div>;
 
     return (
         <Suspense fallback={<Loading />}>

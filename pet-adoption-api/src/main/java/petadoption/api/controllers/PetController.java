@@ -4,6 +4,8 @@ import com.google.api.Http;
 import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ import petadoption.api.services.RecEngineService;
 import petadoption.api.services.SessionValidation;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +41,8 @@ public class PetController {
     private final UserRepository userRepository;
     private final CharacteristicRepository CharacteristicRepository;
     private final CharacteristicRepository characteristicRepository;
+    private static final Logger logger = LoggerFactory.getLogger(PetService.class);
+
 
     @Autowired
     public PetController(PetService petService, PetRepository petRepository, SessionValidation sessionValidation, RecEngineService recEngineService, GCSStorageServicePets gcsStorageServicePets, UserRepository userRepository, CharacteristicRepository characteristicRepository) {
@@ -52,7 +57,7 @@ public class PetController {
     }
 
     @PostMapping("/add-pet-with-images")
-    public ResponseEntity<PetRequestDTO> addPetWithImages(
+    public ResponseEntity<?> addPetWithImages(
             HttpSession session,
             @RequestParam("name") String name,
             @RequestParam("breed") String breed,
@@ -62,7 +67,8 @@ public class PetController {
             @RequestParam("extra1") String extra1,
             @RequestParam("extra2") String extra2,
             @RequestParam("extra3") String extra3,
-            @RequestParam("files") MultipartFile[] files) {
+            @RequestParam("files") MultipartFile[] files,
+            @RequestParam("characteristics") List<String> characteristics){
 
         ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
         if (!validationResponse.getStatusCode().is2xxSuccessful()) {
@@ -80,6 +86,18 @@ public class PetController {
         petRequestDTO.setExtra2(extra2);
         petRequestDTO.setExtra3(extra3);
 
+        for(String chStr : characteristics){
+            Optional<Characteristic> ch = characteristicRepository.findByName(chStr);
+            if(ch.isEmpty()){
+                return ResponseEntity.status(400).body("Invalid characteristic: "+chStr);
+            }
+            if (petRequestDTO.getCharacteristics() == null) {
+                petRequestDTO.setCharacteristics(new ArrayList<>());
+            }
+            petRequestDTO.getCharacteristics().add(ch.get());
+
+        }
+
         Pet pet = petService.addPetWithImages(user, petRequestDTO, files);
 
         if(pet == null) {
@@ -91,11 +109,14 @@ public class PetController {
 
     @PostMapping("/add-pet")
     public ResponseEntity<String> addPet(HttpSession session, @RequestBody @Valid PetRequestDTO petRequestDTO) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) return ResponseEntity.status(401).body("No active session.");
-        if (user.getRole() != User.Role.ADOPTION_CENTER) return ResponseEntity.status(403).body("Unauthorized action.");
-        //User user = userRepository.getOne(1L);
-
+//        User user = (User) session.getAttribute("user");
+//        if (user == null) return ResponseEntity.status(401).body("No active session.");
+//        if (user.getRole() != User.Role.ADOPTION_CENTER) return ResponseEntity.status(403).body("Unauthorized action.");
+        User user = userRepository.getOne(1L);
+        logger.info("adding pet "+petRequestDTO.getName());
+        for(Characteristic ch : petRequestDTO.getCharacteristics()){
+            logger.info("  - char "+ch.getId() + ": "+ch.getName());
+        }
         petService.addPet(user, petRequestDTO);
         return ResponseEntity.status(201).body(petRequestDTO.getName() + " was successfully added.");
     }
@@ -231,6 +252,14 @@ public class PetController {
         }
         User user = (User) validationResponse.getBody();
 
-        return ResponseEntity.status(200).body(recEngineService.getPets(user));
+        return ResponseEntity.status(200).body(recEngineService.getSwipePetsV2(user));
+    }
+
+    @GetMapping("characteristics")
+    public ResponseEntity<List<String>> getCharacteristics(){
+        List<Characteristic> chars = characteristicRepository.getAll();
+        List<String> charStrings = chars.stream().map(Characteristic::getName).toList();
+
+        return ResponseEntity.status(200).body(charStrings);
     }
 }

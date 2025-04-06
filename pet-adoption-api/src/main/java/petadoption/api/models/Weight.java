@@ -10,11 +10,15 @@ import lombok.Setter;
 public class Weight {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "weight_id")
     private Long id;
 
     private Integer weight;
+
+    @ManyToOne()
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @OneToOne
     private Characteristic characteristic;

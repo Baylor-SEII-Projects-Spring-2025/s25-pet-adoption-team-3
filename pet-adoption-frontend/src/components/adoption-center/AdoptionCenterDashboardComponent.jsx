@@ -38,6 +38,56 @@ const petStatuses = [
     "Unneutered Male",
 ];
 
+const furTypes = [
+    "Short fur",
+    "Medium fur",
+    "Long fur",
+    "Curly fur",
+    "Wavy fur",
+    "Straight fur",
+    "Hairless fur",
+    "Double coat fur",
+    "Silky fur",
+    "Wiry fur",
+];
+
+const tailTypes = [
+    "Short tail",
+    "Docked tail",
+    "Bobtail",
+    "Curled tail",
+    "Straight tail",
+    "Plumed tail",
+    "Whip-like tail",
+    "Kinked tail",
+    "Tufted tip tail",
+];
+
+const earTypes = [
+    "Erect ears",
+    "Droopy ears",
+    "Semi-erect ears",
+    "Folded ears",
+    "Floppy ears",
+    "Feathered ears",
+    "Bat ears",
+    "Cropped ears",
+    "Tufted ears",
+    "Button ears",
+];
+
+const bodyTypes = [
+    "Lean body",
+    "Muscular body",
+    "Stocky body",
+    "Slender body",
+    "Compact body",
+    "Elongated body",
+    "Cobby body",
+    "Athletic body",
+    "Heavy - boned body",
+];
+
 const initialPetData = {
     images: [null, null, null, null],
     name: "",
@@ -298,6 +348,17 @@ export default function ProfileDashboardComponent() {
             formData.append("extra1", petData.extra1);
             formData.append("extra2", petData.extra2);
             formData.append("extra3", petData.extra3);
+
+            const characteristics = [
+                petData.furType,
+                petData.tailType,
+                petData.earType,
+                petData.bodyType,
+            ];
+
+            characteristics.forEach((ch) => {
+                formData.append("characteristics", ch);
+            });
 
             for (let [key, value] of formData.entries()) {
                 console.log(`${key}:`, value);
@@ -1154,6 +1215,138 @@ export default function ProfileDashboardComponent() {
                                                                     }}
                                                                 />
                                                             </LocalizationProvider>
+                                                            <TextField
+                                                                select
+                                                                label="Fur Type"
+                                                                name="furType"
+                                                                value={
+                                                                    petData.furType
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                sx={{ mb: 2 }}
+                                                            >
+                                                                {furTypes.map(
+                                                                    (
+                                                                        furType,
+                                                                    ) => (
+                                                                        <MenuItem
+                                                                            key={
+                                                                                furType
+                                                                            }
+                                                                            value={
+                                                                                furType
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                furType
+                                                                            }
+                                                                        </MenuItem>
+                                                                    ),
+                                                                )}
+                                                            </TextField>
+                                                            <TextField
+                                                                select
+                                                                label="Tail Type"
+                                                                name="tailType"
+                                                                value={
+                                                                    petData.tailType
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                sx={{ mb: 2 }}
+                                                            >
+                                                                {tailTypes.map(
+                                                                    (
+                                                                        tailType,
+                                                                    ) => (
+                                                                        <MenuItem
+                                                                            key={
+                                                                                tailType
+                                                                            }
+                                                                            value={
+                                                                                tailType
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                tailType
+                                                                            }
+                                                                        </MenuItem>
+                                                                    ),
+                                                                )}
+                                                            </TextField>
+                                                            <TextField
+                                                                select
+                                                                label="Ear Type"
+                                                                name="earType"
+                                                                value={
+                                                                    petData.earType
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                sx={{ mb: 2 }}
+                                                            >
+                                                                {earTypes.map(
+                                                                    (
+                                                                        earType,
+                                                                    ) => (
+                                                                        <MenuItem
+                                                                            key={
+                                                                                earType
+                                                                            }
+                                                                            value={
+                                                                                earType
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                earType
+                                                                            }
+                                                                        </MenuItem>
+                                                                    ),
+                                                                )}
+                                                            </TextField>
+                                                            <TextField
+                                                                select
+                                                                label="Body Type"
+                                                                name="bodyType"
+                                                                value={
+                                                                    petData.bodyType
+                                                                }
+                                                                onChange={
+                                                                    handleChange
+                                                                }
+                                                                fullWidth
+                                                                required
+                                                                sx={{ mb: 2 }}
+                                                            >
+                                                                {bodyTypes.map(
+                                                                    (
+                                                                        bodyType,
+                                                                    ) => (
+                                                                        <MenuItem
+                                                                            key={
+                                                                                bodyType
+                                                                            }
+                                                                            value={
+                                                                                bodyType
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                bodyType
+                                                                            }
+                                                                        </MenuItem>
+                                                                    ),
+                                                                )}
+                                                            </TextField>
                                                             <TextField
                                                                 label="About Me"
                                                                 name="aboutMe"

@@ -33,6 +33,6 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
     @Query(value = "SELECT image_url FROM pet_images WHERE pet_id = :petId", nativeQuery = true)
     List<String> findImagesByPetId(@Param("petId") Long petId);
 
-    @Query("SELECT p FROM Pet p ORDER BY p.id LIMIT 5")
-    List<Pet> getFivePets();
+    @Query("SELECT p FROM Pet p")
+    List<Pet> getAllPets();
 }
