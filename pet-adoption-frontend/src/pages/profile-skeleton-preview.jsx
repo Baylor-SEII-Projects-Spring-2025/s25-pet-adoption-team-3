@@ -1,5 +1,5 @@
 import React from "react";
-import ProfileSkeleton from "@/components/loading/ProfileSkeleton";
+import ProfileSkeleton from "@/components/profile/Loading";
 
 export default function ProfileSkeletonPreview() {
     return (

@@ -6,7 +6,7 @@ import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Router from "next/router";
-import Loading from "../adoption-center/Loading";
+import Loading from "@/components/profile/Loading";
 import styles from "@/styles/ProfileDashboardComponent.module.css";
 import { Suspense } from "react";
 
@@ -257,7 +257,7 @@ export default function ProfileDashboardComponent() {
 
     if (isPageLoading) return <Loading />;
     return (
-        <Suspense fallback = {styles.container}>
+        <Suspense fallback={<Loading />}>
             <div className={styles.container}>
             <div className={styles.profileLeftSection}>
                 <div className={styles.profileNavbarLeft}>
