@@ -75,9 +75,29 @@ export function SwipeComponent() {
                 return;
             }
             const data = await res.json();
-            setPets((prev) => [...prev, ...data]);
+            console.log("Fetched pets:", data);
+
+            // Filter out any pets that have already been swiped by ID
+            const filteredPets = data.filter(
+                (pet) => !swipedPetIds.current.has(pet.id),
+            );
+            console.log(
+                "Filtered pets (removing already swiped):",
+                filteredPets,
+            );
+
+            // Get pets that haven't been swiped yet
+            const remainingPets = pets.filter((_, i) => !gone.has(i));
+
+            // Set the new pets array
+            setPets([...remainingPets, ...filteredPets]);
+            setIsPageLoading(false);
+
+            // Reset the gone set since we're rebuilding the array
+            gone.clear();
+
             const newIndices = {};
-            data.forEach((pet) => (newIndices[pet.id] = 0));
+            filteredPets.forEach((pet) => (newIndices[pet.id] = 0));
             setCurrentImageIndices((prev) => ({ ...prev, ...newIndices }));
         } catch (err) {
             console.error("Fetch pets error:", err);
