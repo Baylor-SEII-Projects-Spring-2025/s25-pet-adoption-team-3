@@ -75,6 +75,18 @@ export default function ProfileDashboardComponent() {
     
             setUser(fetchedUser);
             setIsPageLoading(false);
+
+            if (data.user.role === "ADOPTION_CENTER") {
+                Router.push("/adoption-center/dashboard");
+                return;
+            }
+            if (data.user.role !== "ADOPTER") {
+                Router.push("/");
+                return;
+            }
+
+            setUser(data.user);
+            setIsPageLoading(false);
         } catch (error) {
             console.error("Error fetching session:", error);
             alert("❌ Error fetching session.");
