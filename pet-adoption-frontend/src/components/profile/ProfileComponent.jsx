@@ -60,9 +60,18 @@ export default function ProfileDashboardComponent() {
             }
 
             const data = await response.json();
-            console.log("✅ Session refreshed:", data);
+
+            if (data.user.role === "ADOPTION_CENTER") {
+                Router.push("/adoption-center/dashboard");
+                return;
+            }
+            if (data.user.role !== "ADOPTER") {
+                Router.push("/");
+                return;
+            }
+
             setUser(data.user);
-        setIsPageLoading(false);
+            setIsPageLoading(false);
         } catch (error) {
             console.error("Error fetching session:", error);
             alert(
