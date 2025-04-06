@@ -755,7 +755,14 @@ export default function ProfileDashboardComponent() {
         }
     };
 
+    if (isPageLoading) {
+        return (
+            <Loading />
+        );
+    }
+
     return (
+        <Suspense fallback={<Loading />}>
         <div className={styles.container}>
             <div className={styles.profileLeftSection}>
                 <div className={styles.profileNavbarLeft}>
@@ -2132,6 +2139,7 @@ export default function ProfileDashboardComponent() {
                                         ? "Updating Profile..."
                                         : "Update Profile"}
                                 </Button>
+                                </div>
                             </div>
                         )}
                     </div>
