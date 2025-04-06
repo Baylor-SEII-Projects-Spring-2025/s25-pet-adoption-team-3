@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, Suspense } from "react";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -8,7 +8,6 @@ import Typography from "@mui/material/Typography";
 import Router from "next/router";
 import Loading from "@/components/profile/Loading";
 import styles from "@/styles/ProfileDashboardComponent.module.css";
-import { Suspense } from "react";
 
 const style = {
     position: "absolute",
