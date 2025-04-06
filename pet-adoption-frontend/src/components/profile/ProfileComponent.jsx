@@ -8,6 +8,7 @@ import Typography from "@mui/material/Typography";
 import Router from "next/router";
 import Loading from "../adoption-center/Loading";
 import styles from "@/styles/ProfileDashboardComponent.module.css";
+import { Suspense } from "react";
 
 const style = {
     position: "absolute",
@@ -74,18 +75,6 @@ export default function ProfileDashboardComponent() {
             }
     
             setUser(fetchedUser);
-            setIsPageLoading(false);
-
-            if (data.user.role === "ADOPTION_CENTER") {
-                Router.push("/adoption-center/dashboard");
-                return;
-            }
-            if (data.user.role !== "ADOPTER") {
-                Router.push("/");
-                return;
-            }
-
-            setUser(data.user);
             setIsPageLoading(false);
         } catch (error) {
             console.error("Error fetching session:", error);
@@ -271,7 +260,8 @@ export default function ProfileDashboardComponent() {
 
     if (isPageLoading) return <Loading />;
     return (
-        <div className={styles.container}>
+        <Suspense fallback = {styles.container}>
+            <div className={styles.container}>
             <div className={styles.profileLeftSection}>
                 <div className={styles.profileNavbarLeft}>
                     <h1>{selectedNav}</h1>
@@ -712,5 +702,6 @@ export default function ProfileDashboardComponent() {
                 </div>
             </div>
         </div>
+        </Suspense>
     );
 }
