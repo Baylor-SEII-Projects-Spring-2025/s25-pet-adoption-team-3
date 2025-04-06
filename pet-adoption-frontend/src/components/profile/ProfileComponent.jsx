@@ -48,38 +48,42 @@ export default function ProfileDashboardComponent() {
                     "Cache-Control": "no-cache",
                 },
             });
-
+    
             if (response.status === 401) {
                 console.warn("No active session.");
                 Router.push("/login");
                 return;
             }
-
+    
             if (!response.ok) {
+                alert("⚠️ Failed to load user session. Please refresh or log in again.");
                 throw new Error("Error fetching session");
             }
-
+    
             const data = await response.json();
-            console.log("✅ Session refreshed:", data);
-            setUser(data.user);
-        setIsPageLoading(false);
+            console.log("User session data:", data);
+    
+            const fetchedUser = data.user;
+    
+            if (fetchedUser.role === "ADOPTION_CENTER") {
+                Router.push("/adoption-center/dashboard");
+                return;
+            } else if (fetchedUser.role !== "ADOPTER") {
+                Router.push("/");
+                return;
+            }
+    
+            setUser(fetchedUser);
+            setIsPageLoading(false);
         } catch (error) {
             console.error("Error fetching session:", error);
-            alert(
-                "⚠️ Failed to fetch your session. Please refresh or log in again.",
-            );
+            alert("❌ Error fetching session.");
         }
     };
-
+    
     useEffect(() => {
         fetchUserSession();
     }, []);
-
-    useEffect(() => {
-        if (user && user.role === "ADOPTION_CENTER") {
-            Router.push("/adoption-center/dashboard");
-        }
-    }, [user]);
 
     const handleDeletePhoto = async () => {
         try {
