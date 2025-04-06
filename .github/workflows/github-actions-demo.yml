@@ -34,6 +34,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ${{ secrets.GCP_USER }}@${{ secrets.GCP_INSTANCE_IP }} << 'EOF'
           echo "${{ secrets.GCP_ENV_PRODUCTION }}" > /home/adoptdontshopinfo/actions-runner/adopt-dont-shop/s25-pet-adoption-team-3/s25-pet-adoption-team-3/pet-adoption-frontend/.env.production
+          echo "${{ secrets.GOOGLE_MAPS_API_KEY }}" > /home/adoptdontshopinfo/actions-runner/adopt-dont-shop/s25-pet-adoption-team-3/s25-pet-adoption-team-3/pet-adoption-frontend/.env.production
           chmod 600 /home/adoptdontshopinfo/actions-runner/adopt-dont-shop/s25-pet-adoption-team-3/s25-pet-adoption-team-3/pet-adoption-frontend/.env.production
           echo "✅ .env.production successfully created on GCP"
           EOF
