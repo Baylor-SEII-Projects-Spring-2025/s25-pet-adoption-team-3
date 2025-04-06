@@ -72,7 +72,9 @@ export default function ProfileDashboardComponent() {
             setIsPageLoading(false);
         } catch (error) {
             console.error("Error fetching session:", error);
-            alert("❌ Error fetching session.");
+            alert(
+                "⚠️ Failed to fetch your session. Please refresh or log in again.",
+            );
         }
     };
 
