@@ -4,12 +4,14 @@ package petadoption.api.models;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.util.Date;
 
 @Entity
 @Getter
 @Setter
+@Accessors(chain = true)
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
