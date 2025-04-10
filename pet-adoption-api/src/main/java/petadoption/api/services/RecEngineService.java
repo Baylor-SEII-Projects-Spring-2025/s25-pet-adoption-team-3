@@ -30,14 +30,7 @@ public class RecEngineService {
         this.userRepository = userRepository;
         this.petRepository = petRepository;
     }
-
-    public void addWeight(List<Weight> weights, Characteristic characteristic){
-        Weight weight = new Weight();
-        weight.setCharacteristic(characteristic);
-        weight.setWeight(1);
-        weights.add(weight);
-    }
-
+    
     public void addWeight(Characteristic characteristic, boolean liked, User user){
         Weight weight = new Weight();
         weight.setCharacteristic(characteristic);
@@ -45,16 +38,6 @@ public class RecEngineService {
         weight.setUser(user);
         user.getWeights().add(weight);
     }
-
-    public Map<Characteristic, Weight> convertListToWeightMap(List<Weight> weights) {
-        return weights.stream()
-                .collect(Collectors.toMap(
-                        Weight::getCharacteristic,
-                        Function.identity(),
-                        (existing, replacement) -> existing //keeps the first entry encountered
-                ));
-    }
-
 
     @Transactional
     public String likePet(User userFromSession, Optional<Pet> petDetail) {

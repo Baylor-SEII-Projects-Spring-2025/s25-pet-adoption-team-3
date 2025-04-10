@@ -7,6 +7,12 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
+@Table(
+    name = "weight",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "characteristic_id"})
+    }
+)
 public class Weight {
 
     @Id
@@ -20,6 +26,7 @@ public class Weight {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "characteristic_id")
     private Characteristic characteristic;
 }

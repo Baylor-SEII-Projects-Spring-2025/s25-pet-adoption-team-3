@@ -119,6 +119,20 @@ const breedToCharacteristicMap = {
   'Poodle': ['Curly fur', 'Tufted tip tail', 'Floppy ears', 'Slender body']
 }
 
+const breedToAPIBreedMap = {
+  'Labrador': 'labrador',
+  'Golden Retriever': 'retriever/golden',
+  'German Shepherd': 'germanshepherd',
+  'Chihuahua': 'chihuahua',
+  'Bulldog': 'bulldog',
+  'Shih Tzu': 'shihtzu',
+  'Beagle': 'beagle',
+  'Dachshund': 'dachshund',
+  'Boxer': 'boxer',
+  'Poodle': 'poodle'
+}
+
+
 const characteristics = [...`(1, 'Short fur'),
 (2, 'Medium fur'),
 (3, 'Long fur'),
@@ -175,5 +189,34 @@ for(let i = 0; i < dogBreeds.length; i++){
 }
 insertStrings = insertStrings.substring(0, insertStrings.length-1); // trim trailing comma
 insertStrings+=';'
-
 console.log(insertStrings);
+
+
+let imageInsertStrings = `INSERT INTO pet_images(pet_id, image_url) VALUES`
+
+const vals = [];
+const promises = [];
+for(let i = 0; i < dogBreeds.length; i++){
+	const dogId = i+1;
+
+	promises.push((async () => {
+		for(let j = 0; j < 4; j++){
+			const image_url = (await (await fetch(`https://dog.ceo/api/breed/${breedToAPIBreedMap[dogBreeds[i]]}/images/random`)).json()).message
+			console.log(image_url);
+			vals.push(`\n(${dogId}, '${image_url}'),`)
+		}
+	})());
+}
+
+
+await Promise.all(promises);
+vals.sort((a, b) => {
+	console.log(`a: ${a.match(/\((?<a>\d+)/).groups['a']}`)
+	return Number(a.match(/\((?<a>\d+)/).groups['a']) - Number(b.match(/\((?<a>\d+)/).groups['a']);
+});
+
+imageInsertStrings += vals.join('');
+imageInsertStrings = imageInsertStrings.substring(0, imageInsertStrings.length-1); // trim trailing comma
+imageInsertStrings+=';'
+
+console.log(imageInsertStrings);
