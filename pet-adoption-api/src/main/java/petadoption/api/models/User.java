@@ -60,6 +60,10 @@ public class User {
     @JoinColumn(name = "user_id")
     private List<PetRecommendation> recommendedPets;
 
+    @ManyToMany()
+    @JoinColumn(name = "user_id")
+    private List<Pet> likedPets;
+
     @OneToMany(cascade = CascadeType.ALL)
     private List<Pet> savedPets;
 

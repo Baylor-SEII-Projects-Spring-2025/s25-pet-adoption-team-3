@@ -48,6 +48,7 @@ public class RecEngineService {
         }
 
         Pet pet = petDetail.get();
+        user.getLikedPets().add(pet);
 
         for (Characteristic characteristic : pet.getPetCharacteristics()) {
             List<Weight> wlist = user.getWeights().stream().filter(e -> e.getCharacteristic().equals(characteristic)).toList();
