@@ -18,6 +18,8 @@ export function SwipeComponent() {
     const [currentImageIndices, setCurrentImageIndices] = useState({});
     const swipedPetIds = useRef(new Set());
     const [isPageLoading, setIsPageLoading] = useState(true);
+    const [dragDisabled, setDragDisabled] = useState(false);
+;
 
     const navigateImage = (petId, direction) => {
         setCurrentImageIndices((prev) => {
@@ -154,6 +156,7 @@ export function SwipeComponent() {
             direction: [xDir],
             velocity,
         }) => {
+            if (dragDisabled) return;
             const trigger = velocity > 0.2;
             const dir = xDir < 0 ? -1 : 1;
             if (!down && trigger) {
@@ -252,6 +255,39 @@ export function SwipeComponent() {
                                                         styles.carouselImage
                                                     }
                                                 />
+                                                <div className={styles.imageActionButtons}>
+                                                    <button
+                                                    className={`${styles.actionButton} ${styles.dislike}`}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleSwipe(pet.id, false);
+                                                        gone.add(i);
+                                                        setDragDisabled(true);
+                                                        api.start((index) =>
+                                                        index === i ? { x: -window.innerWidth, scale: 1 } : {}
+                                                        );
+                                                        setTimeout(() => setDragDisabled(false), 300);
+                                                    }}
+                                                    >
+                                                    ✖
+                                                    </button>
+
+                                                    <button
+                                                    className={`${styles.actionButton} ${styles.like}`}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleSwipe(pet.id, true);
+                                                        gone.add(i);
+                                                        setDragDisabled(true);
+                                                        api.start((index) =>
+                                                        index === i ? { x: window.innerWidth, scale: 1 } : {}
+                                                        );
+                                                        setTimeout(() => setDragDisabled(false), 300);
+                                                    }}
+                                                    >
+                                                    🤍
+                                                    </button>
+                                                </div>
                                                 {hasMultipleImages && (
                                                     <div
                                                         className={
@@ -447,6 +483,17 @@ export function SwipeComponent() {
                                                 >
                                                     {pet.extra3}
                                                 </p>
+                                            </div>
+                                            <div className={styles.actionContainer}>
+                                                <button
+                                                    className={styles.likeButton}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleSwipe(pet.id, true); 
+                                                    }}
+                                                >
+                                                    Like
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
