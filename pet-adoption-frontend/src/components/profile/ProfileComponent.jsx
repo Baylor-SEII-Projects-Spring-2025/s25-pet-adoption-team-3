@@ -316,6 +316,10 @@ export default function ProfileDashboardComponent() {
         Router.push(`/chat/${adoptionCenterId}`);
     };
 
+        const handleCardClick = (petId) => {
+            Router.push(`/view-pet/${petId}`);
+        };
+
 
     if (isPageLoading) return <Loading />;
     return (
@@ -576,6 +580,11 @@ export default function ProfileDashboardComponent() {
                                                 <div
                                                     key={pet.id}
                                                     className={styles.eventCard}
+                                                    onClick={() =>
+                                                        handleCardClick(
+                                                            pet.id,
+                                                        )
+                                                    }
                                                 >
                                                     <img
                                                         src={
