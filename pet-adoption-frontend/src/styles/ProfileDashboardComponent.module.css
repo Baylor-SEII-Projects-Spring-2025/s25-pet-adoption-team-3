@@ -271,6 +271,71 @@
     margin: 0 auto;
 }
 
+.eventsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.eventCard {
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.eventCard:hover {
+    transform: scale(1.02);
+}
+
+.eventImage {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.eventDetails {
+    padding: 12px;
+}
+
+.eventTitle {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.eventDescription,
+.eventDate {
+    font-size: 14px;
+    color: #555;
+    margin-top: 4px;
+}
+
+.petsText {
+    width: 100%;
+}
+
+.petNameRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.messageIcon {
+    cursor: pointer;
+    color: #1976d2;
+    transition: transform 0.2s ease;
+}
+
+.messageIcon:hover {
+    transform: scale(1.2);
+    color: #1565c0;
+}
+
 
 
 @media (max-width: 1270px) {
