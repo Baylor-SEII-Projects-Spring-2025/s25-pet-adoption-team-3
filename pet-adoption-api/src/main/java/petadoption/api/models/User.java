@@ -61,7 +61,7 @@ public class User {
     private List<PetRecommendation> recommendedPets;
 
     @ManyToMany()
-    @JoinColumn(name = "user_id")
+    @JoinTable(name = "user_id")
     private List<Pet> likedPets;
 
     @OneToMany(cascade = CascadeType.ALL)
