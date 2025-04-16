@@ -255,11 +255,25 @@ public class PetController {
         return ResponseEntity.status(200).body(recEngineService.getSwipePetsV2(user));
     }
 
-    @GetMapping("characteristics")
+    @GetMapping("/characteristics")
     public ResponseEntity<List<String>> getCharacteristics(){
         List<Characteristic> chars = characteristicRepository.getAll();
         List<String> charStrings = chars.stream().map(Characteristic::getName).toList();
 
         return ResponseEntity.status(200).body(charStrings);
     }
+
+    @GetMapping("/get-liked-pets")
+    public ResponseEntity<List<SwipePetDTO>> getLikedPets(HttpSession session) {
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTER);
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body(null);
+        }
+        User user = (User) validationResponse.getBody();
+
+        List<SwipePetDTO> petDTOs = petService.getLikedPets(user);
+
+        return ResponseEntity.status(200).body(petDTOs);
+    }
+
 }

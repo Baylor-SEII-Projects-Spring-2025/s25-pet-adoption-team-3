@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import petadoption.api.DTO.PetRequestDTO;
+import petadoption.api.DTO.SwipePetDTO;
 import petadoption.api.models.Pet;
 import petadoption.api.models.User;
 import petadoption.api.repository.PetRepository;
@@ -23,11 +24,13 @@ public class PetService {
     private final GCSStorageServicePets gcsStorageServicePets;
 
     private static final Logger logger = LoggerFactory.getLogger(PetService.class);
+    private final UserService userService;
 
 
-    public PetService(PetRepository petRepository, GCSStorageServicePets gcsStorageServicePets) {
+    public PetService(PetRepository petRepository, GCSStorageServicePets gcsStorageServicePets, UserService userService) {
         this.petRepository = petRepository;
         this.gcsStorageServicePets = gcsStorageServicePets;
+        this.userService = userService;
     }
 
     public void addPet(User user, PetRequestDTO petRequestDTO) {
@@ -193,5 +196,17 @@ public class PetService {
         pet.setImage(imageUrls);
 
         return Optional.of(pet);
+    }
+
+    public List<SwipePetDTO> getLikedPets(User tempUser) {
+        User user = userService.getUserFromId(tempUser.getId());
+        List<Pet> likedPets = user.getLikedPets();
+        List<SwipePetDTO> petDTOs = new ArrayList<>();
+
+        for(int i = 0; i < likedPets.size(); i++) {
+            petDTOs.add(new SwipePetDTO(likedPets.get(i)));
+        }
+
+        return petDTOs;
     }
 }

@@ -113,5 +113,8 @@ public class UserService {
         return ResponseEntity.ok("Verification email resent successfully.");
     }
 
+    public User getUserFromId(Long id){
+        return userRepository.findById(id).orElse(null);
+    }
 
 }
