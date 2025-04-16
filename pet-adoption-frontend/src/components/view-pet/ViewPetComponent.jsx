@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import styles from "@/styles/SwipeComponent.module.css";
 
@@ -16,11 +16,59 @@ export default function ViewPetComponent({ pet }) {
     (now.getMonth() === birthDate.getMonth() && now.getDate() >= birthDate.getDate());
   if (!hasHadBirthdayThisYear) age--;
 
+  const [imageIndex, setImageIndex] = useState(0);
+  const hasMultipleImages = pet.image && pet.image.length > 1;
+
+  const navigateImage = (direction) => {
+    if (!hasMultipleImages) return;
+    setImageIndex((prevIndex) => {
+      const total = pet.image.length;
+      return direction === "next"
+        ? (prevIndex + 1) % total
+        : (prevIndex - 1 + total) % total;
+    });
+  };
+
   return (
     <div className={styles.swipeContainer}>
       <div className={styles.cardContainer}>
         <div className={styles.card}>
           <div className={styles.cardContent}>
+            <div className={styles.carousel}>
+              {pet.image && pet.image.length > 0 ? (
+                <div className={styles.carouselContainer}>
+                  <img
+                    src={pet.image[imageIndex]}
+                    alt={pet.name}
+                    className={styles.carouselImage}
+                  />
+                  {hasMultipleImages && (
+                    <>
+                      <div className={styles.imageCounter}>
+                        {imageIndex + 1} / {pet.image.length}
+                      </div>
+                      <button
+                        className={`${styles.carouselButton} ${styles.prevButton}`}
+                        onClick={() => navigateImage("prev")}
+                        aria-label="Previous image"
+                      >
+                        &#10094;
+                      </button>
+                      <button
+                        className={`${styles.carouselButton} ${styles.nextButton}`}
+                        onClick={() => navigateImage("next")}
+                        aria-label="Next image"
+                      >
+                        &#10095;
+                      </button>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div className={styles.noImage}>No image available</div>
+              )}
+            </div>
+
             <div className={styles.petInfo}>
               <h2 className={styles.petName}>{pet.name}</h2>
               <p>
@@ -86,5 +134,6 @@ ViewPetComponent.propTypes = {
     extra1: PropTypes.string,
     extra2: PropTypes.string,
     extra3: PropTypes.string,
+    image: PropTypes.arrayOf(PropTypes.string),
   }),
 };
