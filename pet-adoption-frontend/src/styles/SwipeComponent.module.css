@@ -223,6 +223,45 @@
     font-weight: 450 !important;
     color: #000;
 }
+  
+  .actionButton {
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .actionButton:hover {
+    transform: scale(1.1);
+  }
+
+  .imageActionButtons {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    z-index: 10;
+    pointer-events: auto;
+  }
+  
+  .carouselContainer {
+    position: relative; 
+  }
+  
+  
+  .like, .dislike {
+    background-color: #8B80F9;
+    color: #F5F5F5;
+  }
 
 /* Media query for mobile devices in portrait orientation */
 @media (max-width: 768px) {

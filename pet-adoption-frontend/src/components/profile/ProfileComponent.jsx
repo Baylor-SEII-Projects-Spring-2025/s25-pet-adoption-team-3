@@ -8,6 +8,7 @@ import Typography from "@mui/material/Typography";
 import Router from "next/router";
 import Loading from "@/components/profile/Loading";
 import styles from "@/styles/ProfileDashboardComponent.module.css";
+import MessageIcon from "@mui/icons-material/Message";
 
 const style = {
     position: "absolute",
@@ -37,6 +38,7 @@ export default function ProfileDashboardComponent() {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [isUpdated, setIsUpdated] = useState(false);
+    const [likedPets, setLikedPets] = useState([]);
 
     const fetchUserSession = async () => {
         try {
@@ -56,7 +58,9 @@ export default function ProfileDashboardComponent() {
             }
 
             if (!response.ok) {
-                alert("⚠️ Failed to load user session. Please refresh or log in again.");
+                alert(
+                    "⚠️ Failed to load user session. Please refresh or log in again.",
+                );
                 throw new Error("Error fetching session");
             }
 
@@ -83,9 +87,38 @@ export default function ProfileDashboardComponent() {
         }
     };
 
+    const fetchLikedPets = async () => {
+        try {
+            const response = await fetch(`${API_URL}/api/pet/get-liked-pets`, {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                console.error("Failed to fetch liked pets");
+                return;
+            }
+
+            const data = await response.json();
+            console.log("🐾 Liked pets:", data);
+            setLikedPets(data);
+        } catch (error) {
+            console.error("Error fetching liked pets:", error);
+        }
+    };
+
     useEffect(() => {
         fetchUserSession();
     }, []);
+
+    useEffect(() => {
+        if (selectedNav === "My Likes") {
+            fetchLikedPets();
+        }
+    }, [selectedNav]);
 
     const handleDeletePhoto = async () => {
         try {
@@ -259,109 +292,167 @@ export default function ProfileDashboardComponent() {
         setIsUpdated(false);
     };
 
+    const calculateAge = (birthdateStr) => {
+        if (!birthdateStr) return "Unknown";
+        const birthdate = new Date(birthdateStr);
+        const today = new Date();
+
+        let age = today.getFullYear() - birthdate.getFullYear();
+        const m = today.getMonth() - birthdate.getMonth();
+
+        if (m < 0 || (m === 0 && today.getDate() < birthdate.getDate())) {
+            age--;
+        }
+
+        return age;
+    };
+
+    const handleStartChat = (adoptionCenterId) => {
+        if (!adoptionCenterId) {
+            alert("No adoption center linked to this pet.");
+            return;
+        }
+
+        Router.push(`/chat/${adoptionCenterId}`);
+    };
+
+
     if (isPageLoading) return <Loading />;
     return (
         <Suspense fallback={<Loading />}>
             <div className={styles.container}>
-            <div className={styles.profileLeftSection}>
-                <div className={styles.profileNavbarLeft}>
-                    <h1>{selectedNav}</h1>
-                    <p
-                        onClick={() => setSelectedNav("Dashboard")}
-                        className={
-                            selectedNav === "Dashboard" ? styles.active : ""
-                        }
-                    >
-                        Dashboard
-                    </p>
-                    <p
-                        onClick={() => setSelectedNav("My Likes")}
-                        className={
-                            selectedNav === "My Likes" ? styles.active : ""
-                        }
-                    >
-                        My Likes
-                    </p>
-                    <p
-                        onClick={() => setSelectedNav("Settings")}
-                        className={
-                            selectedNav === "Settings" ? styles.active : ""
-                        }
-                    >
-                        Settings
-                    </p>
+                <div className={styles.profileLeftSection}>
+                    <div className={styles.profileNavbarLeft}>
+                        <h1>{selectedNav}</h1>
+                        <p
+                            onClick={() => setSelectedNav("Dashboard")}
+                            className={
+                                selectedNav === "Dashboard" ? styles.active : ""
+                            }
+                        >
+                            Dashboard
+                        </p>
+                        <p
+                            onClick={() => setSelectedNav("My Likes")}
+                            className={
+                                selectedNav === "My Likes" ? styles.active : ""
+                            }
+                        >
+                            My Likes
+                        </p>
+                        <p
+                            onClick={() => setSelectedNav("Settings")}
+                            className={
+                                selectedNav === "Settings" ? styles.active : ""
+                            }
+                        >
+                            Settings
+                        </p>
+                    </div>
                 </div>
-            </div>
 
-            <div className={styles.divider}></div>
+                <div className={styles.divider}></div>
 
-            <div className={styles.profileRightSection}>
-                <div className={styles.profileNavbarRight}>
-                    <div className={styles.dashboardHeader}>
-                        {selectedNav === "Dashboard" && (
-                            <div className={styles.dashboard}>
-                                <div className={styles.dashboardHeaderContent}>
-                                    <div className={styles.dashboardWrapper}>
+                <div className={styles.profileRightSection}>
+                    <div className={styles.profileNavbarRight}>
+                        <div className={styles.dashboardHeader}>
+                            {selectedNav === "Dashboard" && (
+                                <div className={styles.dashboard}>
+                                    <div
+                                        className={
+                                            styles.dashboardHeaderContent
+                                        }
+                                    >
                                         <div
-                                            className={
-                                                styles.dashboardWrapperHeader
-                                            }
-                                        >
-                                            <Avatar
-                                                ref={anchorRef}
-                                                sx={{
-                                                    background:
-                                                        user?.profilePhoto
-                                                            ? "transparent"
-                                                            : generateGradient(
-                                                                  user?.firstName +
-                                                                      (user?.lastName ||
-                                                                          ""),
-                                                              ),
-                                                    cursor: "pointer",
-                                                    color: "#fff",
-                                                    width: 100,
-                                                    height: 100,
-                                                    border: "1px solid black",
-                                                }}
-                                                src={
-                                                    user?.profilePhoto ||
-                                                    undefined
-                                                }
-                                            >
-                                                {!user?.profilePhoto && (
-                                                    <>
-                                                        {user?.firstName?.charAt(
-                                                            0,
-                                                        )}
-                                                        {user?.lastName
-                                                            ? user?.lastName.charAt(
-                                                                  0,
-                                                              )
-                                                            : ""}
-                                                    </>
-                                                )}
-                                            </Avatar>
-                                            <h1>
-                                                Welcome Back,{" "}
-                                                {user?.firstName || ""}
-                                            </h1>
-                                        </div>
-                                        <div
-                                            className={styles.dashboardContent}
+                                            className={styles.dashboardWrapper}
                                         >
                                             <div
                                                 className={
-                                                    styles.dashboardContentTop
+                                                    styles.dashboardWrapperHeader
                                                 }
                                             >
+                                                <Avatar
+                                                    ref={anchorRef}
+                                                    sx={{
+                                                        background:
+                                                            user?.profilePhoto
+                                                                ? "transparent"
+                                                                : generateGradient(
+                                                                      user?.firstName +
+                                                                          (user?.lastName ||
+                                                                              ""),
+                                                                  ),
+                                                        cursor: "pointer",
+                                                        color: "#fff",
+                                                        width: 100,
+                                                        height: 100,
+                                                        border: "1px solid black",
+                                                    }}
+                                                    src={
+                                                        user?.profilePhoto ||
+                                                        undefined
+                                                    }
+                                                >
+                                                    {!user?.profilePhoto && (
+                                                        <>
+                                                            {user?.firstName?.charAt(
+                                                                0,
+                                                            )}
+                                                            {user?.lastName
+                                                                ? user?.lastName.charAt(
+                                                                      0,
+                                                                  )
+                                                                : ""}
+                                                        </>
+                                                    )}
+                                                </Avatar>
+                                                <h1>
+                                                    Welcome Back,{" "}
+                                                    {user?.firstName || ""}
+                                                </h1>
+                                            </div>
+                                            <div
+                                                className={
+                                                    styles.dashboardContent
+                                                }
+                                            >
+                                                <div
+                                                    className={
+                                                        styles.dashboardContentTop
+                                                    }
+                                                >
+                                                    <TextField
+                                                        disabled
+                                                        label="First Name"
+                                                        value={
+                                                            user?.firstName ||
+                                                            ""
+                                                        }
+                                                        id="firstName"
+                                                        size="small"
+                                                        InputLabelProps={{
+                                                            shrink: true,
+                                                        }}
+                                                    />
+                                                    <TextField
+                                                        disabled
+                                                        label="Last Name"
+                                                        value={
+                                                            user?.lastName || ""
+                                                        }
+                                                        id="lastName"
+                                                        size="small"
+                                                        InputLabelProps={{
+                                                            shrink: true,
+                                                        }}
+                                                    />
+                                                </div>
+
                                                 <TextField
                                                     disabled
-                                                    label="First Name"
-                                                    value={
-                                                        user?.firstName || ""
-                                                    }
-                                                    id="firstName"
+                                                    label="Email"
+                                                    value={user?.email || ""}
+                                                    id="email"
                                                     size="small"
                                                     InputLabelProps={{
                                                         shrink: true,
@@ -369,60 +460,72 @@ export default function ProfileDashboardComponent() {
                                                 />
                                                 <TextField
                                                     disabled
-                                                    label="Last Name"
-                                                    value={user?.lastName || ""}
-                                                    id="lastName"
+                                                    label="Password"
+                                                    value="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
+                                                    id="password"
                                                     size="small"
                                                     InputLabelProps={{
                                                         shrink: true,
                                                     }}
                                                 />
                                             </div>
+                                        </div>
 
-                                            <TextField
-                                                disabled
-                                                label="Email"
-                                                value={user?.email || ""}
-                                                id="email"
-                                                size="small"
-                                                InputLabelProps={{
-                                                    shrink: true,
-                                                }}
-                                            />
-                                            <TextField
-                                                disabled
-                                                label="Password"
-                                                value="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
-                                                id="password"
-                                                size="small"
-                                                InputLabelProps={{
-                                                    shrink: true,
-                                                }}
-                                            />
+                                        <div
+                                            className={styles.profileMessaging}
+                                        >
+                                            <p>My Messages</p>
+
+                                            {user?.messages?.length === 0 ||
+                                            !user?.messages ? (
+                                                <div
+                                                    className={
+                                                        styles.noMessages
+                                                    }
+                                                >
+                                                    <img
+                                                        src="/icons/no_messages.png"
+                                                        alt="No messages"
+                                                    />
+                                                    <p>
+                                                        No messages found, check
+                                                        back later.
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                <ul>
+                                                    {user?.messages?.map(
+                                                        (message, index) => (
+                                                            <li key={index}>
+                                                                {message}
+                                                            </li>
+                                                        ),
+                                                    )}
+                                                </ul>
+                                            )}
                                         </div>
                                     </div>
+                                    <div className={styles.profileMatches}>
+                                        <p>My Matches</p>
 
-                                    <div className={styles.profileMessaging}>
-                                        <p>My Messages</p>
-
-                                        {user?.messages?.length === 0 ||
-                                        !user?.messages ? (
-                                            <div className={styles.noMessages}>
+                                        {user?.matches?.length === 0 ||
+                                        !user?.matches ? (
+                                            <div className={styles.noMatches}>
                                                 <img
-                                                    src="/icons/no_messages.png"
-                                                    alt="No messages"
+                                                    src="/icons/no_matches.png"
+                                                    alt="No matches"
                                                 />
                                                 <p>
-                                                    No messages found, check
-                                                    back later.
+                                                    No matches found, keep
+                                                    swiping!
                                                 </p>
                                             </div>
                                         ) : (
                                             <ul>
-                                                {user?.messages?.map(
-                                                    (message, index) => (
+                                                {user?.matches?.map(
+                                                    (matches, index) => (
                                                         <li key={index}>
-                                                            {message}
+                                                            {matches}
                                                         </li>
                                                     ),
                                                 )}
@@ -430,85 +533,119 @@ export default function ProfileDashboardComponent() {
                                         )}
                                     </div>
                                 </div>
-                                <div className={styles.profileMatches}>
-                                    <p>My Matches</p>
+                            )}
+                        </div>
 
-                                    {user?.matches?.length === 0 ||
-                                    !user?.matches ? (
-                                        <div className={styles.noMatches}>
-                                            <img
-                                                src="/icons/no_matches.png"
-                                                alt="No matches"
-                                            />
-                                            <p>
-                                                No matches found, keep swiping!
-                                            </p>
+                        {selectedNav === "My Likes" && (
+                            <div className={styles.likesContent}>
+                                <div className={styles.likesNavbar}>
+                                    <p
+                                        onClick={() =>
+                                            setSelectedLikes("My Likes")
+                                        }
+                                        className={
+                                            selectedLikes === "My Likes"
+                                                ? styles.likesActive
+                                                : ""
+                                        }
+                                    >
+                                        My Likes
+                                    </p>
+
+                                    <div
+                                        className={styles.likesNavbarDivider}
+                                    ></div>
+
+                                    <p
+                                        onClick={() =>
+                                            setSelectedLikes("Super Likes")
+                                        }
+                                        className={
+                                            selectedLikes === "Super Likes"
+                                                ? styles.likesActive
+                                                : ""
+                                        }
+                                    >
+                                        Super Likes
+                                    </p>
+                                </div>
+                                <div className={styles.petsText}>
+                                    {likedPets.length > 0 ? (
+                                        <div className={styles.eventsGrid}>
+                                            {likedPets.map((pet) => (
+                                                <div
+                                                    key={pet.id}
+                                                    className={styles.eventCard}
+                                                >
+                                                    <img
+                                                        src={
+                                                            pet.image?.[0] ||
+                                                            "/images/no_image_available.png"
+                                                        }
+                                                        alt={pet.name}
+                                                        className={
+                                                            styles.eventImage
+                                                        }
+                                                    />
+                                                    <div
+                                                        className={
+                                                            styles.eventDetails
+                                                        }
+                                                    >
+                                                        <div
+                                                            className={
+                                                                styles.petNameRow
+                                                            }
+                                                        >
+                                                            <p
+                                                                className={
+                                                                    styles.eventTitle
+                                                                }
+                                                            >
+                                                                {pet.name}
+                                                            </p>
+                                                            <MessageIcon
+                                                                className={
+                                                                    styles.messageIcon
+                                                                }
+                                                                onClick={() =>
+                                                                    handleStartChat(
+                                                                        pet.adoptionCenterId,
+                                                                    )
+                                                                }
+                                                                titleAccess="Message adoption center"
+                                                            />
+                                                        </div>
+
+                                                        <p
+                                                            className={
+                                                                styles.eventDescription
+                                                            }
+                                                        >
+                                                            Breed: {pet.breed} |
+                                                            Age:{" "}
+                                                            {calculateAge(
+                                                                pet.birthdate,
+                                                            )}
+                                                        </p>
+                                                        <p
+                                                            className={
+                                                                styles.eventDate
+                                                            }
+                                                        >
+                                                            Gender:{" "}
+                                                            {pet.spayedStatus}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
                                     ) : (
-                                        <ul>
-                                            {user?.matches?.map(
-                                                (matches, index) => (
-                                                    <li key={index}>
-                                                        {matches}
-                                                    </li>
-                                                ),
-                                            )}
-                                        </ul>
+                                        <p className={styles.noEventsMessage}>
+                                            No liked pets found.
+                                        </p>
                                     )}
                                 </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {selectedNav === "My Likes" && (
-                        <div className={styles.likesContent}>
-                            <div className={styles.likesNavbar}>
-                                <p
-                                    onClick={() => setSelectedLikes("My Likes")}
-                                    className={
-                                        selectedLikes === "My Likes"
-                                            ? styles.likesActive
-                                            : ""
-                                    }
-                                >
-                                    My Likes
-                                </p>
-
-                                <div
-                                    className={styles.likesNavbarDivider}
-                                ></div>
-
-                                <p
-                                    onClick={() =>
-                                        setSelectedLikes("Super Likes")
-                                    }
-                                    className={
-                                        selectedLikes === "Super Likes"
-                                            ? styles.likesActive
-                                            : ""
-                                    }
-                                >
-                                    Super Likes
-                                </p>
-                            </div>
-                            <div className={styles.likesContent}>
-                                {selectedLikes === "My Likes" && (
-                                    <div>
-                                        {user?.likes?.length > 0 ? (
-                                            <ul>
-                                                {user.likes.map(
-                                                    (like, index) => (
-                                                        <li key={index}>
-                                                            {like}
-                                                        </li>
-                                                    ),
-                                                )}
-                                            </ul>
-                                        ) : (
-                                            <p>No likes found.</p>
-                                        )}
-                                    </div>
-                                )}
 
                                 {selectedLikes === "Super Likes" && (
                                     <div>
@@ -528,181 +665,186 @@ export default function ProfileDashboardComponent() {
                                     </div>
                                 )}
                             </div>
-                        </div>
-                    )}
+                        )}
 
-                    {selectedNav === "Settings" && (
-                        <div className={styles.settingsWrapper}>
-                            <div className={styles.dashboardWrapperHeader}>
-                                <Avatar
-                                    ref={anchorRef}
-                                    sx={{
-                                        background: user?.profilePhoto
-                                            ? "transparent"
-                                            : generateGradient(
-                                                  user?.firstName +
-                                                      (user?.lastName || ""),
-                                              ),
-                                        cursor: "pointer",
-                                        color: "#fff",
-                                        width: 100,
-                                        height: 100,
-                                        border: "1px solid black",
-                                    }}
-                                    src={user?.profilePhoto || undefined}
-                                >
-                                    {!user?.profilePhoto && (
-                                        <>
-                                            {user?.firstName?.charAt(0)}
-                                            {user?.lastName
-                                                ? user?.lastName.charAt(0)
-                                                : ""}
-                                        </>
-                                    )}
-                                </Avatar>
+                        {selectedNav === "Settings" && (
+                            <div className={styles.settingsWrapper}>
+                                <div className={styles.dashboardWrapperHeader}>
+                                    <Avatar
+                                        ref={anchorRef}
+                                        sx={{
+                                            background: user?.profilePhoto
+                                                ? "transparent"
+                                                : generateGradient(
+                                                      user?.firstName +
+                                                          (user?.lastName ||
+                                                              ""),
+                                                  ),
+                                            cursor: "pointer",
+                                            color: "#fff",
+                                            width: 100,
+                                            height: 100,
+                                            border: "1px solid black",
+                                        }}
+                                        src={user?.profilePhoto || undefined}
+                                    >
+                                        {!user?.profilePhoto && (
+                                            <>
+                                                {user?.firstName?.charAt(0)}
+                                                {user?.lastName
+                                                    ? user?.lastName.charAt(0)
+                                                    : ""}
+                                            </>
+                                        )}
+                                    </Avatar>
 
-                                <div
-                                    className={
-                                        styles.settingsChangeProfilePhoto
-                                    }
-                                >
                                     <div
                                         className={
-                                            styles.settingsChangePhotoButtons
+                                            styles.settingsChangeProfilePhoto
                                         }
                                     >
-                                        <input
-                                            type="file"
-                                            accept=".png, .jpg, .jpeg"
-                                            onChange={handleUploadPhoto}
-                                            style={{ display: "none" }}
-                                            id="upload-photo"
-                                        />
-                                        <Button
-                                            variant="contained"
-                                            onClick={() =>
-                                                document
-                                                    .getElementById(
-                                                        "upload-photo",
-                                                    )
-                                                    .click()
+                                        <div
+                                            className={
+                                                styles.settingsChangePhotoButtons
                                             }
                                         >
-                                            Upload Photo
-                                        </Button>
-                                        <Button
-                                            type="submit"
-                                            variant="outlined"
-                                            color="error"
-                                            disabled={!user?.profilePhoto}
-                                            onClick={handleOpen}
+                                            <input
+                                                type="file"
+                                                accept=".png, .jpg, .jpeg"
+                                                onChange={handleUploadPhoto}
+                                                style={{ display: "none" }}
+                                                id="upload-photo"
+                                            />
+                                            <Button
+                                                variant="contained"
+                                                onClick={() =>
+                                                    document
+                                                        .getElementById(
+                                                            "upload-photo",
+                                                        )
+                                                        .click()
+                                                }
+                                            >
+                                                Upload Photo
+                                            </Button>
+                                            <Button
+                                                type="submit"
+                                                variant="outlined"
+                                                color="error"
+                                                disabled={!user?.profilePhoto}
+                                                onClick={handleOpen}
+                                            >
+                                                Delete Photo
+                                            </Button>
+                                            <Modal
+                                                open={open}
+                                                onClose={handleClose}
+                                                aria-labelledby="modal-modal-title"
+                                                aria-describedby="modal-modal-description"
+                                            >
+                                                <Box sx={style}>
+                                                    <Typography
+                                                        id="modal-modal-title"
+                                                        variant="h6"
+                                                        component="h2"
+                                                    >
+                                                        Are you sure you want to
+                                                        delete your profile
+                                                        photo?
+                                                    </Typography>
+                                                    <Typography
+                                                        id="modal-modal-description"
+                                                        sx={{ mt: 2 }}
+                                                    >
+                                                        The photo will be
+                                                        permanently deleted and
+                                                        cannot be recovered.
+                                                    </Typography>
+                                                    <Button
+                                                        type="submit"
+                                                        variant="outlined"
+                                                        color="error"
+                                                        sx="margin-top: 20px"
+                                                        onClick={() => {
+                                                            handleDeletePhoto();
+                                                            handleClose();
+                                                        }}
+                                                    >
+                                                        Yes, I&apos;m Sure
+                                                    </Button>
+                                                </Box>
+                                            </Modal>
+                                        </div>
+
+                                        <div
+                                            className={
+                                                styles.settingsUploadError
+                                            }
                                         >
-                                            Delete Photo
-                                        </Button>
-                                        <Modal
-                                            open={open}
-                                            onClose={handleClose}
-                                            aria-labelledby="modal-modal-title"
-                                            aria-describedby="modal-modal-description"
-                                        >
-                                            <Box sx={style}>
-                                                <Typography
-                                                    id="modal-modal-title"
-                                                    variant="h6"
-                                                    component="h2"
-                                                >
-                                                    Are you sure you want to
-                                                    delete your profile photo?
-                                                </Typography>
-                                                <Typography
-                                                    id="modal-modal-description"
-                                                    sx={{ mt: 2 }}
-                                                >
-                                                    The photo will be
-                                                    permanently deleted and
-                                                    cannot be recovered.
-                                                </Typography>
-                                                <Button
-                                                    type="submit"
-                                                    variant="outlined"
-                                                    color="error"
-                                                    sx="margin-top: 20px"
-                                                    onClick={() => {
-                                                        handleDeletePhoto();
-                                                        handleClose();
+                                            {uploadError && (
+                                                <p
+                                                    style={{
+                                                        color: "red",
+                                                        marginTop: "10px",
+                                                        fontSize: "14px",
                                                     }}
                                                 >
-                                                    Yes, I&apos;m Sure
-                                                </Button>
-                                            </Box>
-                                        </Modal>
-                                    </div>
-
-                                    <div className={styles.settingsUploadError}>
-                                        {uploadError && (
-                                            <p
-                                                style={{
-                                                    color: "red",
-                                                    marginTop: "10px",
-                                                    fontSize: "14px",
-                                                }}
-                                            >
-                                                {uploadError}
-                                            </p>
-                                        )}
+                                                    {uploadError}
+                                                </p>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className={styles.dashboardContent}>
-                                <div className={styles.dashboardContentTop}>
+                                <div className={styles.dashboardContent}>
+                                    <div className={styles.dashboardContentTop}>
+                                        <TextField
+                                            label="First Name"
+                                            value={firstName}
+                                            onChange={handleFirstNameChange}
+                                            id="firstName"
+                                            size="small"
+                                        />
+                                        <TextField
+                                            label="Last Name"
+                                            value={lastName}
+                                            onChange={handleLastNameChange}
+                                            id="lastName"
+                                            size="small"
+                                        />
+                                    </div>
+
                                     <TextField
-                                        label="First Name"
-                                        value={firstName}
-                                        onChange={handleFirstNameChange}
-                                        id="firstName"
+                                        disabled
+                                        label="Email"
+                                        value={user?.email || ""}
+                                        id="email"
                                         size="small"
                                     />
                                     <TextField
-                                        label="Last Name"
-                                        value={lastName}
-                                        onChange={handleLastNameChange}
-                                        id="lastName"
+                                        disabled
+                                        label="Password"
+                                        value="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
+                                        id="password"
                                         size="small"
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
                                     />
+
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={handleUpdateProfile}
+                                        disabled={!isUpdated}
+                                    >
+                                        Update Profile
+                                    </Button>
                                 </div>
-
-                                <TextField
-                                    disabled
-                                    label="Email"
-                                    value={user?.email || ""}
-                                    id="email"
-                                    size="small"
-                                />
-                                <TextField
-                                    disabled
-                                    label="Password"
-                                    value="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
-                                    id="password"
-                                    size="small"
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                />
-
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={handleUpdateProfile}
-                                    disabled={!isUpdated}
-                                >
-                                    Update Profile
-                                </Button>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
         </Suspense>
     );
 }
