@@ -484,17 +484,6 @@ export function SwipeComponent() {
                                                     {pet.extra3}
                                                 </p>
                                             </div>
-                                            <div className={styles.actionContainer}>
-                                                <button
-                                                    className={styles.likeButton}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleSwipe(pet.id, true); 
-                                                    }}
-                                                >
-                                                    Like
-                                                </button>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
