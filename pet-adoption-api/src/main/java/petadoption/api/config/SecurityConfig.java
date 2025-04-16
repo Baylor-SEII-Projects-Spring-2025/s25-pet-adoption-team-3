@@ -28,8 +28,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // <-- FIXED THIS
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/", "/oauth2/**", "/login/oauth2/**").permitAll()
-                        .requestMatchers("/api/users/**", "/api/adoption-center/**", "/api/pet/**", "/api/event/**", "/api/swipe/**").permitAll()
+                        .requestMatchers("/auth/**", "/", "/oauth2/**", "/login/oauth2/**", "/ws-chat/**").permitAll()
+                        .requestMatchers("/api/users/**", "/api/adoption-center/**", "/api/pet/**", "/api/event/**", "/api/swipe/**", "/chat/**", "/api/chat/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .defaultSuccessUrl("/oauth/google/success", true)
