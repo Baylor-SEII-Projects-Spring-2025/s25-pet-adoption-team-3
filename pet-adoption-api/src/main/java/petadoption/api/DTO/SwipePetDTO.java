@@ -36,6 +36,8 @@ public class SwipePetDTO {
 
     private String adoptionCenterName;
 
+    private Long adoptionCenterId;
+
     private String location;
 
     private String breed;
@@ -54,6 +56,7 @@ public class SwipePetDTO {
         this.availabilityStatus = pet.getAvailabilityStatus();
         this.image = pet.getImage();
         this.adoptionCenterName = pet.getAdoptionCenter().getAdoptionCenterName();
+        this.adoptionCenterId = pet.getAdoptionCenter().getId();
         this.location = "placeholder";
         this.breed = pet.getBreed();
         this.characteristics = new ArrayList<>();
