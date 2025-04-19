@@ -134,5 +134,16 @@ class RecEngineTest {
         assertEquals("Error: Pet not found", response.getBody());
     }
 
+    @Test
+    void testGetLikedPet_Success() {
+        when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTER)))
+                .thenReturn((ResponseEntity) ResponseEntity.ok(testUser));
+        when(petService.getLikedPets(testUser)).thenReturn(List.of(testSwipePetDTO));
 
+        ResponseEntity<List<SwipePetDTO>> response = controller.getLikedPets(session);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(List.of(testSwipePetDTO), response.getBody());
+        verify(petService).getLikedPets(testUser);
+    }
 }
