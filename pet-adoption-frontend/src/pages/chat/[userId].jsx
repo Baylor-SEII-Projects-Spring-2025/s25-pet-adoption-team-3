@@ -1,6 +1,7 @@
 import React from "react";
 import { useRouter } from "next/router";
 import Chat from "@/components/chat/ChatComponent";
+import ChatNavbar from "@/components/chat/ChatNavbar";
 
 export default function ChatPage() {
     const router = useRouter();
@@ -12,6 +13,7 @@ export default function ChatPage() {
 
     return (
         <>
+            <ChatNavbar />
             <Chat recipientId={recipientId} />
         </>
     );
