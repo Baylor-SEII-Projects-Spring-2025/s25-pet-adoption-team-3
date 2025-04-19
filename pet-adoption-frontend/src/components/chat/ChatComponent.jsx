@@ -16,6 +16,57 @@ export default function ChatComponent({ recipientId }) {
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
     const WS_URL = `${API_URL}/ws-chat`;
 
+    const [previousChats, setPreviousChats] = useState([]);
+
+
+    // Generate avatar background gradient based on name
+    const generateGradient = (name) => {
+        if (!name) return "#f50057";
+
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) {
+            hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        }
+
+        const color1 = `hsl(${hash % 360}, 70%, 50%)`;
+        const color2 = `hsl(${(hash * 3) % 360}, 70%, 60%)`;
+
+        return `linear-gradient(135deg, ${color1}, ${color2})`;
+    };
+
+    // Get initials from name
+    const getInitials = (name) => {
+        if (!name) return "";
+
+        const parts = name.split(" ");
+        if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+        return (
+            parts[0].charAt(0) + parts[parts.length - 1].charAt(0)
+        ).toUpperCase();
+    };
+
+    useEffect(() => {
+        const fetchConversations = async () => {
+            try {
+                const res = await fetch(`${API_URL}/api/chat/conversations`, {
+                    method: "GET",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    console.log("Conversations:", data);
+                    setPreviousChats(data);
+                }
+            } catch (err) {
+                console.error("Failed to fetch conversations:", err);
+            }
+        };
+
+        fetchConversations();
+    }, []);
+
     useEffect(() => {
         const fetchUserSession = async () => {
             try {
@@ -42,9 +93,9 @@ export default function ChatComponent({ recipientId }) {
     }, []);
 
     useEffect(() => {
-        const fetchChatHistory = async () => {
-            if (!user || !recipientId) return;
+        if (!user || !recipientId) return;
 
+        const fetchChatHistory = async () => {
             try {
                 const res = await fetch(
                     `${API_URL}/api/chat/history/${recipientId}`,
@@ -62,6 +113,7 @@ export default function ChatComponent({ recipientId }) {
 
                 const history = await res.json();
                 console.log("Chat history:", history);
+
                 setMessages(history);
             } catch (err) {
                 console.error("Error fetching chat history:", err);
@@ -69,7 +121,7 @@ export default function ChatComponent({ recipientId }) {
         };
 
         fetchChatHistory();
-    }, [user, recipientId]);
+    }, [user?.id, recipientId]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -93,10 +145,11 @@ export default function ChatComponent({ recipientId }) {
                     console.log("Recipient ID:", recipientId);
                     console.log("Sender ID:", incoming.senderId);
 
-
                     if (String(user.id) === String(incoming.senderId)) {
                         console.log("Outgoing message:", incoming);
-                    } else if (String(user.id) === String(incoming.recipientId)) {
+                    } else if (
+                        String(user.id) === String(incoming.recipientId)
+                    ) {
                         console.log("Incoming message:", incoming);
                         setMessages((prev) => [...prev, incoming]);
                     } else {
@@ -138,34 +191,75 @@ export default function ChatComponent({ recipientId }) {
     };
 
     return (
-        <div className={styles.chatContainer}>
-            <div className={styles.chatMessages}>
-                {messages.map((msg, i) => (
+        <div className={styles.chatWrapper}>
+            <div className={styles.chatSidebar}>
+                <h3>Recent Conversations</h3>
+                {previousChats.map((center) => (
                     <div
-                        key={i}
+                        key={center.id}
+                        onClick={() => {
+                            Router.push(`/chat/${center.id}`);
+                        }}
                         className={
-                            msg.senderId === user?.id
-                                ? styles.chatBubbleRight
-                                : styles.chatBubbleLeft
+                            center.id === recipientId
+                                ? styles.activeChat
+                                : styles.chatItem
                         }
                     >
-                        <div className={styles.chatContent}>{msg.content}</div>
+                        {center.profilePhoto ? (
+                            <img
+                                src={center.profilePhoto}
+                                alt={center.name}
+                                className={styles.avatarImage}
+                            />
+                        ) : (
+                            <div
+                                className={styles.avatarPlaceholder}
+                                style={{
+                                    background: generateGradient(center.name),
+                                }}
+                            >
+                                {getInitials(center.name)}
+                            </div>
+                        )}
+                        <span>{center.name}</span>
                     </div>
                 ))}
-                <div ref={messagesEndRef} />
             </div>
-            <div className={styles.chatInputArea}>
-                <input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                    placeholder="Type a message..."
-                    className={styles.chatInput}
-                />
-                <button onClick={sendMessage} className={styles.sendButton}>
-                    Send
-                </button>
+
+            <div className={styles.chatContainer}>
+                <div className={styles.chatMessages}>
+                    {user &&
+                        messages.map((msg, i) => (
+                            <div
+                                key={i}
+                                className={
+                                    msg.senderId.toString() ===
+                                    user.id.toString()
+                                        ? styles.chatBubbleRight
+                                        : styles.chatBubbleLeft
+                                }
+                            >
+                                <div className={styles.chatContent}>
+                                    {msg.content}
+                                </div>
+                            </div>
+                        ))}
+                    <div ref={messagesEndRef} />
+                </div>
+                <div className={styles.chatInputArea}>
+                    <input
+                        type="text"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                        placeholder="Type a message..."
+                        className={styles.chatInput}
+                    />
+                    <button onClick={sendMessage} className={styles.sendButton}>
+                        Send
+                    </button>
+                </div>
             </div>
         </div>
     );

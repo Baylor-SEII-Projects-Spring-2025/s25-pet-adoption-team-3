@@ -309,6 +309,7 @@
 }
 
 .eventDescription,
+.eventAge,
 .eventDate {
     font-size: 14px;
     color: #555;

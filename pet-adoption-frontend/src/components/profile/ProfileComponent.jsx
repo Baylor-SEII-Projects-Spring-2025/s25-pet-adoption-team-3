@@ -581,9 +581,7 @@ export default function ProfileDashboardComponent() {
                                                     key={pet.id}
                                                     className={styles.eventCard}
                                                     onClick={() =>
-                                                        handleCardClick(
-                                                            pet.id,
-                                                        )
+                                                        handleCardClick(pet.id)
                                                     }
                                                 >
                                                     <img
@@ -617,11 +615,14 @@ export default function ProfileDashboardComponent() {
                                                                 className={
                                                                     styles.messageIcon
                                                                 }
-                                                                onClick={() =>
+                                                                onClick={(
+                                                                    e,
+                                                                ) => {
+                                                                    e.stopPropagation();
                                                                     handleStartChat(
                                                                         pet.adoptionCenterId,
-                                                                    )
-                                                                }
+                                                                    );
+                                                                }}
                                                                 titleAccess="Message adoption center"
                                                             />
                                                         </div>
@@ -631,7 +632,13 @@ export default function ProfileDashboardComponent() {
                                                                 styles.eventDescription
                                                             }
                                                         >
-                                                            Breed: {pet.breed} |
+                                                            Breed: {pet.breed}
+                                                        </p>
+                                                        <p
+                                                            className={
+                                                                styles.eventAge
+                                                            }
+                                                        >
                                                             Age:{" "}
                                                             {calculateAge(
                                                                 pet.birthdate,

@@ -21,4 +21,6 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
 
     // Optionally: get messages sent TO a user that are unread
     List<ChatMessage> findByRecipientIdAndIsReadIsFalse(String recipientId);
+
+    List<ChatMessage> findBySenderIdOrRecipientId(String string, String string1);
 }
