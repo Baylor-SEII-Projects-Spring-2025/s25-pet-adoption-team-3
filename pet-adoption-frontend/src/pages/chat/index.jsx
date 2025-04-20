@@ -6,7 +6,7 @@ import ChatNavbar from "@/components/chat/ChatNavbar";
 export default function ChatPage() {
     const router = useRouter();
     const { userId: recipientId } = router.query;
-    
+
     return (
         <>
             <ChatNavbar />

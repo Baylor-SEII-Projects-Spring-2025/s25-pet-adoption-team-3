@@ -4,14 +4,17 @@ import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import styles from "@/styles/ChatComponent.module.css";
 import PropTypes from "prop-types";
+import CircularProgress from "@mui/material/CircularProgress";
 
 export default function ChatComponent({ recipientId }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [user, setUser] = useState(null); // <- this will be sender
     const [isConnected, setIsConnected] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const clientRef = useRef(null);
     const messagesEndRef = useRef(null);
+    const [petContext, setPetContext] = useState(null);
 
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
     const WS_URL = `${API_URL}/ws-chat`;
@@ -52,6 +55,7 @@ export default function ChatComponent({ recipientId }) {
     }, [user, previousChats]);
 
     const fetchConversations = async () => {
+        setIsLoading(true);
         try {
             const res = await fetch(`${API_URL}/api/chat/conversations`, {
                 method: "GET",
@@ -72,6 +76,7 @@ export default function ChatComponent({ recipientId }) {
         } catch (err) {
             console.error("Failed to fetch conversations:", err);
         }
+        setIsLoading(false);
     };
 
     const fetchUnreadCounts = async () => {
@@ -122,6 +127,55 @@ export default function ChatComponent({ recipientId }) {
             console.error("Failed to fetch unread counts:", err);
         }
     };
+
+    useEffect(() => {
+        const context = sessionStorage.getItem("petContext");
+        if (context) {
+            try {
+                const parsed = JSON.parse(context);
+                setPetContext(parsed);
+                console.log("Pet context:", parsed);
+
+                const lastPetContextMsg = [...messages]
+                    .reverse()
+                    .find((msg) => msg.petContext);
+
+                const isSameContext =
+                    lastPetContextMsg &&
+                    lastPetContextMsg.petContext &&
+                    parsed &&
+                    lastPetContextMsg.petContext.name === parsed.name &&
+                    lastPetContextMsg.petContext.age === parsed.age &&
+                    lastPetContextMsg.petContext.breed === parsed.breed &&
+                    lastPetContextMsg.petContext.gender === parsed.gender;
+
+                if (!isSameContext && user && recipientId) {
+                    // safe to send petContext
+                    const baseMsg = {
+                        senderId: user.id,
+                        recipientId: recipientId,
+                        content: "",
+                        timestamp: new Date().toISOString(),
+                        petContext: parsed,
+                    };
+
+                    if (clientRef.current && isConnected) {
+                        clientRef.current.publish({
+                            destination: "/app/chat",
+                            body: JSON.stringify(baseMsg),
+                        });
+
+                        sessionStorage.removeItem("petContext");
+
+                        setMessages((prev) => [...prev, baseMsg]);
+                    }
+                }
+            } catch (err) {
+                console.error("Invalid pet context", err);
+                sessionStorage.removeItem("petContext");
+            }
+        }
+    }, [user, recipientId, isConnected, messages]);
 
     useEffect(() => {
         if (!user || !recipientId) return;
@@ -207,7 +261,6 @@ export default function ChatComponent({ recipientId }) {
                 }
 
                 const history = await res.json();
-                console.log("Chat history:", history);
 
                 setMessages(history);
             } catch (err) {
@@ -228,30 +281,18 @@ export default function ChatComponent({ recipientId }) {
         const socket = new SockJS(WS_URL);
         const stompClient = new Client({
             webSocketFactory: () => socket,
-            debug: (str) => console.log("[STOMP DEBUG]:", str), // optional detailed logs
             reconnectDelay: 5000, // auto-reconnect
             onConnect: () => {
                 setIsConnected(true);
                 stompClient.subscribe("/topic/messages", (msg) => {
                     const incoming = JSON.parse(msg.body);
-                    console.log("Incoming message:", incoming);
-
-                    console.log("User ID:", user.id);
-                    console.log("Recipient ID:", recipientId);
-                    console.log("Sender ID:", incoming.senderId);
 
                     if (
                         String(user.id) === String(incoming.recipientId) &&
                         String(incoming.senderId) === String(recipientId)
                     ) {
-                        // Only add messages that are from the currently active chat partner
                         setMessages((prev) => [...prev, incoming]);
                     } else {
-                        // Optionally update unread count or other UI cues for other chats
-                        console.log(
-                            "Received message from another chat:",
-                            incoming,
-                        );
                         fetchConversations();
                         fetchUnreadCounts();
                     }
@@ -270,12 +311,20 @@ export default function ChatComponent({ recipientId }) {
     const sendMessage = () => {
         if (!input.trim()) return;
 
-        const msg = {
+        const baseMsg = {
             senderId: user.id,
             recipientId: recipientId,
             content: input,
             timestamp: new Date().toISOString(),
         };
+
+        // Check if any message already has petContext in history
+        const hasSentContext = messages.some((msg) => msg.petContext);
+
+        const msg =
+            !hasSentContext && petContext
+                ? { ...baseMsg, petContext }
+                : baseMsg;
 
         if (clientRef.current && isConnected) {
             clientRef.current.publish({
@@ -285,6 +334,10 @@ export default function ChatComponent({ recipientId }) {
 
             setMessages((prev) => [...prev, msg]);
             setInput("");
+
+            if (!hasSentContext && petContext) {
+                setPetContext(null); // clear after sending once
+            }
         } else {
             console.warn("❌ STOMP client not connected");
         }
@@ -309,102 +362,184 @@ export default function ChatComponent({ recipientId }) {
         return bTime - aTime;
     });
 
-    console.log("🔴 Unread Counts:", unreadCounts);
-    console.log(
-        "🧩 Center IDs in sortedChats:",
-        sortedChats.map((c) => c.id),
-    );
-    console.log("🧩 UnreadCounts keys:", Object.keys(unreadCounts));
-
     return (
         <div className={styles.chatWrapper}>
             <div className={styles.chatSidebar}>
-                <h3>Recent Conversations</h3>
-                {sortedChats.map((center) => (
-                    <div
-                        key={center.id}
-                        onClick={() => {
-                            Router.push(`/chat/${center.id}`);
-                        }}
-                        className={
-                            center.id === recipientId
-                                ? styles.activeChat
-                                : styles.chatItem
-                        }
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between", // push dot to right
-                        }}
-                    >
+                <h3 className={styles.recentConversationsHeader}>
+                    Recent Conversations
+                </h3>
+                {isLoading ? (
+                    <div className={styles.loadingWrapper}>
+                        <CircularProgress size={24} />
+                    </div>
+                ) : sortedChats.length === 0 ? (
+                    <div className={styles.noConversations}>
+                        No recent conversations
+                    </div>
+                ) : (
+                    sortedChats.map((center) => (
                         <div
+                            key={center.id}
+                            onClick={() => {
+                                Router.push(`/chat/${center.id}`);
+                            }}
+                            className={
+                                center.id === recipientId
+                                    ? styles.activeChat
+                                    : styles.chatItem
+                            }
                             style={{
                                 display: "flex",
                                 alignItems: "center",
-                                gap: "10px",
+                                justifyContent: "space-between",
                             }}
                         >
-                            {center.profilePhoto ? (
-                                <img
-                                    src={center.profilePhoto}
-                                    alt={center.name}
-                                    className={styles.avatarImage}
-                                />
-                            ) : (
-                                <div
-                                    className={styles.avatarPlaceholder}
-                                    style={{
-                                        background: generateGradient(
-                                            center.name,
-                                        ),
-                                    }}
-                                >
-                                    {getInitials(center.name)}
-                                </div>
-                            )}
-                            <span>{center.name}</span>
-                        </div>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "10px",
+                                }}
+                            >
+                                {center.profilePhoto ? (
+                                    <img
+                                        src={center.profilePhoto}
+                                        alt={center.name}
+                                        className={styles.avatarImage}
+                                    />
+                                ) : (
+                                    <div
+                                        className={styles.avatarPlaceholder}
+                                        style={{
+                                            background: generateGradient(
+                                                center.name,
+                                            ),
+                                        }}
+                                    >
+                                        {getInitials(center.name)}
+                                    </div>
+                                )}
+                                <span>{center.name}</span>
+                            </div>
 
-                        {unreadCounts[center.id]?.count > 0 && (
-                            <div className={styles.unreadIndicator}></div>
-                        )}
-                    </div>
-                ))}
+                            {unreadCounts[center.id]?.count > 0 && (
+                                <div className={styles.unreadIndicator}></div>
+                            )}
+                        </div>
+                    ))
+                )}
             </div>
 
             <div className={styles.chatContainer}>
-                <div className={styles.chatMessages}>
-                    {user &&
-                        messages.map((msg, i) => (
-                            <div
-                                key={i}
-                                className={
-                                    msg.senderId.toString() ===
-                                    user.id.toString()
-                                        ? styles.chatBubbleRight
-                                        : styles.chatBubbleLeft
+                {!recipientId ? (
+                    <div className={styles.noConversationSelected}>
+                        <p>No conversation selected</p>
+                    </div>
+                ) : (
+                    <>
+                        <div className={styles.chatMessages}>
+                            {user &&
+                                messages.map((msg, i) => {
+                                    const isSender =
+                                        msg.senderId.toString() ===
+                                        user.id.toString();
+
+                                    return (
+                                        <div
+                                            key={i}
+                                            className={
+                                                isSender
+                                                    ? styles.chatBubbleRight
+                                                    : styles.chatBubbleLeft
+                                            }
+                                        >
+                                            <div className={styles.chatContent}>
+                                                {/* Show pet context as a message */}
+                                                {msg.petContext ? (
+                                                    <>
+                                                        <p
+                                                            style={{
+                                                                fontStyle:
+                                                                    "italic",
+                                                                marginBottom:
+                                                                    "0.25rem",
+                                                            }}
+                                                        >
+                                                            You&apos;re chatting
+                                                            about{" "}
+                                                            <strong>
+                                                                {
+                                                                    msg
+                                                                        .petContext
+                                                                        .name
+                                                                }
+                                                            </strong>{" "}
+                                                            (
+                                                            {
+                                                                msg.petContext
+                                                                    .breed
+                                                            }
+                                                            , Age{" "}
+                                                            {msg.petContext.age}
+                                                            ,{" "}
+                                                            {
+                                                                msg.petContext
+                                                                    .gender
+                                                            }
+                                                            )
+                                                        </p>
+                                                        <img
+                                                            src={
+                                                                msg.petContext
+                                                                    .image
+                                                            }
+                                                            alt={
+                                                                msg.petContext
+                                                                    .name
+                                                            }
+                                                            className={
+                                                                styles.petContextImage
+                                                            }
+                                                            style={{
+                                                                marginTop:
+                                                                    "0.5rem",
+                                                                maxWidth:
+                                                                    "200px",
+                                                                borderRadius:
+                                                                    "10px",
+                                                            }}
+                                                        />
+                                                    </>
+                                                ) : (
+                                                    msg.content
+                                                )}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+
+                            <div ref={messagesEndRef} />
+                        </div>
+                        <div className={styles.chatInputArea}>
+                            <input
+                                type="text"
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                onKeyDown={(e) =>
+                                    e.key === "Enter" && sendMessage()
                                 }
+                                placeholder="Type a message..."
+                                className={styles.chatInput}
+                            />
+                            <button
+                                onClick={sendMessage}
+                                className={styles.sendButton}
                             >
-                                <div className={styles.chatContent}>
-                                    {msg.content}
-                                </div>
-                            </div>
-                        ))}
-                    <div ref={messagesEndRef} />
-                </div>
-                <div className={styles.chatInputArea}>
-                    <input
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                        placeholder="Type a message..."
-                        className={styles.chatInput}
-                    />
-                    <button onClick={sendMessage} className={styles.sendButton}>
-                        Send
-                    </button>
-                </div>
+                                Send
+                            </button>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );
