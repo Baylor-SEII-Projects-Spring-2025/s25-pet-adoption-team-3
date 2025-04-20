@@ -1,9 +1,6 @@
 package petadoption.api.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,4 +17,9 @@ public class ChatMessage {
     private String content;
     private String timestamp;
     private boolean isRead;
+
+    @Lob
+    @Convert(converter = PetContextConverter.class)
+    private PetContext petContext;
+
 }

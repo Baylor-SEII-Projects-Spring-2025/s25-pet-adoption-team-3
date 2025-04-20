@@ -307,11 +307,16 @@ export default function ProfileDashboardComponent() {
         return age;
     };
 
-    const handleStartChat = (adoptionCenterId) => {
+    const handleStartChat = (adoptionCenterId, petId, name, image, breed, age, gender) => {
         if (!adoptionCenterId) {
             alert("No adoption center linked to this pet.");
             return;
         }
+
+            sessionStorage.setItem(
+                "petContext",
+                JSON.stringify({ petId, name, image, breed, age, gender}),
+            );
 
         Router.push(`/chat/${adoptionCenterId}`);
     };
@@ -620,7 +625,7 @@ export default function ProfileDashboardComponent() {
                                                                 ) => {
                                                                     e.stopPropagation();
                                                                     handleStartChat(
-                                                                        pet.adoptionCenterId,
+                                                                        pet.adoptionCenterId, pet.id, pet.name, pet.image[0], pet.breed, calculateAge(pet.birthdate), pet.spayedStatus,
                                                                     );
                                                                 }}
                                                                 titleAccess="Message adoption center"
