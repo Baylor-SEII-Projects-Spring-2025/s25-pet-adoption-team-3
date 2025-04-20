@@ -4,12 +4,15 @@ import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import styles from "@/styles/ChatComponent.module.css";
 import PropTypes from "prop-types";
+import CircularProgress from "@mui/material/CircularProgress";
+
 
 export default function ChatComponent({ recipientId }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [user, setUser] = useState(null); // <- this will be sender
     const [isConnected, setIsConnected] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const clientRef = useRef(null);
     const messagesEndRef = useRef(null);
 
@@ -52,6 +55,7 @@ export default function ChatComponent({ recipientId }) {
     }, [user, previousChats]);
 
     const fetchConversations = async () => {
+        setIsLoading(true);
         try {
             const res = await fetch(`${API_URL}/api/chat/conversations`, {
                 method: "GET",
@@ -72,6 +76,7 @@ export default function ChatComponent({ recipientId }) {
         } catch (err) {
             console.error("Failed to fetch conversations:", err);
         }
+        setIsLoading(false);
     };
 
     const fetchUnreadCounts = async () => {
@@ -319,92 +324,115 @@ export default function ChatComponent({ recipientId }) {
     return (
         <div className={styles.chatWrapper}>
             <div className={styles.chatSidebar}>
-                <h3>Recent Conversations</h3>
-                {sortedChats.map((center) => (
-                    <div
-                        key={center.id}
-                        onClick={() => {
-                            Router.push(`/chat/${center.id}`);
-                        }}
-                        className={
-                            center.id === recipientId
-                                ? styles.activeChat
-                                : styles.chatItem
-                        }
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between", // push dot to right
-                        }}
-                    >
+                <h3 className={styles.recentConversationsHeader}>Recent Conversations</h3>
+                {isLoading ? (
+                    <div className={styles.loadingWrapper}>
+                        <CircularProgress size={24} />
+                    </div>
+                ) : sortedChats.length === 0 ? (
+                    <div className={styles.noConversations}>
+                        No recent conversations
+                    </div>
+                ) : (
+                    sortedChats.map((center) => (
                         <div
+                            key={center.id}
+                            onClick={() => {
+                                Router.push(`/chat/${center.id}`);
+                            }}
+                            className={
+                                center.id === recipientId
+                                    ? styles.activeChat
+                                    : styles.chatItem
+                            }
                             style={{
                                 display: "flex",
                                 alignItems: "center",
-                                gap: "10px",
+                                justifyContent: "space-between",
                             }}
                         >
-                            {center.profilePhoto ? (
-                                <img
-                                    src={center.profilePhoto}
-                                    alt={center.name}
-                                    className={styles.avatarImage}
-                                />
-                            ) : (
-                                <div
-                                    className={styles.avatarPlaceholder}
-                                    style={{
-                                        background: generateGradient(
-                                            center.name,
-                                        ),
-                                    }}
-                                >
-                                    {getInitials(center.name)}
-                                </div>
-                            )}
-                            <span>{center.name}</span>
-                        </div>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "10px",
+                                }}
+                            >
+                                {center.profilePhoto ? (
+                                    <img
+                                        src={center.profilePhoto}
+                                        alt={center.name}
+                                        className={styles.avatarImage}
+                                    />
+                                ) : (
+                                    <div
+                                        className={styles.avatarPlaceholder}
+                                        style={{
+                                            background: generateGradient(
+                                                center.name,
+                                            ),
+                                        }}
+                                    >
+                                        {getInitials(center.name)}
+                                    </div>
+                                )}
+                                <span>{center.name}</span>
+                            </div>
 
-                        {unreadCounts[center.id]?.count > 0 && (
-                            <div className={styles.unreadIndicator}></div>
-                        )}
-                    </div>
-                ))}
+                            {unreadCounts[center.id]?.count > 0 && (
+                                <div className={styles.unreadIndicator}></div>
+                            )}
+                        </div>
+                    ))
+                )}
             </div>
 
             <div className={styles.chatContainer}>
-                <div className={styles.chatMessages}>
-                    {user &&
-                        messages.map((msg, i) => (
-                            <div
-                                key={i}
-                                className={
-                                    msg.senderId.toString() ===
-                                    user.id.toString()
-                                        ? styles.chatBubbleRight
-                                        : styles.chatBubbleLeft
+                {!recipientId ? (
+                    <div className={styles.noConversationSelected}>
+                        <p>No conversation selected</p>
+                    </div>
+                ) : (
+                    <>
+                        <div className={styles.chatMessages}>
+                            {user &&
+                                messages.map((msg, i) => (
+                                    <div
+                                        key={i}
+                                        className={
+                                            msg.senderId.toString() ===
+                                            user.id.toString()
+                                                ? styles.chatBubbleRight
+                                                : styles.chatBubbleLeft
+                                        }
+                                    >
+                                        <div className={styles.chatContent}>
+                                            {msg.content}
+                                        </div>
+                                    </div>
+                                ))}
+                            <div ref={messagesEndRef} />
+                        </div>
+                        <div className={styles.chatInputArea}>
+                            <input
+                                type="text"
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                onKeyDown={(e) =>
+                                    e.key === "Enter" && sendMessage()
                                 }
+                                placeholder="Type a message..."
+                                className={styles.chatInput}
+                            />
+                            <button
+                                onClick={sendMessage}
+                                className={styles.sendButton}
                             >
-                                <div className={styles.chatContent}>
-                                    {msg.content}
-                                </div>
-                            </div>
-                        ))}
-                    <div ref={messagesEndRef} />
-                </div>
-                <div className={styles.chatInputArea}>
-                    <input
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                        placeholder="Type a message..."
-                        className={styles.chatInput}
-                    />
-                    <button onClick={sendMessage} className={styles.sendButton}>
-                        Send
-                    </button>
-                </div>
+                                Send
+                            </button>
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );

@@ -106,3 +106,19 @@
     line-height: 1.2;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
+
+.messageWithDot {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    /* space between text and dot */
+}
+
+.notificationDot {
+    width: 8px;
+    height: 8px;
+    position: relative;
+    border-radius: 50%;
+    background-color: red;
+    margin-top: 5px;
+}

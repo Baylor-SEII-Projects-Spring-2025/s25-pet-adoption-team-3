@@ -10,12 +10,16 @@ import MenuList from "@mui/material/MenuList";
 import MenuItem from "@mui/material/MenuItem";
 import { useRouter } from "next/router";
 
+import SockJS from "sockjs-client";
+import { Client } from "@stomp/stompjs";
+
 export default function ChatNavbar() {
     const [user, setUser] = useState(null);
     const [open, setOpen] = useState(false);
-        const [unreadCount, setUnreadCount] = useState(0);
+    const [unreadCount, setUnreadCount] = useState(0);
     const anchorRef = useRef(null);
     const Router = useRouter();
+    const clientRef = useRef(null);
 
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -44,22 +48,46 @@ export default function ChatNavbar() {
         }
     };
 
-        const fetchUnreadCount = async () => {
-            try {
-                const res = await fetch(`${API_URL}/api/chat/unread-count`, {
-                    method: "GET",
-                    credentials: "include",
-                });
+    const fetchUnreadCount = async () => {
+        try {
+            const res = await fetch(`${API_URL}/api/chat/unread-count`, {
+                method: "GET",
+                credentials: "include",
+            });
 
-                if (res.ok) {
-                    const count = await res.json();
-                    setUnreadCount(count);
-                }
-            } catch (err) {
-                console.error("Failed to fetch unread count:", err);
+            if (res.ok) {
+                const count = await res.json();
+                setUnreadCount(count);
             }
-        };
+        } catch (err) {
+            console.error("Failed to fetch unread count:", err);
+        }
+    };
 
+    useEffect(() => {
+        if (!user) return;
+
+        const socket = new SockJS(`${API_URL}/ws-chat`);
+        const client = new Client({
+            webSocketFactory: () => socket,
+            reconnectDelay: 5000,
+            onConnect: () => {
+                client.subscribe("/topic/messages", (msg) => {
+                    const incoming = JSON.parse(msg.body);
+                    if (String(incoming.recipientId) === String(user.id)) {
+                        setUnreadCount((prev) => prev + 1);
+                    }
+                });
+            },
+        });
+
+        clientRef.current = client;
+        client.activate();
+
+        return () => {
+            client.deactivate();
+        };
+    }, [user]);
 
     useEffect(() => {
         if (!user) {
@@ -115,22 +143,24 @@ export default function ChatNavbar() {
         return `linear-gradient(135deg, ${color1}, ${color2})`;
     };
 
-        const roleLinks = {
-            ADOPTION_CENTER: {
-                dashboard: "/adoption-center/dashboard",
-                profile: "/adoption-center/dashboard",
-                settings: "/adoption-center/dashboard",
-            },
-            ADOPTER: {
-                dashboard: "/profile",
-                profile: "/profile",
-                settings: "/profile",
-            },
-        };
+    const roleLinks = {
+        ADOPTION_CENTER: {
+            dashboard: "/adoption-center/dashboard",
+            profile: "/adoption-center/dashboard",
+            settings: "/adoption-center/dashboard",
+            messages: "/chat",
+        },
+        ADOPTER: {
+            dashboard: "/profile",
+            profile: "/profile",
+            settings: "/profile",
+            messages: "/chat",
+        },
+    };
 
-        const links = user
-            ? roleLinks[user.role] || roleLinks["default"]
-            : roleLinks["default"];
+    const links = user
+        ? roleLinks[user.role] || roleLinks["default"]
+        : roleLinks["default"];
 
     return (
         <nav className={styles.navbar}>
@@ -241,6 +271,30 @@ export default function ChatNavbar() {
                                                         }
                                                     >
                                                         My Likes
+                                                    </Link>
+                                                </MenuItem>
+                                                <MenuItem onClick={handleClose}>
+                                                    <Link
+                                                        href={links.messages}
+                                                        className={
+                                                            styles.navbarLink
+                                                        }
+                                                    >
+                                                        <span
+                                                            className={
+                                                                styles.messageWithDot
+                                                            }
+                                                        >
+                                                            My Messages
+                                                            {unreadCount >
+                                                                0 && (
+                                                                <span
+                                                                    className={
+                                                                        styles.notificationDot
+                                                                    }
+                                                                ></span>
+                                                            )}
+                                                        </span>
                                                     </Link>
                                                 </MenuItem>
                                                 <MenuItem onClick={handleClose}>
