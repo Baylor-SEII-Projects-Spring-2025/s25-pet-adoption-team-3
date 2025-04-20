@@ -7,18 +7,15 @@
     background-color: #8B80F9;
     color: white;
 }
-
 .logo {
     display: flex;
     align-items: center;
 }
-
 .logo img {
     margin-top: 8px;
     height: 45px;
     cursor: pointer;
 }
-
 .navLinks {
     list-style: none;
     display: flex;
@@ -29,11 +26,9 @@
     justify-content: flex-start;
     margin-left: 50px;
 }
-
 .navLinks li {
     display: inline;
 }
-
 .navLinks a {
     text-decoration: none;
     color: white;
@@ -42,16 +37,13 @@
     font-style: normal;
     transition: color 0.3s ease-in-out;
 }
-
 .navLinks a:hover {
     color: #CFBFF7;
 }
-
 .auth {
     display: flex;
     align-items: center;
 }
-
 .loginButton {
     background-color: white;
     color: #000000;
@@ -61,17 +53,44 @@
     text-decoration: none;
     transition: background 0.3s ease-in-out;
 }
-
 .loginButton:hover {
     background-color: #CFBFF7;
 }
-
-.navbarLink{
+.navbarLink {
     text-decoration: none;
     color: black;
 }
-
-.profileItems{
+.profileItems {
     display: flex;
     align-items: center;
+}
+
+/* Fixed notification indicators */
+.notificationDot {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 8px;
+    height: 8px;
+    background-color: #FF4757;
+    border-radius: 50%;
+    border: 2px solid #8B80F9; /* Match with navbar background */
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+.notificationCount {
+    position: absolute;
+    font-family: sans-serif;
+    top: -5px;
+    right: 20px;
+    background-color: #FF4757;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    border-radius: 999px;
+    padding: 1px 5px;
+    min-width: 16px;
+    text-align: center;
+    line-height: 1.2;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }

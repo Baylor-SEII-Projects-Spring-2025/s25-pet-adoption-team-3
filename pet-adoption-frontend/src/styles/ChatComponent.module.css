@@ -1,9 +1,11 @@
 .chatWrapper {
+    position: relative;
     display: flex;
     height: calc(100vh - 81px);
     width: 100vw;
     font-family: 'Segoe UI', sans-serif;
     background: #ffffff;
+
 }
 
 .chatSidebar {
@@ -63,6 +65,7 @@
     color: white;
     font-weight: bold;
     font-size: 14px;
+    position: relative;
 }
 
 .chatContainer {
@@ -142,6 +145,15 @@
 
 .sendButton:hover {
     background-color: #125ea9;
+}
+
+.unreadIndicator {
+    right: 0;
+    width: 6px;
+    height: 6px;
+    background-color: red;
+    border-radius: 50%;
+    z-index: 1;
 }
 
 @keyframes fadeIn {
