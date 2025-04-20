@@ -188,6 +188,9 @@ export default function ProfileNavbar() {
                             placement="bottom-start"
                             transition
                             disablePortal
+                            style={{
+                                zIndex: 10000
+                            }}
                         >
                             {({ TransitionProps }) => (
                                 <Grow

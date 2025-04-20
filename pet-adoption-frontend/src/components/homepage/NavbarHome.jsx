@@ -183,6 +183,9 @@ export default function Navbar() {
                             placement="bottom-start"
                             transition
                             disablePortal
+                            style={{
+                                zIndex: 100000,
+                            }}
                         >
                             {({ TransitionProps }) => (
                                 <Grow

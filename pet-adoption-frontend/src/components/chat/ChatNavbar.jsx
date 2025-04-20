@@ -184,6 +184,9 @@ export default function ChatNavbar() {
                             placement="bottom-start"
                             transition
                             disablePortal
+                            style={{
+                                zIndex: 10000,
+                            }}
                         >
                             {({ TransitionProps }) => (
                                 <Grow

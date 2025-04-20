@@ -187,6 +187,9 @@ export default function AdoptionNavbar() {
                             placement="bottom-start"
                             transition
                             disablePortal
+                            style={{
+                                zIndex: 10000,
+                            }}
                         >
                             {({ TransitionProps }) => (
                                 <Grow
