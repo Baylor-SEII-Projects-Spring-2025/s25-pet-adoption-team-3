@@ -13,6 +13,7 @@ import { useRouter } from "next/router";
 export default function AdoptionNavbar() {
     const [user, setUser] = useState(null);
     const [open, setOpen] = useState(false);
+        const [unreadCount, setUnreadCount] = useState(0);
     const anchorRef = useRef(null);
     const Router = useRouter();
 
@@ -36,12 +37,29 @@ export default function AdoptionNavbar() {
 
             const data = await response.json();
             setUser(data.user);
+            fetchUnreadCount();
 
             if (data.user.role != "ADOPTION_CENTER") {
                 Router.push("/");
             }
         } catch (error) {
             console.error("Error fetching session:", error);
+        }
+    };
+
+    const fetchUnreadCount = async () => {
+        try {
+            const res = await fetch(`${API_URL}/api/chat/unread-count`, {
+                method: "GET",
+                credentials: "include",
+            });
+
+            if (res.ok) {
+                const count = await res.json();
+                setUnreadCount(count);
+            }
+        } catch (err) {
+            console.error("Failed to fetch unread count:", err);
         }
     };
 
@@ -166,6 +184,12 @@ export default function AdoptionNavbar() {
                                         </>
                                     )}
                             </Avatar>
+
+                            {unreadCount > 0 && (
+                                <span className={styles.notificationCount}>
+                                    {unreadCount > 99 ? "99+" : unreadCount}
+                                </span>
+                            )}
 
                             <img
                                 src="/icons/profile_expand_arrow.png"

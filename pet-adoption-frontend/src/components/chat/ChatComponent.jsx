@@ -17,7 +17,7 @@ export default function ChatComponent({ recipientId }) {
     const WS_URL = `${API_URL}/ws-chat`;
 
     const [previousChats, setPreviousChats] = useState([]);
-
+    const [unreadCounts, setUnreadCounts] = useState({});
 
     // Generate avatar background gradient based on name
     const generateGradient = (name) => {
@@ -46,26 +46,120 @@ export default function ChatComponent({ recipientId }) {
     };
 
     useEffect(() => {
-        const fetchConversations = async () => {
+        if (user) {
+            fetchUnreadCounts(); // Only run after user is fetched
+        }
+    }, [user, previousChats]);
+
+    const fetchConversations = async () => {
+        try {
+            const res = await fetch(`${API_URL}/api/chat/conversations`, {
+                method: "GET",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                console.log("Conversations:", data);
+                setPreviousChats(
+                    data.map((chat) => ({
+                        ...chat,
+                        id: String(chat.id),
+                    })),
+                );
+            }
+        } catch (err) {
+            console.error("Failed to fetch conversations:", err);
+        }
+    };
+
+    const fetchUnreadCounts = async () => {
+        if (!user) return;
+        try {
+            // First get the global unread count
+            const countRes = await fetch(`${API_URL}/api/chat/unread-count`, {
+                method: "GET",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+            });
+
+            if (!countRes.ok) return;
+
+            // Then get unread counts per conversation
+            const counts = {};
+            for (const chat of previousChats) {
+                const res = await fetch(
+                    `${API_URL}/api/chat/history/${chat.id}`,
+                    {
+                        method: "GET",
+                        credentials: "include",
+                        headers: { "Content-Type": "application/json" },
+                    },
+                );
+
+                if (res.ok) {
+                    const history = await res.json();
+                    const unreadCount = history.filter(
+                        (msg) =>
+                            !msg.read &&
+                            String(msg.recipientId) === String(user.id),
+                    ).length;
+
+                    if (unreadCount > 0) {
+                        counts[String(chat.id)] = {
+                            count: unreadCount,
+                            lastMessageTime:
+                                history[history.length - 1]?.timestamp ||
+                                new Date().toISOString(),
+                        };
+                    }
+                }
+            }
+
+            setUnreadCounts(counts);
+        } catch (err) {
+            console.error("Failed to fetch unread counts:", err);
+        }
+    };
+
+    useEffect(() => {
+        if (!user || !recipientId) return;
+
+        const fetchChatHistory = async () => {
             try {
-                const res = await fetch(`${API_URL}/api/chat/conversations`, {
-                    method: "GET",
+                const res = await fetch(
+                    `${API_URL}/api/chat/history/${recipientId}`,
+                    {
+                        method: "GET",
+                        credentials: "include",
+                        headers: { "Content-Type": "application/json" },
+                    },
+                );
+
+                if (!res.ok) {
+                    console.error("Failed to fetch chat history");
+                    return;
+                }
+
+                const history = await res.json();
+                setMessages(history);
+
+                // ✅ Mark messages from this chat as read
+                await fetch(`${API_URL}/api/chat/mark-read/${recipientId}`, {
+                    method: "PUT",
                     credentials: "include",
                     headers: { "Content-Type": "application/json" },
                 });
 
-                if (res.ok) {
-                    const data = await res.json();
-                    console.log("Conversations:", data);
-                    setPreviousChats(data);
-                }
+                fetchUnreadCounts(); // Refresh UI count
             } catch (err) {
-                console.error("Failed to fetch conversations:", err);
+                console.error("Error fetching chat history:", err);
             }
         };
 
-        fetchConversations();
-    }, []);
+        fetchChatHistory();
+    }, [user?.id, recipientId]);
 
     useEffect(() => {
         const fetchUserSession = async () => {
@@ -83,6 +177,7 @@ export default function ChatComponent({ recipientId }) {
 
                 const data = await res.json();
                 setUser(data.user);
+                fetchConversations();
                 console.log("User session:", data.user);
             } catch (err) {
                 console.error("Failed to fetch user session:", err);
@@ -145,15 +240,20 @@ export default function ChatComponent({ recipientId }) {
                     console.log("Recipient ID:", recipientId);
                     console.log("Sender ID:", incoming.senderId);
 
-                    if (String(user.id) === String(incoming.senderId)) {
-                        console.log("Outgoing message:", incoming);
-                    } else if (
-                        String(user.id) === String(incoming.recipientId)
+                    if (
+                        String(user.id) === String(incoming.recipientId) &&
+                        String(incoming.senderId) === String(recipientId)
                     ) {
-                        console.log("Incoming message:", incoming);
+                        // Only add messages that are from the currently active chat partner
                         setMessages((prev) => [...prev, incoming]);
                     } else {
-                        console.log("Unknown message:", incoming);
+                        // Optionally update unread count or other UI cues for other chats
+                        console.log(
+                            "Received message from another chat:",
+                            incoming,
+                        );
+                        fetchConversations();
+                        fetchUnreadCounts();
                     }
                 });
             },
@@ -190,11 +290,37 @@ export default function ChatComponent({ recipientId }) {
         }
     };
 
+    const sortedChats = [...previousChats].sort((a, b) => {
+        const aUnread = unreadCounts[a.id]?.count > 0;
+        const bUnread = unreadCounts[b.id]?.count > 0;
+
+        const aTime = new Date(
+            unreadCounts[a.id]?.lastMessageTime || a.lastMessageTime || 0,
+        );
+        const bTime = new Date(
+            unreadCounts[b.id]?.lastMessageTime || b.lastMessageTime || 0,
+        );
+
+        // Sort by unread first
+        if (aUnread && !bUnread) return -1;
+        if (!aUnread && bUnread) return 1;
+
+        // Then by latest message time
+        return bTime - aTime;
+    });
+
+    console.log("🔴 Unread Counts:", unreadCounts);
+    console.log(
+        "🧩 Center IDs in sortedChats:",
+        sortedChats.map((c) => c.id),
+    );
+    console.log("🧩 UnreadCounts keys:", Object.keys(unreadCounts));
+
     return (
         <div className={styles.chatWrapper}>
             <div className={styles.chatSidebar}>
                 <h3>Recent Conversations</h3>
-                {previousChats.map((center) => (
+                {sortedChats.map((center) => (
                     <div
                         key={center.id}
                         onClick={() => {
@@ -205,24 +331,43 @@ export default function ChatComponent({ recipientId }) {
                                 ? styles.activeChat
                                 : styles.chatItem
                         }
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between", // push dot to right
+                        }}
                     >
-                        {center.profilePhoto ? (
-                            <img
-                                src={center.profilePhoto}
-                                alt={center.name}
-                                className={styles.avatarImage}
-                            />
-                        ) : (
-                            <div
-                                className={styles.avatarPlaceholder}
-                                style={{
-                                    background: generateGradient(center.name),
-                                }}
-                            >
-                                {getInitials(center.name)}
-                            </div>
+                        <div
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "10px",
+                            }}
+                        >
+                            {center.profilePhoto ? (
+                                <img
+                                    src={center.profilePhoto}
+                                    alt={center.name}
+                                    className={styles.avatarImage}
+                                />
+                            ) : (
+                                <div
+                                    className={styles.avatarPlaceholder}
+                                    style={{
+                                        background: generateGradient(
+                                            center.name,
+                                        ),
+                                    }}
+                                >
+                                    {getInitials(center.name)}
+                                </div>
+                            )}
+                            <span>{center.name}</span>
+                        </div>
+
+                        {unreadCounts[center.id]?.count > 0 && (
+                            <div className={styles.unreadIndicator}></div>
                         )}
-                        <span>{center.name}</span>
                     </div>
                 ))}
             </div>

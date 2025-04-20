@@ -76,3 +76,33 @@
     display: flex;
     align-items: center;
 }
+
+.notificationDot {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 8px;
+    height: 8px;
+    background-color: #FF4757;
+    border-radius: 50%;
+    border: 2px solid #8B80F9;
+    /* Match with navbar background */
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+.notificationCount {
+    position: absolute;
+    font-family: sans-serif;
+    top: -5px;
+    right: 20px;
+    background-color: #FF4757;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    border-radius: 999px;
+    padding: 1px 5px;
+    min-width: 16px;
+    text-align: center;
+    line-height: 1.2;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}

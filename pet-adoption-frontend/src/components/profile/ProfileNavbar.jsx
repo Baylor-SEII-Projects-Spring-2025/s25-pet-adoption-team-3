@@ -13,6 +13,7 @@ import { useRouter } from "next/router";
 export default function ProfileNavbar() {
     const [user, setUser] = useState(null);
     const [open, setOpen] = useState(false);
+        const [unreadCount, setUnreadCount] = useState(0);
     const anchorRef = useRef(null);
     const Router = useRouter();
 
@@ -37,12 +38,29 @@ export default function ProfileNavbar() {
             const data = await response.json();
             console.log("✅ Session found:", data);
             setUser(data.user);
+            fetchUnreadCount();
 
             if (data.user.role == "ADOPTION_CENTER") {
                 Router.push("/adoption-center/dashboard");
             }
         } catch (error) {
             console.error("Error fetching session:", error);
+        }
+    };
+
+    const fetchUnreadCount = async () => {
+        try {
+            const res = await fetch(`${API_URL}/api/chat/unread-count`, {
+                method: "GET",
+                credentials: "include",
+            });
+
+            if (res.ok) {
+                const count = await res.json();
+                setUnreadCount(count);
+            }
+        } catch (err) {
+            console.error("Failed to fetch unread count:", err);
         }
     };
 
@@ -100,22 +118,22 @@ export default function ProfileNavbar() {
         return `linear-gradient(135deg, ${color1}, ${color2})`;
     };
 
-        const roleLinks = {
-            ADOPTION_CENTER: {
-                dashboard: "/adoption-center/dashboard",
-                profile: "/adoption-center/dashboard",
-                settings: "/adoption-center/dashboard",
-            },
-            ADOPTER: {
-                dashboard: "/profile",
-                profile: "/profile",
-                settings: "/profile",
-            },
-        };
+    const roleLinks = {
+        ADOPTION_CENTER: {
+            dashboard: "/adoption-center/dashboard",
+            profile: "/adoption-center/dashboard",
+            settings: "/adoption-center/dashboard",
+        },
+        ADOPTER: {
+            dashboard: "/profile",
+            profile: "/profile",
+            settings: "/profile",
+        },
+    };
 
-        const links = user
-            ? roleLinks[user.role] || roleLinks["default"]
-            : roleLinks["default"];
+    const links = user
+        ? roleLinks[user.role] || roleLinks["default"]
+        : roleLinks["default"];
 
     return (
         <nav className={styles.navbar}>
@@ -168,6 +186,12 @@ export default function ProfileNavbar() {
                                     )}
                             </Avatar>
 
+                            {unreadCount > 0 && (
+                                <span className={styles.notificationCount}>
+                                    {unreadCount > 99 ? "99+" : unreadCount}
+                                </span>
+                            )}
+
                             <img
                                 src="/icons/profile_expand_arrow.png"
                                 alt="Expand"
@@ -189,7 +213,7 @@ export default function ProfileNavbar() {
                             transition
                             disablePortal
                             style={{
-                                zIndex: 10000
+                                zIndex: 10000,
                             }}
                         >
                             {({ TransitionProps }) => (

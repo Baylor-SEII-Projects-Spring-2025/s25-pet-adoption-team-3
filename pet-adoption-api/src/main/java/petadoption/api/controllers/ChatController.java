@@ -7,6 +7,7 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import petadoption.api.models.ChatMessage;
 import petadoption.api.models.User;
 import petadoption.api.repository.ChatMessageRepository;
@@ -45,9 +46,13 @@ public class ChatController {
             @PathVariable String otherUserId
     ) {
         User currentUser = (User) session.getAttribute("user");
-        List<ChatMessage> history = messageRepository.findConversation(currentUser.getId().toString(), otherUserId);
+        String currentUserId = currentUser.getId().toString();
+
+        List<ChatMessage> history = messageRepository.findConversation(currentUserId, otherUserId);
+
         return ResponseEntity.ok(history);
     }
+
 
     @GetMapping("/api/chat/conversations")
     public ResponseEntity<?> getPreviousConversations(HttpSession session) {
@@ -73,6 +78,16 @@ public class ChatController {
                 .map(id -> {
                     User user = userRepository.findById(Long.parseLong(id)).orElse(null);
                     String name;
+                    String currentUserId = currentUser.getId().toString();
+                    List<ChatMessage> messages = messageRepository.findConversation(currentUserId, id);
+
+                    String lastTime = messages.isEmpty() ? null :
+                            messages.get(messages.size() - 1).getTimestamp();
+
+                    long unreadCount = messages.stream()
+                            .filter(msg -> msg.getRecipientId().equals(currentUserId) && !msg.isRead())
+                            .count();
+
                     if (user.getFirstName() != null && !user.getFirstName().isEmpty()) {
                         if(user.getLastName() == null || user.getLastName().isEmpty()) {
                             name = user.getFirstName();
@@ -89,7 +104,9 @@ public class ChatController {
                     return Map.of(
                             "id", user.getId().toString(),
                             "name", name,
-                            "profilePhoto", profilePhoto
+                            "profilePhoto", profilePhoto,
+                            "lastMessageTime", lastTime != null ? lastTime : "",
+                            "unreadCount", String.valueOf(unreadCount)
                     );
 
                 })
@@ -99,6 +116,40 @@ public class ChatController {
 
         return ResponseEntity.ok(conversations);
     }
+
+    @GetMapping("/api/chat/unread-count")
+    public ResponseEntity<Integer> getUnreadCount(HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return ResponseEntity.status(401).body(0);
+        }
+
+        int count = messageRepository
+                .findByRecipientIdAndIsReadIsFalse(currentUser.getId().toString())
+                .size();
+
+        return ResponseEntity.ok(count);
+    }
+
+    @PutMapping("/api/chat/mark-read/{otherUserId}")
+    public ResponseEntity<?> markMessagesAsRead(
+            HttpSession session,
+            @PathVariable String otherUserId
+    ) {
+        User currentUser = (User) session.getAttribute("user");
+        String currentUserId = currentUser.getId().toString();
+
+        List<ChatMessage> unreadMessages = messageRepository.findConversation(currentUserId, otherUserId)
+                .stream()
+                .filter(msg -> msg.getRecipientId().equals(currentUserId) && !msg.isRead())
+                .toList();
+
+        unreadMessages.forEach(msg -> msg.setRead(true));
+        messageRepository.saveAll(unreadMessages);
+
+        return ResponseEntity.ok().build();
+    }
+
 
 
 }

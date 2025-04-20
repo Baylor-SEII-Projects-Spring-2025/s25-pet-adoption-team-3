@@ -12,6 +12,7 @@ import MenuItem from "@mui/material/MenuItem";
 export default function Navbar() {
     const [user, setUser] = useState(null);
     const [open, setOpen] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
     const anchorRef = useRef(null);
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -30,17 +31,35 @@ export default function Navbar() {
                 return;
             }
 
-                if (!response.ok) {
-                    throw new Error("Error fetching session");
-                }
-
-                const data = await response.json();
-                console.log("✅ Session found:", data);
-                setUser(data.user);
-            } catch (error) {
-                console.error("Error fetching session:", error);
+            if (!response.ok) {
+                throw new Error("Error fetching session");
             }
-        };
+
+            const data = await response.json();
+            console.log("✅ Session found:", data);
+            setUser(data.user);
+            fetchUnreadCount();
+        } catch (error) {
+            console.error("Error fetching session:", error);
+        }
+    };
+
+    const fetchUnreadCount = async () => {
+        try {
+            const res = await fetch(`${API_URL}/api/chat/unread-count`, {
+                method: "GET",
+                credentials: "include",
+            });
+
+            if (res.ok) {
+                const count = await res.json();
+                setUnreadCount(count);
+            }
+        } catch (err) {
+            console.error("Failed to fetch unread count:", err);
+        }
+    };
+
 
     useEffect(() => {
         if (!user) {
@@ -162,6 +181,12 @@ export default function Navbar() {
                                         </>
                                     )}
                             </Avatar>
+
+                            {unreadCount > 0 && (
+                                <span className={styles.notificationCount}>
+                                    {unreadCount > 99 ? "99+" : unreadCount}
+                                </span>
+                            )}
 
                             <img
                                 src="/icons/profile_expand_arrow.png"

@@ -13,6 +13,7 @@ import { useRouter } from "next/router";
 export default function ChatNavbar() {
     const [user, setUser] = useState(null);
     const [open, setOpen] = useState(false);
+        const [unreadCount, setUnreadCount] = useState(0);
     const anchorRef = useRef(null);
     const Router = useRouter();
 
@@ -37,10 +38,28 @@ export default function ChatNavbar() {
             const data = await response.json();
             console.log("✅ Session found:", data);
             setUser(data.user);
+            fetchUnreadCount();
         } catch (error) {
             console.error("Error fetching session:", error);
         }
     };
+
+        const fetchUnreadCount = async () => {
+            try {
+                const res = await fetch(`${API_URL}/api/chat/unread-count`, {
+                    method: "GET",
+                    credentials: "include",
+                });
+
+                if (res.ok) {
+                    const count = await res.json();
+                    setUnreadCount(count);
+                }
+            } catch (err) {
+                console.error("Failed to fetch unread count:", err);
+            }
+        };
+
 
     useEffect(() => {
         if (!user) {
@@ -164,6 +183,12 @@ export default function ChatNavbar() {
                                     )}
                             </Avatar>
 
+                            {unreadCount > 0 && (
+                                <span className={styles.notificationCount}>
+                                    {unreadCount > 99 ? "99+" : unreadCount}
+                                </span>
+                            )}
+
                             <img
                                 src="/icons/profile_expand_arrow.png"
                                 alt="Expand"
@@ -185,7 +210,7 @@ export default function ChatNavbar() {
                             transition
                             disablePortal
                             style={{
-                                zIndex: 10000,
+                                zIndex: 1000000000,
                             }}
                         >
                             {({ TransitionProps }) => (
