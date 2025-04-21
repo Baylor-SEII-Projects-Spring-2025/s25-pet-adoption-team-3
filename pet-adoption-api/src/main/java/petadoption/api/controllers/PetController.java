@@ -25,9 +25,8 @@ import petadoption.api.services.RecEngineService;
 import petadoption.api.services.SessionValidation;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000" })
 @RestController
@@ -174,9 +173,26 @@ public class PetController {
     }
 
     @GetMapping("/get-all-pets/{adoptionCenterID}")
-    public ResponseEntity<List<Pet>> getAllPets(@PathVariable Long adoptionCenterID) {
+    public ResponseEntity<?> getAllPets(@PathVariable Long adoptionCenterID) {
         List<Pet> pets = petService.getAllPets(adoptionCenterID);
-        return ResponseEntity.ok(pets);
+        System.out.println("Pets: " + pets);
+
+        List<Map<String, Object>> result = pets.stream()
+                .map(pet -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("petId", pet.getId());
+                    map.put("petName", pet.getName());
+                    map.put("petImage", pet.getImage() != null && !pet.getImage().isEmpty() ? pet.getImage().get(0) : null);
+                    map.put("breed", pet.getBreed());
+                    map.put("spayedStatus", pet.getSpayedStatus());
+                    map.put("status", pet.getAvailabilityStatus());
+
+                    return map;
+                })
+                .collect(Collectors.toList());
+
+
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/get-pet-detail/{petId}")

