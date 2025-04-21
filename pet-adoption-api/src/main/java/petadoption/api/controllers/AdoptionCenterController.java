@@ -5,14 +5,20 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import petadoption.api.DTO.AdoptionCenterDTO;
+import petadoption.api.models.Pet;
 import petadoption.api.models.User;
+import petadoption.api.repository.PetRepository;
 import petadoption.api.repository.UserRepository;
 import petadoption.api.services.AdoptionCenterService;
 
 import petadoption.api.services.GCSStorageService;
 import petadoption.api.services.SessionValidation;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = {"http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000"})
 @RestController
@@ -22,13 +28,15 @@ public class AdoptionCenterController {
     private final UserRepository userRepository;
     private final GCSStorageService gcsStorageService;
     private final SessionValidation sessionValidation;
+    private final PetRepository petRepository;
 
 
-    public AdoptionCenterController(AdoptionCenterService adoptionCenterService, UserRepository userRepository, SessionValidation sessionValidation) {
+    public AdoptionCenterController(AdoptionCenterService adoptionCenterService, UserRepository userRepository, SessionValidation sessionValidation, PetRepository petRepository) {
         this.sessionValidation = sessionValidation;
         this.adoptionCenterService = adoptionCenterService;
         this.gcsStorageService = new GCSStorageService();
         this.userRepository = userRepository;
+        this.petRepository = petRepository;
     }
 
     @PostMapping("/register")
@@ -142,5 +150,39 @@ public class AdoptionCenterController {
 
         return ResponseEntity.ok("Address updated to: " + adoptionCenterDTO.getAddress());
     }
+
+    @GetMapping("/pets")
+    public ResponseEntity<?> getPetsForLoggedInAdoptionCenter(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            return ResponseEntity.status(401).body("User not logged in.");
+        }
+
+        User user = (User) session.getAttribute("user");
+        if (user.getAdoptionCenterName().isEmpty() || user.getAdoptionCenterName() == null) {
+            return ResponseEntity.status(403).body("User is not an adoption center.");
+        }
+
+        List<Pet> pets = petRepository.findByAdoptionCenterId(user.getId());
+        return ResponseEntity.ok(pets);
+    }
+
+    @GetMapping("/users-who-liked/{petId}")
+    public ResponseEntity<?> getUsersWhoLikedPet(@PathVariable Long petId) {
+        List<Object[]> results = userRepository.findUsersWhoLikedPet(petId);
+
+        List<Map<String, Object>> users = results.stream().map(obj -> {
+            Map<String, Object> user = new HashMap<>();
+            user.put("id", obj[0]);
+            user.put("firstName", obj[1]);
+            user.put("lastName", obj[2]);
+            user.put("email", obj[3]);
+            user.put("profilePhoto", obj[4]);
+            return user;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(users);
+    }
+
 
 }

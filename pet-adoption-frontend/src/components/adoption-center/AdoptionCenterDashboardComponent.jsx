@@ -770,6 +770,11 @@ export default function ProfileDashboardComponent() {
         }
     };
 
+    const handlePetClick = (petId) => {
+        const encodedId = btoa(petId.toString()); // base64 encode
+        Router.push(`/pet-info/${encodedId}`);
+    };
+
     if (isPageLoading) {
         return <Loading />;
     }
@@ -1472,6 +1477,14 @@ export default function ProfileDashboardComponent() {
                                                                     className={
                                                                         styles.petCard
                                                                     }
+                                                                    onClick={() =>
+                                                                        handlePetClick(
+                                                                            pet.id,
+                                                                        )
+                                                                    }
+                                                                    style={{
+                                                                        cursor: "pointer",
+                                                                    }}
                                                                 >
                                                                     <img
                                                                         src={
