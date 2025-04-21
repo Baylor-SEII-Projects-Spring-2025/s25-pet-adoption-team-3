@@ -1,17 +1,55 @@
-import React, { useEffect, useState } from "react";
-import styles from "@/styles/PetInfoComponent.module.css";
-import PropTypes from "prop-types";
-import Avatar from "@mui/material/Avatar";
-import Router from "next/router";
+import React, { useEffect, useState } from 'react';
+import styles from '@/styles/PetInfoComponent.module.css';
+import PropTypes from 'prop-types';
+import Avatar from '@mui/material/Avatar';
+import Router from 'next/router';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import IconButton from '@mui/material/IconButton';
+import { Menu, MenuItem, Snackbar, Alert } from '@mui/material';
 
 export default function PetInfoComponent({ petUUID }) {
     const [pet, setPet] = useState(null);
     const [likedUsers, setLikedUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+    const [menuUserId, setMenuUserId] = useState(null);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
     const decodedPetId = petUUID ? atob(petUUID) : null;
+
+    useEffect(() => {
+        const fetchUserSession = async () => {
+            try {
+                const response = await fetch(`${API_URL}/auth/session`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.status === 401) {
+                    Router.push('/login');
+                    console.warn('No active session.');
+                    return;
+                }
+
+                const data = await response.json();
+                console.log('✅ Session found:', data);
+
+                if (data.user.role == 'ADOPTER') {
+                    Router.push('/profile');
+                }
+            } catch (error) {
+                console.error('Error fetching session:', error);
+            }
+        };
+        fetchUserSession();
+    }, []);
 
     useEffect(() => {
         if (!decodedPetId) return;
@@ -20,7 +58,7 @@ export default function PetInfoComponent({ petUUID }) {
             try {
                 const petRes = await fetch(
                     `${API_URL}/api/pet/get-pet-detail/${decodedPetId}`,
-                    { credentials: "include" },
+                    { credentials: 'include' },
                 );
                 const petData = await petRes.json();
                 if (!petRes.ok) throw new Error(petData);
@@ -28,13 +66,13 @@ export default function PetInfoComponent({ petUUID }) {
 
                 const userRes = await fetch(
                     `${API_URL}/api/adoption-center/users-who-liked/${decodedPetId}`,
-                    { credentials: "include" },
+                    { credentials: 'include' },
                 );
                 const userData = await userRes.json();
                 if (!userRes.ok) throw new Error(userData);
                 setLikedUsers(userData);
             } catch (err) {
-                setError(err.message || "Error fetching data");
+                setError(err.message || 'Error fetching data');
             } finally {
                 setLoading(false);
             }
@@ -44,7 +82,7 @@ export default function PetInfoComponent({ petUUID }) {
     }, [decodedPetId]);
 
     const generateGradient = (name) => {
-        if (!name) return "#f50057";
+        if (!name) return '#f50057';
 
         let hash = 0;
         for (let i = 0; i < name.length; i++) {
@@ -58,7 +96,7 @@ export default function PetInfoComponent({ petUUID }) {
     };
 
     const calculateAge = (birthdateStr) => {
-        if (!birthdateStr) return "Unknown";
+        if (!birthdateStr) return 'Unknown';
         const birthdate = new Date(birthdateStr);
         const today = new Date();
 
@@ -74,7 +112,43 @@ export default function PetInfoComponent({ petUUID }) {
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error: {error}</p>;
-    console.log("👍 Liked users:", likedUsers);
+
+    const handleAdoptPet = async (userId) => {
+        handleMenuClose();
+
+        try {
+            const response = await fetch(
+                `${API_URL}/api/adoption-center/adopt-pet/${pet.id}/by/${userId}`,
+                {
+                    method: 'PUT',
+                    credentials: 'include',
+                },
+            );
+
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(errText);
+            }
+
+            setSnackbarMessage('Pet successfully adopted!');
+            setSnackbarSeverity('success');
+            setSnackbarOpen(true);
+        } catch (error) {
+            setSnackbarMessage(error.message);
+            setSnackbarSeverity('error');
+            setSnackbarOpen(true);
+        }
+    };
+
+    const handleMenuOpen = (event, userId) => {
+        setMenuAnchorEl(event.currentTarget);
+        setMenuUserId(userId);
+    };
+
+    const handleMenuClose = () => {
+        setMenuAnchorEl(null);
+        setMenuUserId(null);
+    };
 
     return decodedPetId ? (
         <div className={styles.dashboardWrapper}>
@@ -82,7 +156,7 @@ export default function PetInfoComponent({ petUUID }) {
 
             <div className={styles.petInfoContainer}>
                 <img
-                    src={pet.image?.[0] || "/images/no_image_available.png"}
+                    src={pet.image?.[0] || '/images/no_image_available.png'}
                     alt={pet.name}
                     className={styles.petInfoImage}
                 />
@@ -98,27 +172,24 @@ export default function PetInfoComponent({ petUUID }) {
                         <strong>Status:</strong> {pet.availabilityStatus}
                     </p>
                     <p>
-                        <strong>Birthdate:</strong>{" "}
+                        <strong>Birthdate:</strong>{' '}
                         {pet.birthdate
                             ? new Date(pet.birthdate).toLocaleDateString(
-                                  "en-US",
+                                  'en-US',
                                   {
-                                      year: "numeric",
-                                      month: "long",
-                                      day: "numeric",
+                                      year: 'numeric',
+                                      month: 'long',
+                                      day: 'numeric',
                                   },
                               )
-                            : "Unknown"}
+                            : 'Unknown'}
                     </p>
 
                     <p>
                         <strong>About:</strong> {pet.aboutMe}
                     </p>
                     <p>
-                        <strong>Extras:</strong>{" "}
-                        {[pet.extra1, pet.extra2, pet.extra3]
-                            .filter(Boolean)
-                            .join(", ")}
+                        <strong>Availability:</strong> {pet.availabilityStatus}
                     </p>
                 </div>
             </div>
@@ -130,6 +201,21 @@ export default function PetInfoComponent({ petUUID }) {
                 </p>
             ) : (
                 <div className={styles.eventsGrid}>
+                    <Menu
+                        anchorEl={menuAnchorEl}
+                        open={Boolean(menuAnchorEl)}
+                        onClose={handleMenuClose}
+                    >
+                        <MenuItem
+                            onClick={() => {
+                                handleAdoptPet(menuUserId);
+                                handleMenuClose();
+                            }}
+                        >
+                            Adopt for this user
+                        </MenuItem>
+                    </Menu>
+
                     {likedUsers.map((user) => (
                         <div
                             key={user.id}
@@ -142,14 +228,14 @@ export default function PetInfoComponent({ petUUID }) {
                                     name: pet.name,
                                     image:
                                         pet.image?.[0] ||
-                                        "/images/no_image_available.png",
+                                        '/images/no_image_available.png',
                                     breed: pet.breed,
                                     age: calculateAge(pet.birthdate), // optionally format/calculate age
-                                    gender: pet.spayedStatus || "Unknown", // adjust if you have gender separate
+                                    gender: pet.spayedStatus || 'Unknown', // adjust if you have gender separate
                                 };
 
                                 sessionStorage.setItem(
-                                    "petContext",
+                                    'petContext',
                                     JSON.stringify(petContext),
                                 );
                                 Router.push(`/chat/${user.id}`);
@@ -157,41 +243,69 @@ export default function PetInfoComponent({ petUUID }) {
                         >
                             <div className={styles.eventDetails}>
                                 <div className={styles.petNameRow}>
-                                    <p className={styles.eventTitle}>
-                                        {user.firstName} {user.lastName}
-                                    </p>
-                                    <Avatar
-                                        sx={{
-                                            background: user.profilePhoto
-                                                ? "transparent"
-                                                : generateGradient(
-                                                      user.firstName +
-                                                          (user.lastName || ""),
-                                                  ),
-                                            cursor: "pointer",
-                                            color: "#fff",
-                                            zIndex: 100000,
-                                        }}
-                                        src={user.profilePhoto || undefined}
-                                    >
-                                        {!user.profilePhoto && (
-                                            <>
-                                                {user.firstName.charAt(0)}
-                                                {user.lastName
-                                                    ? user.lastName.charAt(0)
-                                                    : ""}
-                                            </>
-                                        )}
-                                    </Avatar>
+                                    <div>
+                                        <p className={styles.eventTitle}>
+                                            {user.firstName} {user.lastName}
+                                        </p>
+                                        <p className={styles.eventDescription}>
+                                            {user.email}
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <Avatar
+                                            sx={{
+                                                background: user.profilePhoto
+                                                    ? 'transparent'
+                                                    : generateGradient(user.firstName + (user.lastName || ''),),
+                                                cursor: 'pointer',
+                                                color: '#fff',
+                                                zIndex: 100000,
+                                                marginRight: '8px',
+                                            }}
+                                            src={user.profilePhoto || undefined}
+                                        >
+                                            {!user.profilePhoto && (
+                                                <>
+                                                    {user.firstName.charAt(0)}
+                                                    {user.lastName
+                                                        ? user.lastName.charAt(
+                                                              0,
+                                                          )
+                                                        : ''}
+                                                </>
+                                            )}
+                                        </Avatar>
+                                        <IconButton
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // prevent parent onClick
+                                                handleMenuOpen(e, user.id);
+                                            }}
+                                        >
+                                            <MoreVertIcon />
+                                        </IconButton>
+                                    </div>
                                 </div>
-                                <p className={styles.eventDescription}>
-                                    {user.email}
-                                </p>
                             </div>
                         </div>
                     ))}
                 </div>
             )}
+
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={4000}
+                onClose={() => setSnackbarOpen(false)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={() => setSnackbarOpen(false)}
+                    severity={snackbarSeverity}
+                    sx={{ width: '100%' }}
+                >
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </div>
     ) : (
         <div className={styles.noConversationSelected}>

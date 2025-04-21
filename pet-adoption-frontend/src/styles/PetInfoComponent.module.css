@@ -290,6 +290,7 @@
     flex-direction: column;
     justify-content: space-between;
     height: 100%;
+    scroll-behavior: smooth;
 }
 
 .eventCard:hover {

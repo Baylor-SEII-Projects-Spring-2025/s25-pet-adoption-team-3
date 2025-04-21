@@ -1,138 +1,139 @@
-import dayjs from "dayjs";
-import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import dayjs from 'dayjs';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
-import React, { useEffect, useState, useRef, Suspense } from "react";
-import Avatar from "@mui/material/Avatar";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import Modal from "@mui/material/Modal";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import MenuItem from "@mui/material/MenuItem";
-import Router from "next/router";
-import styles from "@/styles/AdoptionCenterDashboardComponent.module.css";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { extractImageFiles } from "@/utils/extractImageFiles";
-import { CircularProgress } from "@mui/material";
-import Loading from "@/components/adoption-center/Loading";
+import React, { useEffect, useState, useRef, Suspense } from 'react';
+import Avatar from '@mui/material/Avatar';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Modal from '@mui/material/Modal';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import MenuItem from '@mui/material/MenuItem';
+import Router from 'next/router';
+import styles from '@/styles/AdoptionCenterDashboardComponent.module.css';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { extractImageFiles } from '@/utils/extractImageFiles';
+import { CircularProgress } from '@mui/material';
+import Loading from '@/components/adoption-center/Loading';
 
 dayjs.extend(isSameOrAfter);
 
 const style = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
     width: 400,
-    bgcolor: "background.paper",
+    bgcolor: 'background.paper',
     boxShadow: 24,
     p: 4,
 };
 
 const petStatuses = [
-    "Spayed Female",
-    "Unspayed Female",
-    "Neutered Male",
-    "Unneutered Male",
+    'Spayed Female',
+    'Unspayed Female',
+    'Neutered Male',
+    'Unneutered Male',
 ];
 
 const furTypes = [
-    "Short fur",
-    "Medium fur",
-    "Long fur",
-    "Curly fur",
-    "Wavy fur",
-    "Straight fur",
-    "Hairless fur",
-    "Double coat fur",
-    "Silky fur",
-    "Wiry fur",
+    'Short fur',
+    'Medium fur',
+    'Long fur',
+    'Curly fur',
+    'Wavy fur',
+    'Straight fur',
+    'Hairless fur',
+    'Double coat fur',
+    'Silky fur',
+    'Wiry fur',
 ];
 
 const tailTypes = [
-    "Short tail",
-    "Docked tail",
-    "Bobtail",
-    "Curled tail",
-    "Straight tail",
-    "Plumed tail",
-    "Whip-like tail",
-    "Kinked tail",
-    "Tufted tip tail",
+    'Short tail',
+    'Docked tail',
+    'Bobtail',
+    'Curled tail',
+    'Straight tail',
+    'Plumed tail',
+    'Whip-like tail',
+    'Kinked tail',
+    'Tufted tip tail',
 ];
 
 const earTypes = [
-    "Erect ears",
-    "Droopy ears",
-    "Semi-erect ears",
-    "Folded ears",
-    "Floppy ears",
-    "Feathered ears",
-    "Bat ears",
-    "Cropped ears",
-    "Tufted ears",
-    "Button ears",
+    'Erect ears',
+    'Droopy ears',
+    'Semi-erect ears',
+    'Folded ears',
+    'Floppy ears',
+    'Feathered ears',
+    'Bat ears',
+    'Cropped ears',
+    'Tufted ears',
+    'Button ears',
 ];
 
 const bodyTypes = [
-    "Lean body",
-    "Muscular body",
-    "Stocky body",
-    "Slender body",
-    "Compact body",
-    "Elongated body",
-    "Cobby body",
-    "Athletic body",
-    "Heavy - boned body",
+    'Lean body',
+    'Muscular body',
+    'Stocky body',
+    'Slender body',
+    'Compact body',
+    'Elongated body',
+    'Cobby body',
+    'Athletic body',
+    'Heavy - boned body',
 ];
 
 const initialPetData = {
     images: [null, null, null, null],
-    name: "",
-    breed: "",
-    spayedStatus: "",
-    birthdate: "",
-    aboutMe: "",
-    extra1: "",
-    extra2: "",
-    extra3: "",
+    name: '',
+    breed: '',
+    spayedStatus: '',
+    birthdate: '',
+    aboutMe: '',
+    extra1: '',
+    extra2: '',
+    extra3: '',
 };
 
 const initialEventData = {
     images: [null],
-    title: "",
-    description: "",
-    startDate: "",
-    endDate: "",
+    title: '',
+    description: '',
+    startDate: '',
+    endDate: '',
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function ProfileDashboardComponent() {
-    const [selectedNav, setSelectedNav] = useState("Dashboard");
-    const [selectedPets, setSelectedPets] = useState("My Pets");
-    const [selectedEvents, setSelectedEvents] = useState("My Events");
+    const [selectedNav, setSelectedNav] = useState('Dashboard');
+    const [selectedPets, setSelectedPets] = useState('My Pets');
+    const [selectedEvents, setSelectedEvents] = useState('My Events');
     const [user, setUser] = useState(null);
-    const [uploadError, setUploadError] = useState("");
+    const [uploadError, setUploadError] = useState('');
     const anchorRef = useRef(null);
     const [eventData, setEventData] = useState(initialEventData);
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-    const [adoptionCenterName, setAdoptionCenterName] = useState("");
-    const [websiteLink, setWebsiteLink] = useState("");
-    const [address, setAddress] = useState("");
+    const [adoptionCenterName, setAdoptionCenterName] = useState('');
+    const [websiteLink, setWebsiteLink] = useState('');
+    const [address, setAddress] = useState('');
     const [bio, setBio] = useState(false);
-    const [phoneNumber, setPhoneNumber] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [isUpdated, setIsUpdated] = useState(false);
     const [openModal, setOpenModal] = React.useState(false);
     const [availablePets, setAvailablePets] = useState([]);
     const [availableEvents, setAvailableEvents] = useState([]);
-    const [searchQuery, setSearchQuery] = useState("");
+    const [searchQuery, setSearchQuery] = useState('');
     const [isPageLoading, setIsPageLoading] = useState(true);
+    const [archivedPets, setArchivedPets] = useState([]);
 
     const handleModalOpen = () => {
         setOpenModal(true);
@@ -144,45 +145,45 @@ export default function ProfileDashboardComponent() {
     const fetchUserSession = async () => {
         try {
             const response = await fetch(`${API_URL}/auth/session`, {
-                method: "GET",
-                credentials: "include",
+                method: 'GET',
+                credentials: 'include',
                 headers: {
-                    "Content-Type": "application/json",
-                    "Cache-Control": "no-cache",
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache',
                 },
             });
 
             if (response.status === 401) {
-                console.warn("No active session.");
-                Router.push("/login");
+                console.warn('No active session.');
+                Router.push('/login');
                 return;
             }
 
             if (!response.ok) {
                 alert(
-                    "⚠️ Failed to load user session. Please refresh or log in again.",
+                    '⚠️ Failed to load user session. Please refresh or log in again.',
                 );
-                throw new Error("Error fetching session");
+                throw new Error('Error fetching session');
             }
 
             const data = await response.json();
-            console.log("User session data:", data);
+            console.log('User session data:', data);
 
             const fetchedUser = data.user;
 
-            if (fetchedUser.role === "ADOPTER") {
-                Router.push("/profile");
+            if (fetchedUser.role === 'ADOPTER') {
+                Router.push('/profile');
                 return;
-            } else if (fetchedUser.role !== "ADOPTION_CENTER") {
-                Router.push("/");
+            } else if (fetchedUser.role !== 'ADOPTION_CENTER') {
+                Router.push('/');
                 return;
             }
 
             setUser(fetchedUser);
             setIsPageLoading(false);
         } catch (error) {
-            console.error("Error fetching session:", error);
-            alert("❌ Error fetching session.");
+            console.error('Error fetching session:', error);
+            alert('❌ Error fetching session.');
         }
     };
 
@@ -190,33 +191,87 @@ export default function ProfileDashboardComponent() {
         fetchUserSession();
     }, []);
 
+    useEffect(() => {
+        const fetchArchivedPets = async () => {
+            try {
+                const response = await fetch(
+                    `${API_URL}/api/adoption-center/archived-pets`,
+                    { credentials: 'include' },
+                );
+                if (!response.ok)
+                    throw new Error('Failed to fetch archived pets');
+                const data = await response.json();
+                console.log('Archived pets data:', data);
+                setArchivedPets(data);
+            } catch (err) {
+                console.error('Error loading archived pets:', err);
+            }
+        };
+
+        if (selectedPets === 'Archived Pets') {
+            fetchArchivedPets();
+        }
+    }, [selectedPets]);
+
+    //fetch available pets logic
+    const fetchAvailablePets = async () => {
+        try {
+            const response = await fetch(
+                `${API_URL}/api/pet/get-all-pets/${user.id}`,
+                {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                },
+            );
+
+            if (!response.ok) {
+                alert('❌ Failed to fetch pets.');
+                throw new Error('Failed to fetch pets');
+            }
+
+            const data = await response.json();
+            console.log('Available pets data:', data);
+
+            // Filter only available pets
+            const filteredPets = data.filter(
+                (pet) => pet.status === 'AVAILABLE',
+            );
+            setAvailablePets(filteredPets);
+        } catch (error) {
+            console.error('Error fetching pets:', error);
+        }
+    };
+
     const handleDeletePhoto = async () => {
         try {
             const response = await fetch(
                 `${API_URL}/api/users/deleteProfilePhoto/${user.id}`,
                 {
-                    method: "PUT",
-                    credentials: "include",
+                    method: 'PUT',
+                    credentials: 'include',
                     headers: {
-                        "Content-Type": "application/json",
+                        'Content-Type': 'application/json',
                     },
                 },
             );
 
             if (response.status === 400) {
-                console.log("User not found");
+                console.log('User not found');
                 return;
             }
 
             if (response.ok) {
-                console.log("✅ Profile photo deleted successfully");
+                console.log('✅ Profile photo deleted successfully');
                 window.location.reload();
             } else {
-                console.error("Failed to delete profile photo");
+                console.error('Failed to delete profile photo');
             }
         } catch (error) {
-            console.error("Error deleting profile photo:", error);
-            alert("❌ Error deleting profile photo. Please try again.");
+            console.error('Error deleting profile photo:', error);
+            alert('❌ Error deleting profile photo. Please try again.');
         }
     };
 
@@ -225,37 +280,37 @@ export default function ProfileDashboardComponent() {
         if (!file) return;
 
         const formData = new FormData();
-        formData.append("file", file);
+        formData.append('file', file);
 
         try {
             const response = await fetch(
                 `${API_URL}/api/users/${user.id}/uploadProfilePhoto`,
                 {
-                    method: "POST",
+                    method: 'POST',
                     body: formData,
-                    credentials: "include",
+                    credentials: 'include',
                 },
             );
 
             if (response.ok) {
                 const updatedUser = await response.json();
-                console.log("✅ Photo uploaded, updated user:", updatedUser);
+                console.log('✅ Photo uploaded, updated user:', updatedUser);
                 setUser(updatedUser);
-                setUploadError("");
+                setUploadError('');
                 window.location.reload();
             } else if (response.status === 413) {
-                setUploadError("❌ File size too large. Max allowed is 5MB.");
+                setUploadError('❌ File size too large. Max allowed is 5MB.');
             } else {
-                setUploadError("❌ Upload failed. Please try again.");
+                setUploadError('❌ Upload failed. Please try again.');
             }
         } catch (error) {
-            console.error("❌ Error uploading photo:", error);
-            setUploadError("❌ Error uploading photo. Please try again.");
+            console.error('❌ Error uploading photo:', error);
+            setUploadError('❌ Error uploading photo. Please try again.');
         }
     };
 
     const generateGradient = (name) => {
-        if (!name) return "#f50057";
+        if (!name) return '#f50057';
 
         let hash = 0;
         for (let i = 0; i < name.length; i++) {
@@ -271,14 +326,14 @@ export default function ProfileDashboardComponent() {
     // add a pet logic
     const [petData, setPetData] = useState({
         images: [null, null, null, null],
-        name: "",
-        breed: "",
-        spayedStatus: "",
-        birthdate: "",
-        aboutMe: "",
-        extra1: "",
-        extra2: "",
-        extra3: "",
+        name: '',
+        breed: '',
+        spayedStatus: '',
+        birthdate: '',
+        aboutMe: '',
+        extra1: '',
+        extra2: '',
+        extra3: '',
     });
 
     const handleChange = (e) => {
@@ -291,7 +346,7 @@ export default function ProfileDashboardComponent() {
 
         const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
-            alert("❌ File size exceeds 5MB. Please upload a smaller file.");
+            alert('❌ File size exceeds 5MB. Please upload a smaller file.');
             return;
         }
 
@@ -306,48 +361,48 @@ export default function ProfileDashboardComponent() {
     const handleFormSubmit = (e) => {
         e.preventDefault();
         if (petData.images.filter((img) => img !== null).length !== 4) {
-            alert("You must upload exactly 4 images.");
+            alert('You must upload exactly 4 images.');
             return;
         }
 
-        console.log("Submitting pet data:", petData);
+        console.log('Submitting pet data:', petData);
     };
 
     const isFormValid = () => {
         return (
             petData.images.every((img) => img !== null) && // All 4 images uploaded
-            petData.name.trim() !== "" &&
-            petData.breed.trim() !== "" &&
-            petData.spayedStatus.trim() !== "" &&
-            petData.birthdate.trim() !== "" &&
-            petData.aboutMe.trim() !== "" &&
-            petData.extra1.trim() !== "" &&
-            petData.extra2.trim() !== "" &&
-            petData.extra3.trim() !== ""
+            petData.name.trim() !== '' &&
+            petData.breed.trim() !== '' &&
+            petData.spayedStatus.trim() !== '' &&
+            petData.birthdate.trim() !== '' &&
+            petData.aboutMe.trim() !== '' &&
+            petData.extra1.trim() !== '' &&
+            petData.extra2.trim() !== '' &&
+            petData.extra3.trim() !== ''
         );
     };
 
     const handleAddPetSubmit = async () => {
         setLoading(true);
         if (!isFormValid()) {
-            alert("Please fill out all fields and upload exactly 4 images.");
+            alert('Please fill out all fields and upload exactly 4 images.');
             setLoading(false);
             return;
         }
-        console.log("📤 Submitting pet data:", petData);
+        console.log('📤 Submitting pet data:', petData);
 
         try {
             const formData = new FormData();
             extractImageFiles(petData, formData);
 
-            formData.append("name", petData.name);
-            formData.append("breed", petData.breed);
-            formData.append("spayedStatus", petData.spayedStatus);
-            formData.append("birthdate", petData.birthdate);
-            formData.append("aboutMe", petData.aboutMe);
-            formData.append("extra1", petData.extra1);
-            formData.append("extra2", petData.extra2);
-            formData.append("extra3", petData.extra3);
+            formData.append('name', petData.name);
+            formData.append('breed', petData.breed);
+            formData.append('spayedStatus', petData.spayedStatus);
+            formData.append('birthdate', petData.birthdate);
+            formData.append('aboutMe', petData.aboutMe);
+            formData.append('extra1', petData.extra1);
+            formData.append('extra2', petData.extra2);
+            formData.append('extra3', petData.extra3);
 
             const characteristics = [
                 petData.furType,
@@ -357,7 +412,7 @@ export default function ProfileDashboardComponent() {
             ];
 
             characteristics.forEach((ch) => {
-                formData.append("characteristics", ch);
+                formData.append('characteristics', ch);
             });
 
             for (let [key, value] of formData.entries()) {
@@ -367,24 +422,24 @@ export default function ProfileDashboardComponent() {
             const response = await fetch(
                 `${API_URL}/api/pet/add-pet-with-images`,
                 {
-                    method: "POST",
+                    method: 'POST',
                     body: formData,
-                    credentials: "include",
+                    credentials: 'include',
                 },
             );
 
             if (!response.ok) {
                 const errorText = await response.text();
-                console.error("❌ Server response:", errorText);
+                console.error('❌ Server response:', errorText);
                 throw new Error(
                     `Failed to upload pet details: ${response.status} ${errorText}`,
                 );
             }
 
-            console.log("✅ Pet added successfully");
+            console.log('✅ Pet added successfully');
         } catch (error) {
-            console.error("Error uploading pet data:", error);
-            alert("❌ Failed to add pet. Please try again.");
+            console.error('Error uploading pet data:', error);
+            alert('❌ Failed to add pet. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -403,7 +458,7 @@ export default function ProfileDashboardComponent() {
         if (newValue) {
             setEventData((prev) => ({
                 ...prev,
-                [field]: newValue.format("YYYY-MM-DD"),
+                [field]: newValue.format('YYYY-MM-DD'),
             }));
         }
     };
@@ -432,10 +487,10 @@ export default function ProfileDashboardComponent() {
     const isEventFormValid = () => {
         return (
             eventData.images[0] !== null &&
-            eventData.title.trim() !== "" &&
-            eventData.description.trim() !== "" &&
-            eventData.startDate.trim() !== "" &&
-            eventData.endDate.trim() !== ""
+            eventData.title.trim() !== '' &&
+            eventData.description.trim() !== '' &&
+            eventData.startDate.trim() !== '' &&
+            eventData.endDate.trim() !== ''
         );
     };
 
@@ -444,37 +499,37 @@ export default function ProfileDashboardComponent() {
         setLoading(true);
 
         if (!isEventFormValid()) {
-            alert("Please fill out all fields and upload an image.");
+            alert('Please fill out all fields and upload an image.');
             return;
         }
 
-        console.log("Submitting event data:", eventData);
+        console.log('Submitting event data:', eventData);
 
         try {
             const formData = new FormData();
             extractImageFiles(eventData, formData);
-            formData.append("title", eventData.title);
-            formData.append("description", eventData.description);
-            formData.append("startDate", eventData.startDate);
-            formData.append("endDate", eventData.endDate);
+            formData.append('title', eventData.title);
+            formData.append('description', eventData.description);
+            formData.append('startDate', eventData.startDate);
+            formData.append('endDate', eventData.endDate);
 
             const response = await fetch(
                 `${API_URL}/api/event/create-event-with-image/${user.id}`,
                 {
-                    method: "POST",
+                    method: 'POST',
                     body: formData,
-                    credentials: "include",
+                    credentials: 'include',
                 },
             );
 
             if (response.ok) {
-                console.log("✅ ", response.body);
+                console.log('✅ ', response.body);
             } else {
-                console.log("❌ Error creating event: ", response.body);
+                console.log('❌ Error creating event: ', response.body);
             }
         } catch (error) {
-            console.log("❌ Error creating event: ", error);
-            alert("❌ Failed to create event. Please try again.");
+            console.log('❌ Error creating event: ', error);
+            alert('❌ Failed to create event. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -493,33 +548,33 @@ export default function ProfileDashboardComponent() {
             const response = await fetch(
                 `${API_URL}/api/event/getAllEvents/${user.id}`,
                 {
-                    method: "GET",
-                    credentials: "include",
+                    method: 'GET',
+                    credentials: 'include',
                     headers: {
-                        "Content-Type": "application/json",
+                        'Content-Type': 'application/json',
                     },
                 },
             );
 
             if (!response.ok) {
-                alert("❌ Failed to fetch events.");
-                throw new Error("Failed to fetch events");
+                alert('❌ Failed to fetch events.');
+                throw new Error('Failed to fetch events');
             }
 
             const data = await response.json();
 
             // Filter only available events
             const filteredEvents = data.filter((event) =>
-                dayjs(event.startDate).isSameOrAfter(dayjs(), "day"),
+                dayjs(event.startDate).isSameOrAfter(dayjs(), 'day'),
             );
             setAvailableEvents(filteredEvents);
         } catch (error) {
-            console.error("Error fetching events:", error);
+            console.error('Error fetching events:', error);
         }
     };
 
     useEffect(() => {
-        if (user && selectedEvents === "My Events") {
+        if (user && selectedEvents === 'My Events') {
             fetchAvailableEvents();
         }
     }, [user, selectedEvents]);
@@ -535,39 +590,8 @@ export default function ProfileDashboardComponent() {
             event.description.toLowerCase().includes(searchQuery),
     );
 
-    //fetch available pets logic
-    const fetchAvailablePets = async () => {
-        try {
-            const response = await fetch(
-                `${API_URL}/api/pet/get-all-pets/${user.id}`,
-                {
-                    method: "GET",
-                    credentials: "include",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                },
-            );
-
-            if (!response.ok) {
-                alert("❌ Failed to fetch pets.");
-                throw new Error("Failed to fetch pets");
-            }
-
-            const data = await response.json();
-
-            // Filter only available pets
-            const filteredPets = data.filter(
-                (pet) => pet.availabilityStatus === "AVAILABLE",
-            );
-            setAvailablePets(filteredPets);
-        } catch (error) {
-            console.error("Error fetching pets:", error);
-        }
-    };
-
     useEffect(() => {
-        if (user && selectedPets === "My Pets") {
+        if (user && selectedPets === 'My Pets') {
             fetchAvailablePets();
         }
     }, [user, selectedPets]);
@@ -579,19 +603,32 @@ export default function ProfileDashboardComponent() {
 
     const filteredPets = availablePets.filter(
         (pet) =>
-            pet.name.toLowerCase().includes(searchQuery) ||
+            pet.petName.toLowerCase().includes(searchQuery) ||
             pet.breed.toLowerCase().includes(searchQuery) ||
             pet.spayedStatus.toLowerCase().includes(searchQuery),
+    );
+
+    const archivedFilteredPets = archivedPets.filter(
+        (petArchived) =>
+            petArchived.petName
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()) ||
+            petArchived.breed
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()) ||
+            petArchived.spayedStatus
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()),
     );
 
     // update adoption center logic
     useEffect(() => {
         if (user) {
-            setAdoptionCenterName(user.adoptionCenterName || "");
-            setWebsiteLink(user.website || "");
-            setBio(user.bio || "");
-            setPhoneNumber(user.phoneNumber || "");
-            setAddress(user.address || "");
+            setAdoptionCenterName(user.adoptionCenterName || '');
+            setWebsiteLink(user.website || '');
+            setBio(user.bio || '');
+            setPhoneNumber(user.phoneNumber || '');
+            setAddress(user.address || '');
         }
     }, [user]);
 
@@ -652,10 +689,10 @@ export default function ProfileDashboardComponent() {
             const response = await fetch(
                 `${API_URL}/api/adoption-center/change-name/${user.id}`,
                 {
-                    method: "PUT",
-                    credentials: "include",
+                    method: 'PUT',
+                    credentials: 'include',
                     headers: {
-                        "Content-Type": "application/json",
+                        'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
                         adoptionCenterName,
@@ -664,14 +701,14 @@ export default function ProfileDashboardComponent() {
             );
 
             if (response.ok) {
-                console.log("✅ Adoption center name updated successfully");
+                console.log('✅ Adoption center name updated successfully');
                 setIsUpdated(false);
             } else {
-                console.error("Failed to update adoption center name");
-                alert("❌ Failed to update adoption center name.");
+                console.error('Failed to update adoption center name');
+                alert('❌ Failed to update adoption center name.');
             }
         } catch (error) {
-            console.error("Error updating adoption center name:", error);
+            console.error('Error updating adoption center name:', error);
         } finally {
             setLoading(false);
         }
@@ -683,10 +720,10 @@ export default function ProfileDashboardComponent() {
             const response = await fetch(
                 `${API_URL}/api/adoption-center/update-website-link/${user.id}`,
                 {
-                    method: "PUT",
-                    credentials: "include",
+                    method: 'PUT',
+                    credentials: 'include',
                     headers: {
-                        "Content-Type": "application/json",
+                        'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
                         website: websiteLink,
@@ -695,14 +732,14 @@ export default function ProfileDashboardComponent() {
             );
 
             if (response.ok) {
-                console.log("✅ Website link updated successfully");
+                console.log('✅ Website link updated successfully');
                 setIsUpdated(false);
             } else {
-                console.error("Failed to update website link");
-                alert("❌ Failed to update website link.");
+                console.error('Failed to update website link');
+                alert('❌ Failed to update website link.');
             }
         } catch (error) {
-            console.error("Error updating website link:", error);
+            console.error('Error updating website link:', error);
         } finally {
             setLoading(false);
         }
@@ -714,10 +751,10 @@ export default function ProfileDashboardComponent() {
             const response = await fetch(
                 `${API_URL}/api/adoption-center/update-bio/${user.id}`,
                 {
-                    method: "PUT",
-                    credentials: "include",
+                    method: 'PUT',
+                    credentials: 'include',
                     headers: {
-                        "Content-Type": "application/json",
+                        'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
                         bio,
@@ -726,14 +763,14 @@ export default function ProfileDashboardComponent() {
             );
 
             if (response.ok) {
-                console.log("✅ Bio updated successfully");
+                console.log('✅ Bio updated successfully');
                 setIsUpdated(false);
             } else {
-                console.error("Failed to update bio");
-                alert("❌ Failed to update bio.");
+                console.error('Failed to update bio');
+                alert('❌ Failed to update bio.');
             }
         } catch (error) {
-            console.error("Error updating bio:", error);
+            console.error('Error updating bio:', error);
         } finally {
             setLoading(false);
         }
@@ -745,10 +782,10 @@ export default function ProfileDashboardComponent() {
             const response = await fetch(
                 `${API_URL}/api/adoption-center/update-phone-number/${user.id}`,
                 {
-                    method: "PUT",
-                    credentials: "include",
+                    method: 'PUT',
+                    credentials: 'include',
                     headers: {
-                        "Content-Type": "application/json",
+                        'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
                         phoneNumber,
@@ -757,20 +794,21 @@ export default function ProfileDashboardComponent() {
             );
 
             if (response.ok) {
-                console.log("✅ Phone number updated successfully");
+                console.log('✅ Phone number updated successfully');
                 setIsUpdated(false);
             } else {
-                console.error("Failed to update phone number");
-                alert("❌ Failed to update phone number.");
+                console.error('Failed to update phone number');
+                alert('❌ Failed to update phone number.');
             }
         } catch (error) {
-            console.error("Error updating phone number:", error);
+            console.error('Error updating phone number:', error);
         } finally {
             setLoading(false);
         }
     };
 
     const handlePetClick = (petId) => {
+        console.log('Pet ID:', petId);
         const encodedId = btoa(petId.toString()); // base64 encode
         Router.push(`/pet-info/${encodedId}`);
     };
@@ -786,33 +824,33 @@ export default function ProfileDashboardComponent() {
                     <div className={styles.profileNavbarLeft}>
                         <h1>{selectedNav}</h1>
                         <p
-                            onClick={() => setSelectedNav("Dashboard")}
+                            onClick={() => setSelectedNav('Dashboard')}
                             className={
-                                selectedNav === "Dashboard" ? styles.active : ""
+                                selectedNav === 'Dashboard' ? styles.active : ''
                             }
                         >
                             Dashboard
                         </p>
                         <p
-                            onClick={() => setSelectedNav("My Pets")}
+                            onClick={() => setSelectedNav('My Pets')}
                             className={
-                                selectedNav === "My Pets" ? styles.active : ""
+                                selectedNav === 'My Pets' ? styles.active : ''
                             }
                         >
                             My Pets
                         </p>
                         <p
-                            onClick={() => setSelectedNav("My Events")}
+                            onClick={() => setSelectedNav('My Events')}
                             className={
-                                selectedNav === "My Events" ? styles.active : ""
+                                selectedNav === 'My Events' ? styles.active : ''
                             }
                         >
                             My Events
                         </p>
                         <p
-                            onClick={() => setSelectedNav("Settings")}
+                            onClick={() => setSelectedNav('Settings')}
                             className={
-                                selectedNav === "Settings" ? styles.active : ""
+                                selectedNav === 'Settings' ? styles.active : ''
                             }
                         >
                             Settings
@@ -825,7 +863,7 @@ export default function ProfileDashboardComponent() {
                 <div className={styles.profileRightSection}>
                     <div className={styles.profileNavbarRight}>
                         <div className={styles.dashboardHeader}>
-                            {selectedNav === "Dashboard" && (
+                            {selectedNav === 'Dashboard' && (
                                 <div className={styles.dashboard}>
                                     <div
                                         className={
@@ -842,7 +880,7 @@ export default function ProfileDashboardComponent() {
                                             >
                                                 <h1>
                                                     {user?.adoptionCenterName ||
-                                                        ""}
+                                                        ''}
                                                 </h1>
                                             </div>
                                         </div>
@@ -860,8 +898,8 @@ export default function ProfileDashboardComponent() {
                                                     }
                                                 >
                                                     <img
-                                                        src="/icons/no_messages.png"
-                                                        alt="No messages"
+                                                        src='/icons/no_messages.png'
+                                                        alt='No messages'
                                                     />
                                                     <p>
                                                         No messages found, check
@@ -888,8 +926,8 @@ export default function ProfileDashboardComponent() {
                                         !user?.matches ? (
                                             <div className={styles.noMatches}>
                                                 <img
-                                                    src="/icons/no_matches.png"
-                                                    alt="No matches"
+                                                    src='/icons/no_matches.png'
+                                                    alt='No matches'
                                                 />
                                                 <p>
                                                     No pets found, add some
@@ -912,18 +950,18 @@ export default function ProfileDashboardComponent() {
                             )}
                         </div>
 
-                        {selectedNav === "My Pets" && (
+                        {selectedNav === 'My Pets' && (
                             <div className={styles.likesContent}>
                                 <div className={styles.petsHeader}>
                                     <div className={styles.likesNavbar}>
                                         <p
                                             onClick={() =>
-                                                setSelectedPets("My Pets")
+                                                setSelectedPets('My Pets')
                                             }
                                             className={
-                                                selectedPets === "My Pets"
+                                                selectedPets === 'My Pets'
                                                     ? styles.likesActive
-                                                    : ""
+                                                    : ''
                                             }
                                         >
                                             My Pets
@@ -937,12 +975,12 @@ export default function ProfileDashboardComponent() {
 
                                         <p
                                             onClick={() =>
-                                                setSelectedPets("Archived Pets")
+                                                setSelectedPets('Archived Pets')
                                             }
                                             className={
-                                                selectedPets === "Archived Pets"
+                                                selectedPets === 'Archived Pets'
                                                     ? styles.likesActive
-                                                    : ""
+                                                    : ''
                                             }
                                         >
                                             Archived Pets
@@ -950,14 +988,14 @@ export default function ProfileDashboardComponent() {
                                     </div>
                                 </div>
                                 <div className={styles.likesContent}>
-                                    {selectedPets === "My Pets" && (
+                                    {selectedPets === 'My Pets' && (
                                         <div>
                                             <div
                                                 className={styles.addPetButton}
                                             >
                                                 <TextField
-                                                    label="Search Pets"
-                                                    variant="outlined"
+                                                    label='Search Pets'
+                                                    variant='outlined'
                                                     fullWidth
                                                     value={searchQuery}
                                                     onChange={
@@ -966,31 +1004,31 @@ export default function ProfileDashboardComponent() {
                                                     className={
                                                         styles.searchField
                                                     }
-                                                    size="small"
+                                                    size='small'
                                                     sx={{ mb: 2 }}
                                                 />
                                                 <Button
-                                                    variant="contained"
-                                                    color="primary"
+                                                    variant='contained'
+                                                    color='primary'
                                                     className={
                                                         styles.addPetButtonClass
                                                     }
                                                     onClick={handleModalOpen}
                                                 >
                                                     <img
-                                                        src="/icons/plus_icon.png"
-                                                        alt="Add"
+                                                        src='/icons/plus_icon.png'
+                                                        alt='Add'
                                                     />
                                                     New Pet
                                                 </Button>
                                                 <Modal
                                                     open={openModal}
                                                     onClose={handleModalClose}
-                                                    aria-labelledby="add-pet-modal"
+                                                    aria-labelledby='add-pet-modal'
                                                 >
                                                     <Box sx={modalStyle}>
                                                         <Typography
-                                                            variant="h5"
+                                                            variant='h5'
                                                             sx={{ mb: 2 }}
                                                         >
                                                             Add New Pet
@@ -1005,7 +1043,7 @@ export default function ProfileDashboardComponent() {
                                                             }
                                                         >
                                                             <h3>
-                                                                {" "}
+                                                                {' '}
                                                                 Upload photos
                                                             </h3>
                                                             {/* Image Upload Grid */}
@@ -1029,8 +1067,8 @@ export default function ProfileDashboardComponent() {
                                                                         >
                                                                             {/* Hidden File Input */}
                                                                             <input
-                                                                                type="file"
-                                                                                accept="image/*"
+                                                                                type='file'
+                                                                                accept='image/*'
                                                                                 onChange={(
                                                                                     event,
                                                                                 ) =>
@@ -1111,8 +1149,8 @@ export default function ProfileDashboardComponent() {
 
                                                             {/* Text Fields */}
                                                             <TextField
-                                                                label="Name"
-                                                                name="name"
+                                                                label='Name'
+                                                                name='name'
                                                                 value={
                                                                     petData.name
                                                                 }
@@ -1124,8 +1162,8 @@ export default function ProfileDashboardComponent() {
                                                                 sx={{ mb: 2 }}
                                                             />
                                                             <TextField
-                                                                label="Breed"
-                                                                name="breed"
+                                                                label='Breed'
+                                                                name='breed'
                                                                 value={
                                                                     petData.breed
                                                                 }
@@ -1138,8 +1176,8 @@ export default function ProfileDashboardComponent() {
                                                             />
                                                             <TextField
                                                                 select
-                                                                label="Spayed/Neutered Status"
-                                                                name="spayedStatus"
+                                                                label='Spayed/Neutered Status'
+                                                                name='spayedStatus'
                                                                 value={
                                                                     petData.spayedStatus
                                                                 }
@@ -1175,7 +1213,7 @@ export default function ProfileDashboardComponent() {
                                                                 }
                                                             >
                                                                 <DatePicker
-                                                                    label="Birthdate"
+                                                                    label='Birthdate'
                                                                     value={
                                                                         petData.birthdate
                                                                             ? dayjs(
@@ -1194,13 +1232,13 @@ export default function ProfileDashboardComponent() {
                                                                                     ...petData,
                                                                                     birthdate:
                                                                                         newValue.format(
-                                                                                            "YYYY-MM-DD",
+                                                                                            'YYYY-MM-DD',
                                                                                         ),
                                                                                 },
                                                                             );
                                                                         }
                                                                     }}
-                                                                    format="YYYY-MM-DD"
+                                                                    format='YYYY-MM-DD'
                                                                     shouldDisableDate={(
                                                                         date,
                                                                     ) =>
@@ -1222,8 +1260,8 @@ export default function ProfileDashboardComponent() {
                                                             </LocalizationProvider>
                                                             <TextField
                                                                 select
-                                                                label="Fur Type"
-                                                                name="furType"
+                                                                label='Fur Type'
+                                                                name='furType'
                                                                 value={
                                                                     petData.furType
                                                                 }
@@ -1255,8 +1293,8 @@ export default function ProfileDashboardComponent() {
                                                             </TextField>
                                                             <TextField
                                                                 select
-                                                                label="Tail Type"
-                                                                name="tailType"
+                                                                label='Tail Type'
+                                                                name='tailType'
                                                                 value={
                                                                     petData.tailType
                                                                 }
@@ -1288,8 +1326,8 @@ export default function ProfileDashboardComponent() {
                                                             </TextField>
                                                             <TextField
                                                                 select
-                                                                label="Ear Type"
-                                                                name="earType"
+                                                                label='Ear Type'
+                                                                name='earType'
                                                                 value={
                                                                     petData.earType
                                                                 }
@@ -1321,8 +1359,8 @@ export default function ProfileDashboardComponent() {
                                                             </TextField>
                                                             <TextField
                                                                 select
-                                                                label="Body Type"
-                                                                name="bodyType"
+                                                                label='Body Type'
+                                                                name='bodyType'
                                                                 value={
                                                                     petData.bodyType
                                                                 }
@@ -1353,8 +1391,8 @@ export default function ProfileDashboardComponent() {
                                                                 )}
                                                             </TextField>
                                                             <TextField
-                                                                label="About Me"
-                                                                name="aboutMe"
+                                                                label='About Me'
+                                                                name='aboutMe'
                                                                 value={
                                                                     petData.aboutMe
                                                                 }
@@ -1370,14 +1408,14 @@ export default function ProfileDashboardComponent() {
 
                                                             {/* Extra Sections */}
                                                             <Typography
-                                                                variant="subtitle1"
+                                                                variant='subtitle1'
                                                                 sx={{ mt: 2 }}
                                                             >
                                                                 Additional Info:
                                                             </Typography>
                                                             <TextField
-                                                                label="I go crazy for..."
-                                                                name="extra1"
+                                                                label='I go crazy for...'
+                                                                name='extra1'
                                                                 value={
                                                                     petData.extra1
                                                                 }
@@ -1389,8 +1427,8 @@ export default function ProfileDashboardComponent() {
                                                                 sx={{ mb: 2 }}
                                                             />
                                                             <TextField
-                                                                label="My favorite toy is..."
-                                                                name="extra2"
+                                                                label='My favorite toy is...'
+                                                                name='extra2'
                                                                 value={
                                                                     petData.extra2
                                                                 }
@@ -1402,8 +1440,8 @@ export default function ProfileDashboardComponent() {
                                                                 sx={{ mb: 2 }}
                                                             />
                                                             <TextField
-                                                                label="The way to win me over is..."
-                                                                name="extra3"
+                                                                label='The way to win me over is...'
+                                                                name='extra3'
                                                                 value={
                                                                     petData.extra3
                                                                 }
@@ -1419,9 +1457,9 @@ export default function ProfileDashboardComponent() {
                                                             <Box
                                                                 sx={{
                                                                     display:
-                                                                        "flex",
+                                                                        'flex',
                                                                     justifyContent:
-                                                                        "space-between",
+                                                                        'space-between',
                                                                     mt: 3,
                                                                 }}
                                                             >
@@ -1429,14 +1467,14 @@ export default function ProfileDashboardComponent() {
                                                                     onClick={
                                                                         handleModalClose
                                                                     }
-                                                                    variant="outlined"
+                                                                    variant='outlined'
                                                                 >
                                                                     Cancel
                                                                 </Button>
                                                                 <Button
-                                                                    type="submit"
-                                                                    variant="contained"
-                                                                    color="primary"
+                                                                    type='submit'
+                                                                    variant='contained'
+                                                                    color='primary'
                                                                     disabled={
                                                                         !isFormValid()
                                                                     }
@@ -1449,14 +1487,14 @@ export default function ProfileDashboardComponent() {
                                                                                 size={
                                                                                     20
                                                                                 }
-                                                                                color="inherit"
+                                                                                color='inherit'
                                                                             />
                                                                         ) : null
                                                                     }
                                                                 >
                                                                     {loading
-                                                                        ? "Adding Pet..."
-                                                                        : "Add Pet"}
+                                                                        ? 'Adding Pet...'
+                                                                        : 'Add Pet'}
                                                                 </Button>
                                                             </Box>
                                                         </form>
@@ -1479,20 +1517,19 @@ export default function ProfileDashboardComponent() {
                                                                     }
                                                                     onClick={() =>
                                                                         handlePetClick(
-                                                                            pet.id,
+                                                                            pet.petId,
                                                                         )
                                                                     }
                                                                     style={{
-                                                                        cursor: "pointer",
+                                                                        cursor: 'pointer',
                                                                     }}
                                                                 >
                                                                     <img
                                                                         src={
-                                                                            pet
-                                                                                .image[0]
+                                                                            pet.petImage
                                                                         }
                                                                         alt={
-                                                                            pet.name
+                                                                            pet.petName
                                                                         }
                                                                         className={
                                                                             styles.petImage
@@ -1510,11 +1547,11 @@ export default function ProfileDashboardComponent() {
                                                                                 }
                                                                             >
                                                                                 {
-                                                                                    pet.name
+                                                                                    pet.petName
                                                                                 }
                                                                             </p>
                                                                             <p>
-                                                                                Breed:{" "}
+                                                                                Breed:{' '}
                                                                                 {
                                                                                     pet.breed
                                                                                 }
@@ -1525,11 +1562,11 @@ export default function ProfileDashboardComponent() {
                                                                                 }
                                                                             </p>
                                                                             <p>
-                                                                                Born:{" "}
+                                                                                Born:{' '}
                                                                                 {dayjs(
                                                                                     pet.birthdate,
                                                                                 ).format(
-                                                                                    "MMMM D, YYYY",
+                                                                                    'MMMM D, YYYY',
                                                                                 )}
                                                                             </p>
                                                                         </div>
@@ -1545,20 +1582,101 @@ export default function ProfileDashboardComponent() {
                                         </div>
                                     )}
 
-                                    {selectedPets === "Archived Pets" && (
+                                    {selectedPets === 'Archived Pets' && (
                                         <div className={styles.archivedPets}>
-                                            {user?.superLikes?.length > 0 ? (
-                                                <ul>
-                                                    {user.superLikes.map(
-                                                        (superLike, index) => (
-                                                            <li key={index}>
-                                                                {superLike}
-                                                            </li>
+                                            <div
+                                                className={styles.addPetButton}
+                                            >
+                                                {/* Search Bar */}
+                                                <TextField
+                                                    label='Search Pets'
+                                                    variant='outlined'
+                                                    fullWidth
+                                                    value={searchQuery}
+                                                    onChange={
+                                                        handleSearchChange
+                                                    }
+                                                    className={
+                                                        styles.searchField
+                                                    }
+                                                    size='small'
+                                                    sx={{ mb: 2 }}
+                                                />
+                                            </div>
+
+                                            {archivedFilteredPets.length > 0 ? (
+                                                <div
+                                                    className={styles.petsGrid}
+                                                >
+                                                    {archivedFilteredPets.map(
+                                                        (pet) => (
+                                                            <div
+                                                                key={pet.id}
+                                                                className={
+                                                                    styles.petCard
+                                                                }
+                                                                onClick={() =>
+                                                                    handlePetClick(
+                                                                        pet.petId,
+                                                                    )
+                                                                }
+                                                                style={{
+                                                                    cursor: 'pointer',
+                                                                }}
+                                                            >
+                                                                <img
+                                                                    src={
+                                                                        pet.petImage
+                                                                    }
+                                                                    alt={
+                                                                        pet.name
+                                                                    }
+                                                                    className={
+                                                                        styles.petImage
+                                                                    }
+                                                                />
+                                                                <div
+                                                                    className={
+                                                                        styles.petDetails
+                                                                    }
+                                                                >
+                                                                    <div>
+                                                                        <p
+                                                                            className={
+                                                                                styles.petName
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                pet.petName
+                                                                            }
+                                                                        </p>
+                                                                        <p>
+                                                                            Breed:{' '}
+                                                                            {
+                                                                                pet.breed
+                                                                            }
+                                                                        </p>
+                                                                        <p>
+                                                                            {
+                                                                                pet.spayedStatus
+                                                                            }
+                                                                        </p>
+                                                                        <p>
+                                                                            Born:{' '}
+                                                                            {dayjs(
+                                                                                pet.birthdate,
+                                                                            ).format(
+                                                                                'MMMM D, YYYY',
+                                                                            )}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         ),
                                                     )}
-                                                </ul>
+                                                </div>
                                             ) : (
-                                                <p>No archived pets found.</p>
+                                                <p>No Archived Pets found.</p>
                                             )}
                                         </div>
                                     )}
@@ -1566,18 +1684,18 @@ export default function ProfileDashboardComponent() {
                             </div>
                         )}
 
-                        {selectedNav === "My Events" && (
+                        {selectedNav === 'My Events' && (
                             <div className={styles.likesContent}>
                                 <div className={styles.petsHeader}>
                                     <div className={styles.likesNavbar}>
                                         <p
                                             onClick={() =>
-                                                setSelectedEvents("My Events")
+                                                setSelectedEvents('My Events')
                                             }
                                             className={
-                                                selectedEvents === "My Events"
+                                                selectedEvents === 'My Events'
                                                     ? styles.likesActive
-                                                    : ""
+                                                    : ''
                                             }
                                         >
                                             My Events
@@ -1592,14 +1710,14 @@ export default function ProfileDashboardComponent() {
                                         <p
                                             onClick={() =>
                                                 setSelectedEvents(
-                                                    "Archived Events",
+                                                    'Archived Events',
                                                 )
                                             }
                                             className={
                                                 selectedEvents ===
-                                                "Archived Events"
+                                                'Archived Events'
                                                     ? styles.likesActive
-                                                    : ""
+                                                    : ''
                                             }
                                         >
                                             Archived Events
@@ -1608,7 +1726,7 @@ export default function ProfileDashboardComponent() {
                                 </div>
 
                                 <div className={styles.likesContent}>
-                                    {selectedEvents === "My Events" && (
+                                    {selectedEvents === 'My Events' && (
                                         <div>
                                             <div
                                                 className={
@@ -1616,8 +1734,8 @@ export default function ProfileDashboardComponent() {
                                                 }
                                             >
                                                 <TextField
-                                                    label="Search Events"
-                                                    variant="outlined"
+                                                    label='Search Events'
+                                                    variant='outlined'
                                                     fullWidth
                                                     value={searchQuery}
                                                     onChange={
@@ -1626,12 +1744,12 @@ export default function ProfileDashboardComponent() {
                                                     className={
                                                         styles.searchField
                                                     }
-                                                    size="small"
+                                                    size='small'
                                                     sx={{ mb: 2 }}
                                                 />
                                                 <Button
-                                                    variant="contained"
-                                                    color="primary"
+                                                    variant='contained'
+                                                    color='primary'
                                                     className={
                                                         styles.addEventButtonClass
                                                     }
@@ -1640,19 +1758,19 @@ export default function ProfileDashboardComponent() {
                                                     }
                                                 >
                                                     <img
-                                                        src="/icons/plus_icon.png"
-                                                        alt="Add"
+                                                        src='/icons/plus_icon.png'
+                                                        alt='Add'
                                                     />
                                                     New Event
                                                 </Button>
                                                 <Modal
                                                     open={openModal}
                                                     onClose={handleModalClose}
-                                                    aria-labelledby="add-event-modal"
+                                                    aria-labelledby='add-event-modal'
                                                 >
                                                     <Box sx={modalStyle}>
                                                         <Typography
-                                                            variant="h5"
+                                                            variant='h5'
                                                             sx={{ mb: 2 }}
                                                         >
                                                             Add New Event
@@ -1677,15 +1795,15 @@ export default function ProfileDashboardComponent() {
                                                                 }
                                                             >
                                                                 <input
-                                                                    type="file"
-                                                                    accept="image/*"
+                                                                    type='file'
+                                                                    accept='image/*'
                                                                     onChange={
                                                                         handleEventImageUpload
                                                                     }
                                                                     className={
                                                                         styles.fileInput
                                                                     }
-                                                                    id="event-file-input"
+                                                                    id='event-file-input'
                                                                 />
 
                                                                 {eventData
@@ -1704,7 +1822,7 @@ export default function ProfileDashboardComponent() {
                                                                             className={
                                                                                 styles.previewImageEvent
                                                                             }
-                                                                            alt="Uploaded Event"
+                                                                            alt='Uploaded Event'
                                                                         />
                                                                         <button
                                                                             className={
@@ -1735,7 +1853,7 @@ export default function ProfileDashboardComponent() {
                                                                         onClick={() =>
                                                                             document
                                                                                 .getElementById(
-                                                                                    "event-file-input",
+                                                                                    'event-file-input',
                                                                                 )
                                                                                 .click()
                                                                         }
@@ -1747,8 +1865,8 @@ export default function ProfileDashboardComponent() {
 
                                                             {/* Text Fields */}
                                                             <TextField
-                                                                label="Event Title"
-                                                                name="title"
+                                                                label='Event Title'
+                                                                name='title'
                                                                 value={
                                                                     eventData.title
                                                                 }
@@ -1760,8 +1878,8 @@ export default function ProfileDashboardComponent() {
                                                                 sx={{ mb: 2 }}
                                                             />
                                                             <TextField
-                                                                label="Event Description"
-                                                                name="description"
+                                                                label='Event Description'
+                                                                name='description'
                                                                 value={
                                                                     eventData.description
                                                                 }
@@ -1781,7 +1899,7 @@ export default function ProfileDashboardComponent() {
                                                             >
                                                                 {/* Start Date Picker */}
                                                                 <DatePicker
-                                                                    label="Start Date"
+                                                                    label='Start Date'
                                                                     value={
                                                                         eventData.startDate
                                                                             ? dayjs(
@@ -1793,11 +1911,11 @@ export default function ProfileDashboardComponent() {
                                                                         newValue,
                                                                     ) =>
                                                                         handleEventDateChange(
-                                                                            "startDate",
+                                                                            'startDate',
                                                                             newValue,
                                                                         )
                                                                     }
-                                                                    format="YYYY-MM-DD"
+                                                                    format='YYYY-MM-DD'
                                                                     shouldDisableDate={(
                                                                         date,
                                                                     ) =>
@@ -1819,7 +1937,7 @@ export default function ProfileDashboardComponent() {
 
                                                                 {/* End Date Picker */}
                                                                 <DatePicker
-                                                                    label="End Date"
+                                                                    label='End Date'
                                                                     value={
                                                                         eventData.endDate
                                                                             ? dayjs(
@@ -1831,11 +1949,11 @@ export default function ProfileDashboardComponent() {
                                                                         newValue,
                                                                     ) =>
                                                                         handleEventDateChange(
-                                                                            "endDate",
+                                                                            'endDate',
                                                                             newValue,
                                                                         )
                                                                     }
-                                                                    format="YYYY-MM-DD"
+                                                                    format='YYYY-MM-DD'
                                                                     shouldDisableDate={
                                                                         (
                                                                             date,
@@ -1867,9 +1985,9 @@ export default function ProfileDashboardComponent() {
                                                             <Box
                                                                 sx={{
                                                                     display:
-                                                                        "flex",
+                                                                        'flex',
                                                                     justifyContent:
-                                                                        "space-between",
+                                                                        'space-between',
                                                                     mt: 3,
                                                                 }}
                                                             >
@@ -1877,14 +1995,14 @@ export default function ProfileDashboardComponent() {
                                                                     onClick={
                                                                         handleModalClose
                                                                     }
-                                                                    variant="outlined"
+                                                                    variant='outlined'
                                                                 >
                                                                     Cancel
                                                                 </Button>
                                                                 <Button
-                                                                    type="submit"
-                                                                    variant="contained"
-                                                                    color="primary"
+                                                                    type='submit'
+                                                                    variant='contained'
+                                                                    color='primary'
                                                                     disabled={
                                                                         !isEventFormValid()
                                                                     }
@@ -1894,14 +2012,14 @@ export default function ProfileDashboardComponent() {
                                                                                 size={
                                                                                     20
                                                                                 }
-                                                                                color="inherit"
+                                                                                color='inherit'
                                                                             />
                                                                         ) : null
                                                                     }
                                                                 >
                                                                     {loading
-                                                                        ? "Creating Event..."
-                                                                        : "Create Event"}
+                                                                        ? 'Creating Event...'
+                                                                        : 'Create Event'}
                                                                 </Button>
                                                             </Box>
                                                         </form>
@@ -1968,13 +2086,13 @@ export default function ProfileDashboardComponent() {
                                                                             {dayjs(
                                                                                 event.startDate,
                                                                             ).format(
-                                                                                "MMMM D, YYYY",
-                                                                            )}{" "}
-                                                                            -{" "}
+                                                                                'MMMM D, YYYY',
+                                                                            )}{' '}
+                                                                            -{' '}
                                                                             {dayjs(
                                                                                 event.endDate,
                                                                             ).format(
-                                                                                "MMMM D, YYYY",
+                                                                                'MMMM D, YYYY',
                                                                             )}
                                                                         </p>
                                                                     </div>
@@ -1995,7 +2113,7 @@ export default function ProfileDashboardComponent() {
                                         </div>
                                     )}
 
-                                    {selectedEvents === "Archived Events" && (
+                                    {selectedEvents === 'Archived Events' && (
                                         <div className={styles.archivedPets}>
                                             {user?.archivedEvents?.length >
                                             0 ? (
@@ -2017,24 +2135,24 @@ export default function ProfileDashboardComponent() {
                             </div>
                         )}
 
-                        {selectedNav === "Settings" && (
+                        {selectedNav === 'Settings' && (
                             <div className={styles.settingsWrapper}>
                                 <div className={styles.dashboardWrapperHeader}>
                                     <Avatar
                                         ref={anchorRef}
                                         sx={{
                                             background: user?.profilePhoto
-                                                ? "transparent"
+                                                ? 'transparent'
                                                 : generateGradient(
                                                       user?.firstName +
                                                           (user?.lastName ||
-                                                              ""),
+                                                              ''),
                                                   ),
-                                            cursor: "pointer",
-                                            color: "#fff",
+                                            cursor: 'pointer',
+                                            color: '#fff',
                                             width: 100,
                                             height: 100,
-                                            border: "1px solid black",
+                                            border: '1px solid black',
                                         }}
                                         src={user?.profilePhoto || undefined}
                                     >
@@ -2043,7 +2161,7 @@ export default function ProfileDashboardComponent() {
                                                 {user?.firstName?.charAt(0)}
                                                 {user?.lastName
                                                     ? user?.lastName.charAt(0)
-                                                    : ""}
+                                                    : ''}
                                             </>
                                         )}
                                     </Avatar>
@@ -2059,18 +2177,18 @@ export default function ProfileDashboardComponent() {
                                             }
                                         >
                                             <input
-                                                type="file"
-                                                accept=".png, .jpg, .jpeg"
+                                                type='file'
+                                                accept='.png, .jpg, .jpeg'
                                                 onChange={handleUploadPhoto}
-                                                style={{ display: "none" }}
-                                                id="upload-photo"
+                                                style={{ display: 'none' }}
+                                                id='upload-photo'
                                             />
                                             <Button
-                                                variant="contained"
+                                                variant='contained'
                                                 onClick={() =>
                                                     document
                                                         .getElementById(
-                                                            "upload-photo",
+                                                            'upload-photo',
                                                         )
                                                         .click()
                                                 }
@@ -2078,9 +2196,9 @@ export default function ProfileDashboardComponent() {
                                                 Upload Photo
                                             </Button>
                                             <Button
-                                                type="submit"
-                                                variant="outlined"
-                                                color="error"
+                                                type='submit'
+                                                variant='outlined'
+                                                color='error'
                                                 disabled={!user?.profilePhoto}
                                                 onClick={handleOpen}
                                             >
@@ -2089,21 +2207,21 @@ export default function ProfileDashboardComponent() {
                                             <Modal
                                                 open={open}
                                                 onClose={handleClose}
-                                                aria-labelledby="modal-modal-title"
-                                                aria-describedby="modal-modal-description"
+                                                aria-labelledby='modal-modal-title'
+                                                aria-describedby='modal-modal-description'
                                             >
                                                 <Box sx={style}>
                                                     <Typography
-                                                        id="modal-modal-title"
-                                                        variant="h6"
-                                                        component="h2"
+                                                        id='modal-modal-title'
+                                                        variant='h6'
+                                                        component='h2'
                                                     >
                                                         Are you sure you want to
                                                         delete your profile
                                                         photo?
                                                     </Typography>
                                                     <Typography
-                                                        id="modal-modal-description"
+                                                        id='modal-modal-description'
                                                         sx={{ mt: 2 }}
                                                     >
                                                         The photo will be
@@ -2111,10 +2229,10 @@ export default function ProfileDashboardComponent() {
                                                         cannot be recovered.
                                                     </Typography>
                                                     <Button
-                                                        type="submit"
-                                                        variant="outlined"
-                                                        color="error"
-                                                        sx="margin-top: 20px"
+                                                        type='submit'
+                                                        variant='outlined'
+                                                        color='error'
+                                                        sx='margin-top: 20px'
                                                         onClick={() => {
                                                             handleDeletePhoto();
                                                             handleClose();
@@ -2134,9 +2252,9 @@ export default function ProfileDashboardComponent() {
                                             {uploadError && (
                                                 <p
                                                     style={{
-                                                        color: "red",
-                                                        marginTop: "10px",
-                                                        fontSize: "14px",
+                                                        color: 'red',
+                                                        marginTop: '10px',
+                                                        fontSize: '14px',
                                                     }}
                                                 >
                                                     {uploadError}
@@ -2148,84 +2266,84 @@ export default function ProfileDashboardComponent() {
                                 <div className={styles.dashboardContent}>
                                     <div className={styles.dashboardContentTop}>
                                         <TextField
-                                            label="Adoption Center Name"
+                                            label='Adoption Center Name'
                                             value={adoptionCenterName}
                                             onChange={
                                                 handleAdoptionCenterNameChange
                                             }
-                                            id="firstName"
-                                            size="small"
+                                            id='firstName'
+                                            size='small'
                                         />
                                     </div>
                                     <TextField
                                         disabled
-                                        label="Email"
-                                        value={user?.email || ""}
-                                        id="email"
-                                        size="small"
+                                        label='Email'
+                                        value={user?.email || ''}
+                                        id='email'
+                                        size='small'
                                     />
                                     <TextField
                                         disabled
-                                        label="Password"
-                                        value="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"
-                                        id="password"
-                                        size="small"
+                                        label='Password'
+                                        value='&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;'
+                                        id='password'
+                                        size='small'
                                         InputLabelProps={{
                                             shrink: true,
                                         }}
                                     />
                                     <TextField
-                                        label="Website Link"
+                                        label='Website Link'
                                         value={websiteLink}
                                         onChange={handleWebsiteChange}
                                         fullWidth
-                                        id="website link"
-                                        size="small"
+                                        id='website link'
+                                        size='small'
                                     />
                                     <TextField
                                         disabled
-                                        label="Address"
+                                        label='Address'
                                         value={address}
                                         fullWidth
-                                        id="address"
-                                        size="small"
+                                        id='address'
+                                        size='small'
                                     />
                                     <TextField
-                                        label="Bio"
+                                        label='Bio'
                                         value={bio}
                                         onChange={handleBioChange}
                                         fullWidth
-                                        id="bio"
-                                        size="small"
+                                        id='bio'
+                                        size='small'
                                         multiline
                                         rows={3}
                                     />
                                     <TextField
-                                        label="Phone Number"
+                                        label='Phone Number'
                                         value={phoneNumber}
                                         onChange={handlePhoneNumberChange}
                                         fullWidth
-                                        id="phone number"
-                                        size="small"
+                                        id='phone number'
+                                        size='small'
                                     />
 
                                     <Button
-                                        variant="contained"
-                                        color="primary"
+                                        variant='contained'
+                                        color='primary'
                                         onClick={handleUpdateProfile}
                                         disabled={!isUpdated}
                                         startIcon={
                                             loading ? (
                                                 <CircularProgress
                                                     size={20}
-                                                    color="inherit"
+                                                    color='inherit'
                                                 />
                                             ) : null
                                         }
                                     >
                                         {loading
-                                            ? "Updating Profile..."
-                                            : "Update Profile"}
+                                            ? 'Updating Profile...'
+                                            : 'Update Profile'}
                                     </Button>
                                 </div>
                             </div>
@@ -2238,16 +2356,16 @@ export default function ProfileDashboardComponent() {
 }
 
 const modalStyle = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "90%",
-    maxWidth: "600px",
-    bgcolor: "background.paper",
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '90%',
+    maxWidth: '600px',
+    bgcolor: 'background.paper',
     boxShadow: 24,
     p: 4,
-    borderRadius: "10px",
-    maxHeight: "80vh",
-    overflowY: "auto",
+    borderRadius: '10px',
+    maxHeight: '80vh',
+    overflowY: 'auto',
 };

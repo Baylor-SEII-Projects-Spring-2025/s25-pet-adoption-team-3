@@ -55,6 +55,10 @@ public class Pet {
     @ManyToMany
     private List<Characteristic> petCharacteristics;
 
+    @ManyToOne
+    @JoinColumn(name = "adopter_id")
+    private User adopter;
+
     public enum PetStatus {
         AVAILABLE,
         ARCHIVED
