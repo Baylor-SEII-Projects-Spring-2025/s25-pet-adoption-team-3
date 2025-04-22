@@ -308,9 +308,15 @@
 }
 
 .eventTitle {
-    font-size: 18px;
+    font-size: 24px;
     font-weight: bold;
-    margin-bottom: 6px;
+    color: #1a1a1a;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .eventDescription,
@@ -395,4 +401,14 @@
     .profileMessaging {
         max-width: 100%;
     }
+}
+
+.noLikesMessage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #999;
+    font-size: 16px;
+    padding: 2rem;
+    opacity: 0.7;
 }

@@ -152,7 +152,7 @@ export default function PetInfoComponent({ petUUID }) {
 
     return decodedPetId ? (
         <div className={styles.dashboardWrapper}>
-            <h2 className={styles.eventTitle}>Pet Detail</h2>
+            <h2 className={styles.eventTitle}>🐾 Pet Detail 🐾</h2>
 
             <div className={styles.petInfoContainer}>
                 <img
@@ -163,16 +163,16 @@ export default function PetInfoComponent({ petUUID }) {
 
                 <div className={styles.petDetailsContent}>
                     <p>
-                        <strong>Name:</strong> {pet.name}
+                        <strong>✨Name:</strong> {pet.name}
                     </p>
                     <p>
-                        <strong>Breed:</strong> {pet.breed}
+                        <strong>🐶Breed:</strong> {pet.breed}
                     </p>
                     <p>
-                        <strong>Status:</strong> {pet.availabilityStatus}
+                        <strong>❔Status:</strong> {pet.availabilityStatus}
                     </p>
                     <p>
-                        <strong>Birthdate:</strong>{' '}
+                        <strong>📅Birthdate:</strong>{' '}
                         {pet.birthdate
                             ? new Date(pet.birthdate).toLocaleDateString(
                                   'en-US',
@@ -186,18 +186,18 @@ export default function PetInfoComponent({ petUUID }) {
                     </p>
 
                     <p>
-                        <strong>About:</strong> {pet.aboutMe}
+                        <strong>📝About:</strong> {pet.aboutMe}
                     </p>
                     <p>
-                        <strong>Availability:</strong> {pet.availabilityStatus}
+                        <strong>🏠Availability:</strong> {pet.availabilityStatus}
                     </p>
                 </div>
             </div>
 
             <h3 className={styles.eventTitle}>Liked by Users</h3>
             {likedUsers.length === 0 ? (
-                <p className={styles.noEventsMessage}>
-                    No users have liked this pet yet.
+                <p className={styles.noLikesMessage}>
+                    <p>No users have liked this pet yet. 💔</p>
                 </p>
             ) : (
                 <div className={styles.eventsGrid}>
