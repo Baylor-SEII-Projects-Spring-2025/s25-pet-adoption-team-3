@@ -567,15 +567,15 @@ export default function ProfileDashboardComponent() {
 
                                     <p
                                         onClick={() =>
-                                            setSelectedLikes("Super Likes")
+                                            setSelectedLikes("My Pets")
                                         }
                                         className={
-                                            selectedLikes === "Super Likes"
+                                            selectedLikes === "My Pets"
                                                 ? styles.likesActive
                                                 : ""
                                         }
                                     >
-                                        Super Likes
+                                        My Pets
                                     </p>
                                 </div>
                                 <div className={styles.petsText}>
@@ -625,7 +625,16 @@ export default function ProfileDashboardComponent() {
                                                                 ) => {
                                                                     e.stopPropagation();
                                                                     handleStartChat(
-                                                                        pet.adoptionCenterId, pet.id, pet.name, pet.image[0], pet.breed, calculateAge(pet.birthdate), pet.spayedStatus,
+                                                                        pet.adoptionCenterId,
+                                                                        pet.id,
+                                                                        pet.name,
+                                                                        pet
+                                                                            .image[0],
+                                                                        pet.breed,
+                                                                        calculateAge(
+                                                                            pet.birthdate,
+                                                                        ),
+                                                                        pet.spayedStatus,
                                                                     );
                                                                 }}
                                                                 titleAccess="Message adoption center"
@@ -668,7 +677,7 @@ export default function ProfileDashboardComponent() {
                                     )}
                                 </div>
 
-                                {selectedLikes === "Super Likes" && (
+                                {selectedLikes === "My Pets" && (
                                     <div>
                                         {user?.superLikes?.length > 0 ? (
                                             <ul>
@@ -681,7 +690,7 @@ export default function ProfileDashboardComponent() {
                                                 )}
                                             </ul>
                                         ) : (
-                                            <p>No super likes found.</p>
+                                            <p>No pets found.</p>
                                         )}
                                     </div>
                                 )}
