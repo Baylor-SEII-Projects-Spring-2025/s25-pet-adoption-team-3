@@ -6,6 +6,7 @@ import Router from 'next/router';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import IconButton from '@mui/material/IconButton';
 import { Menu, MenuItem, Snackbar, Alert } from '@mui/material';
+import PetInfoSkeleton from "@/components/loading/PetInfoSkeleton";
 
 export default function PetInfoComponent({ petUUID }) {
     const [pet, setPet] = useState(null);
@@ -110,7 +111,7 @@ export default function PetInfoComponent({ petUUID }) {
         return age;
     };
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) return PetInfoSkeleton;
     if (error) return <p>Error: {error}</p>;
 
     const handleAdoptPet = async (userId) => {
