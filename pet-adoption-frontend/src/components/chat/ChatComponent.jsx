@@ -4,7 +4,7 @@ import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 import styles from "@/styles/ChatComponent.module.css";
 import PropTypes from "prop-types";
-import CircularProgress from "@mui/material/CircularProgress";
+import ChatSkeleton from "@/components/loading/ChatSkeleton";
 
 export default function ChatComponent({ recipientId }) {
     const [messages, setMessages] = useState([]);
@@ -75,8 +75,9 @@ export default function ChatComponent({ recipientId }) {
             }
         } catch (err) {
             console.error("Failed to fetch conversations:", err);
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     };
 
     const fetchUnreadCounts = async () => {
@@ -362,17 +363,15 @@ export default function ChatComponent({ recipientId }) {
         return bTime - aTime;
     });
 
+    if(isLoading) return <ChatSkeleton />;
+
     return (
         <div className={styles.chatWrapper}>
             <div className={styles.chatSidebar}>
                 <h3 className={styles.recentConversationsHeader}>
                     Recent Conversations
                 </h3>
-                {isLoading ? (
-                    <div className={styles.loadingWrapper}>
-                        <CircularProgress size={24} />
-                    </div>
-                ) : sortedChats.length === 0 ? (
+                    {sortedChats.length === 0 ? (
                     <div className={styles.noConversations}>
                         No recent conversations
                     </div>
