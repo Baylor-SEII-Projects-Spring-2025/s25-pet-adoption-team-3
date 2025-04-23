@@ -14,6 +14,7 @@ import petadoption.api.services.AdoptionCenterService;
 import petadoption.api.services.GCSStorageService;
 import petadoption.api.services.SessionValidation;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +52,7 @@ public class AdoptionCenterController {
      * @return ResponseEntity with registration result
      */
     @PostMapping("/register")
-    public ResponseEntity<?> registerAdoptionCenter(@RequestBody AdoptionCenterDTO adoptionCenterDTO) {
+    public ResponseEntity<?> registerAdoptionCenter(@RequestBody AdoptionCenterDTO adoptionCenterDTO) throws IOException, InterruptedException {
         return adoptionCenterService.registerAdoptionCenter(adoptionCenterDTO);
     }
 

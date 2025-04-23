@@ -6,6 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.*;
+import petadoption.api.DTO.EventDetailsDTO;
 import petadoption.api.DTO.EventRequestDTO;
 import petadoption.api.models.Event;
 import petadoption.api.models.User;
@@ -14,7 +15,9 @@ import petadoption.api.services.EventService;
 import petadoption.api.services.GCSStorageServiceEvents;
 import petadoption.api.services.SessionValidation;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,30 +50,30 @@ public class EventController {
      * @param description     Event description
      * @param startDate       Event start date (ISO format)
      * @param endDate         Event end date (ISO format)
-     * @param files           Event image file (multipart)
+     * @param file           Event image file (multipart)
      * @return ResponseEntity with the created Event object or error status
      */
     @PostMapping("/create-event-with-image/{adoptionCenterId}")
-    public ResponseEntity<Event> createEventWithImage(
+    public ResponseEntity<EventDetailsDTO> createEventWithImage(
             HttpSession session,
             @PathVariable Long adoptionCenterId,
             @RequestParam("title") String title,
             @RequestParam("description") String description,
             @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam("files") MultipartFile files) {
+            @RequestParam("files") MultipartFile file) throws IOException {
 
         ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
         if (!validationResponse.getStatusCode().is2xxSuccessful()) {
             return ResponseEntity.status(validationResponse.getStatusCode()).body(null);
         }
+
         User user = (User) validationResponse.getBody();
+        Event event = eventService.createEventWithImage(user, adoptionCenterId, title, description, startDate, endDate, file);
 
-        ResponseEntity<Event> eventResponse = eventService.createEventWithImage(
-                user, adoptionCenterId, title, description, startDate, endDate, files);
-
-        return eventResponse;
+        return ResponseEntity.status(201).body(new EventDetailsDTO(event));
     }
+
 
     /**
      * Deletes an event by its ID for a specific adoption center.
@@ -151,5 +154,28 @@ public class EventController {
     public ResponseEntity<?> getAllEvents(@PathVariable Long adoptionCenterId) {
         List<Event> events = eventService.getEventsByAdoptionCenterId(adoptionCenterId);
         return ResponseEntity.ok(events);
+    }
+
+    @GetMapping("/get-nearby-events")
+    public ResponseEntity<List<EventDetailsDTO>> getNearbyEvents(HttpSession session) {
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTER);
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body(null);
+        }
+        User user = (User) validationResponse.getBody();
+
+        List<Event> events = eventService.getNearbyEvents(user);
+
+        if(events.isEmpty()) {
+            return ResponseEntity.ok(null);
+        }
+
+        List<EventDetailsDTO> eventDetailsDTOList = new ArrayList<>();
+
+        for (Event event : events) {
+            eventDetailsDTOList.add(new EventDetailsDTO(event));
+        }
+
+        return ResponseEntity.ok().body(eventDetailsDTOList);
     }
 }

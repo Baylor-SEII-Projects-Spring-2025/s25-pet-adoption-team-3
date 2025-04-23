@@ -384,4 +384,15 @@ public class PetController {
         return ResponseEntity.status(200).body(petDTOs);
     }
 
+    @GetMapping("/get-my-pets")
+    public ResponseEntity<List<Pet>> getMyPets(HttpSession session) {
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body(null);
+        }
+        User user = (User) validationResponse.getBody();
+        return ResponseEntity.ok(petService.getAllPets(user.getId()));
+    }
+
+
 }

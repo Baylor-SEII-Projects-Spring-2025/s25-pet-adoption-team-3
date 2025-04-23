@@ -56,6 +56,7 @@ export default function ProfileDashboardComponent() {
     const [lastName, setLastName] = useState("");
     const [isUpdated, setIsUpdated] = useState(false);
     const [likedPets, setLikedPets] = useState([]);
+    const [myPets, setMyPets] = useState([]);
 
     const fetchUserSession = async () => {
         try {
@@ -125,15 +126,39 @@ export default function ProfileDashboardComponent() {
         }
     };
 
+    const fetchMyPets = async () => {
+        try {
+            const response = await fetch(`${API_URL}/api/pet/get-my-pets`, {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                console.error("Failed to fetch my pets");
+                return;
+            }
+
+            const data = await response.json();
+            console.log("🐶 My pets:", data);
+            setMyPets(data);
+        } catch (error) {
+            console.error("Error fetching my pets:", error);
+        }
+    };
+
     useEffect(() => {
         fetchUserSession();
     }, []);
 
     useEffect(() => {
         if (selectedNav === "My Likes") {
-            fetchLikedPets();
+            if (selectedLikes === "My Likes") fetchLikedPets();
+            if (selectedLikes === "My Pets") fetchMyPets();
         }
-    }, [selectedNav]);
+    }, [selectedLikes, selectedNav]);
 
     const handleDeletePhoto = async () => {
         try {
@@ -319,24 +344,31 @@ export default function ProfileDashboardComponent() {
         return age;
     };
 
-    const handleStartChat = (adoptionCenterId, petId, name, image, breed, age, gender) => {
+    const handleStartChat = (
+        adoptionCenterId,
+        petId,
+        name,
+        image,
+        breed,
+        age,
+        gender,
+    ) => {
         if (!adoptionCenterId) {
             alert("No adoption center linked to this pet.");
             return;
         }
 
-            sessionStorage.setItem(
-                "petContext",
-                JSON.stringify({ petId, name, image, breed, age, gender}),
-            );
+        sessionStorage.setItem(
+            "petContext",
+            JSON.stringify({ petId, name, image, breed, age, gender }),
+        );
 
         Router.push(`/chat/${adoptionCenterId}`);
     };
 
-        const handleCardClick = (petId) => {
-            Router.push(`/view-pet/${petId}`);
-        };
-
+    const handleCardClick = (petId) => {
+        Router.push(`/view-pet/${petId}`);
+    };
 
     if (isPageLoading) return <Loading />;
     return (
@@ -579,21 +611,27 @@ export default function ProfileDashboardComponent() {
 
                                     <p
                                         onClick={() =>
-                                            setSelectedLikes("Super Likes")
+                                            setSelectedLikes("My Pets")
                                         }
                                         className={
-                                            selectedLikes === "Super Likes"
+                                            selectedLikes === "My Pets"
                                                 ? styles.likesActive
                                                 : ""
                                         }
                                     >
-                                        Super Likes
+                                        My Pets
                                     </p>
                                 </div>
                                 <div className={styles.petsText}>
-                                    {likedPets.length > 0 ? (
+                                    {(selectedLikes === "My Likes"
+                                        ? likedPets
+                                        : myPets
+                                    ).length > 0 ? (
                                         <div className={styles.eventsGrid}>
-                                            {likedPets.map((pet) => (
+                                            {(selectedLikes === "My Likes"
+                                                ? likedPets
+                                                : myPets
+                                            ).map((pet) => (
                                                 <div
                                                     key={pet.id}
                                                     className={styles.eventCard}
@@ -628,22 +666,33 @@ export default function ProfileDashboardComponent() {
                                                             >
                                                                 {pet.name}
                                                             </p>
-                                                            <MessageIcon
-                                                                className={
-                                                                    styles.messageIcon
-                                                                }
-                                                                onClick={(
-                                                                    e,
-                                                                ) => {
-                                                                    e.stopPropagation();
-                                                                    handleStartChat(
-                                                                        pet.adoptionCenterId, pet.id, pet.name, pet.image[0], pet.breed, calculateAge(pet.birthdate), pet.spayedStatus,
-                                                                    );
-                                                                }}
-                                                                titleAccess="Message adoption center"
-                                                            />
+                                                            {selectedLikes ===
+                                                                "My Likes" && (
+                                                                <MessageIcon
+                                                                    className={
+                                                                        styles.messageIcon
+                                                                    }
+                                                                    onClick={(
+                                                                        e,
+                                                                    ) => {
+                                                                        e.stopPropagation();
+                                                                        handleStartChat(
+                                                                            pet.adoptionCenterId,
+                                                                            pet.id,
+                                                                            pet.name,
+                                                                            pet
+                                                                                .image?.[0],
+                                                                            pet.breed,
+                                                                            calculateAge(
+                                                                                pet.birthdate,
+                                                                            ),
+                                                                            pet.spayedStatus,
+                                                                        );
+                                                                    }}
+                                                                    titleAccess="Message adoption center"
+                                                                />
+                                                            )}
                                                         </div>
-
                                                         <p
                                                             className={
                                                                 styles.eventDescription
@@ -675,28 +724,12 @@ export default function ProfileDashboardComponent() {
                                         </div>
                                     ) : (
                                         <p className={styles.noEventsMessage}>
-                                            No liked pets found.
+                                            {selectedLikes === "My Likes"
+                                                ? "No liked pets found."
+                                                : "No pets listed under your profile."}
                                         </p>
                                     )}
                                 </div>
-
-                                {selectedLikes === "Super Likes" && (
-                                    <div>
-                                        {user?.superLikes?.length > 0 ? (
-                                            <ul>
-                                                {user.superLikes.map(
-                                                    (superLike, index) => (
-                                                        <li key={index}>
-                                                            {superLike}
-                                                        </li>
-                                                    ),
-                                                )}
-                                            </ul>
-                                        ) : (
-                                            <p>No super likes found.</p>
-                                        )}
-                                    </div>
-                                )}
                             </div>
                         )}
 
