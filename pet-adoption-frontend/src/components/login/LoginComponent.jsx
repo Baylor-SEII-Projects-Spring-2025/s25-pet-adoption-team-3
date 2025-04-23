@@ -1,3 +1,18 @@
+/**
+ * LoginComponent
+ * -----------------------------------------------------------
+ * This component renders the user login form for the application,
+ * supporting both email/password authentication and Google OAuth.
+ *
+ * Main Features:
+ *  - Email and password input fields with live validation
+ *  - Handles login with backend API, sets user session, and redirects by role
+ *  - "Forgot Password" and "Sign Up" navigation links
+ *  - Google OAuth login button using custom utility
+ *  - Shows a loading spinner while authenticating
+ *  - Responsive, styled layout with illustration for visual appeal
+ */
+
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import TextField from "@mui/material/TextField";
@@ -43,7 +58,6 @@ export default function LoginComponent() {
             }
 
             const data = await response.json();
-            console.log("Login successful:", data);
             setUser(data.user);
 
             if (data.role === "ADOPTION_CENTER") {
@@ -78,7 +92,6 @@ export default function LoginComponent() {
             }
 
             const data = await response.json();
-            console.log("✅ Session found:", data);
             setUser(data.user);
 
             router.push("/");

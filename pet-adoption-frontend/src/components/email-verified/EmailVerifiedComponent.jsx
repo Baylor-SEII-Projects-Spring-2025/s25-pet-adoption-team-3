@@ -1,3 +1,16 @@
+/**
+ * EmailVerifiedComponent
+ * -----------------------------------------------------------
+ * This component displays a confirmation screen after a user
+ * successfully verifies their email address.
+ *
+ * Main Features:
+ *  - Shows a success icon and "Email Verified!" message
+ *  - Provides instructions for next steps (log in to account)
+ *  - Includes a prominent button to navigate directly to the login page
+ *  - Styled with a centered card layout for clear user feedback
+ */
+
 import React from "react";
 import Link from "next/link";
 import styles from "@/styles/EmailVerified.module.css";

@@ -1,3 +1,16 @@
+/**
+ * AdoptionCenterSkeleton (Alternate Version)
+ * -----------------------------------------------------------
+ * This component displays an alternative skeleton loader for the adoption center dashboard,
+ * providing placeholder UI for main sections while data is loading.
+ *
+ * Main Features:
+ *  - Uses Material-UI Skeletons and responsive Stack/Box layouts
+ *  - Simulates dashboard sidebar, main content, and profile details
+ *  - Disables body scrolling during the loading state for UX consistency
+ *  - Can be used as a flexible loading screen for center-specific dashboard pages
+ */
+
 import React, { useEffect } from "react";
 import { Skeleton, Box, Stack } from "@mui/material";
 
@@ -9,10 +22,8 @@ export default function AdoptionCenterSkeleton() {
     return (
         <Box p={0} maxWidth={"2000px"} margin="0 auto">
             <Stack direction="row" spacing={4}>
-                {/* Left: Large rectangular skeleton */}
                 <Skeleton variant="rectangular" width="50%" height={640} />
                 <Stack direction="column" width="50%">
-                    {/* Right: Text skeletons */}
                     <Stack spacing={1} width="50%" marginTop={3}>
                         <Stack spacing={1} width="80%">
                             <Skeleton variant="text" height={80} />

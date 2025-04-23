@@ -20,7 +20,7 @@ public class SwipePetDTO {
     private Long id;
     private List<String> image;
     private String name;
-    private String spayedStatus; //"Spayed Female", "Unspayed Female", etc.
+    private String spayedStatus;
 
     private String birthdate;
 

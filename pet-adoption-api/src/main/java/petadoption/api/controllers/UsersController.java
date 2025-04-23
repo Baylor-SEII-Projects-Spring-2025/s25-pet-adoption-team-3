@@ -30,7 +30,6 @@ import petadoption.api.repository.TokenRepository;
 import petadoption.api.services.GCSStorageService;
 import petadoption.api.services.UserService;
 
-//Usages: View User profile, edit user Profile, and Maybe Delete Account.
 
 @CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000" })@RestController
 @RequestMapping("/api/users")
@@ -178,7 +177,6 @@ public class UsersController {
 
         request.getSession().invalidate();
         HttpSession newSession = request.getSession(true);
-        System.out.println("User DELETE PHOTO: " + updatedUser);
         newSession.setAttribute("user", updatedUser);
 
         return ResponseEntity.ok("Profile photo deleted successfully!");
@@ -205,8 +203,6 @@ public class UsersController {
             request.getSession().invalidate();
             HttpSession newSession = request.getSession(true);
             newSession.setAttribute("user", updatedUser);
-
-            System.out.println("User AFTER UPLOAD: " + updatedUser.getProfilePhoto());
 
             return ResponseEntity.ok(updatedUser);
         } catch (IOException e) {

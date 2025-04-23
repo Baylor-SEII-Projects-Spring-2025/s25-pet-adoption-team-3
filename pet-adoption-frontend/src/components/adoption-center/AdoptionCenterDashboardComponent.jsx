@@ -1,3 +1,22 @@
+/**
+ * AdoptionCenterDashboardComponent
+ * -----------------------------------------------------------
+ * This component provides the main dashboard for Adoption Center users.
+ * It enables adoption centers to manage their profiles, pets, and events,
+ * and view messages and matches. The dashboard is divided into four
+ * main tabs: Dashboard, My Pets, My Events, and Settings.
+ *
+ * Main Features:
+ *  - Dashboard: Overview section showing center name, messages, and pet matches.
+ *  - My Pets: View, search, and manage active or archived pets; add new pets with image and details forms.
+ *  - My Events: View, search, and manage current or archived events; add new events with images and details.
+ *  - Settings: Edit adoption center profile, upload/delete profile photo, and update details like name, bio, and phone number.
+ *  - Includes modal forms for adding pets/events, and advanced search/filtering options.
+ *  - Uses Material-UI for form controls and layout.
+ *  - Responsive and styled to match the app's overall design.
+ *  - Handles user authentication and role-based redirect logic.
+ */
+
 import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
@@ -167,7 +186,6 @@ export default function ProfileDashboardComponent() {
             }
 
             const data = await response.json();
-            console.log('User session data:', data);
 
             const fetchedUser = data.user;
 
@@ -201,7 +219,6 @@ export default function ProfileDashboardComponent() {
                 if (!response.ok)
                     throw new Error('Failed to fetch archived pets');
                 const data = await response.json();
-                console.log('Archived pets data:', data);
                 setArchivedPets(data);
             } catch (err) {
                 console.error('Error loading archived pets:', err);
@@ -233,9 +250,7 @@ export default function ProfileDashboardComponent() {
             }
 
             const data = await response.json();
-            console.log('Available pets data:', data);
 
-            // Filter only available pets
             const filteredPets = data.filter(
                 (pet) => pet.status === 'AVAILABLE',
             );
@@ -259,12 +274,10 @@ export default function ProfileDashboardComponent() {
             );
 
             if (response.status === 400) {
-                console.log('User not found');
                 return;
             }
 
             if (response.ok) {
-                console.log('✅ Profile photo deleted successfully');
                 window.location.reload();
             } else {
                 console.error('Failed to delete profile photo');
@@ -294,7 +307,6 @@ export default function ProfileDashboardComponent() {
 
             if (response.ok) {
                 const updatedUser = await response.json();
-                console.log('✅ Photo uploaded, updated user:', updatedUser);
                 setUser(updatedUser);
                 setUploadError('');
                 window.location.reload();
@@ -323,7 +335,6 @@ export default function ProfileDashboardComponent() {
         return `linear-gradient(135deg, ${color1}, ${color2})`;
     };
 
-    // add a pet logic
     const [petData, setPetData] = useState({
         images: [null, null, null, null],
         name: '',
@@ -364,8 +375,6 @@ export default function ProfileDashboardComponent() {
             alert('You must upload exactly 4 images.');
             return;
         }
-
-        console.log('Submitting pet data:', petData);
     };
 
     const isFormValid = () => {
@@ -389,7 +398,6 @@ export default function ProfileDashboardComponent() {
             setLoading(false);
             return;
         }
-        console.log('📤 Submitting pet data:', petData);
 
         try {
             const formData = new FormData();
@@ -415,10 +423,6 @@ export default function ProfileDashboardComponent() {
                 formData.append('characteristics', ch);
             });
 
-            for (let [key, value] of formData.entries()) {
-                console.log(`${key}:`, value);
-            }
-
             const response = await fetch(
                 `${API_URL}/api/pet/add-pet-with-images`,
                 {
@@ -435,8 +439,6 @@ export default function ProfileDashboardComponent() {
                     `Failed to upload pet details: ${response.status} ${errorText}`,
                 );
             }
-
-            console.log('✅ Pet added successfully');
         } catch (error) {
             console.error('Error uploading pet data:', error);
             alert('❌ Failed to add pet. Please try again.');
@@ -444,16 +446,11 @@ export default function ProfileDashboardComponent() {
             setLoading(false);
         }
 
-        // Reset form
         setPetData(initialPetData);
         handleModalClose();
-
-        // Refresh pets
         fetchAvailablePets();
     };
 
-    // add an event logic
-    // Event Handlers
     const handleEventDateChange = (field, newValue) => {
         if (newValue) {
             setEventData((prev) => ({
@@ -503,8 +500,6 @@ export default function ProfileDashboardComponent() {
             return;
         }
 
-        console.log('Submitting event data:', eventData);
-
         try {
             const formData = new FormData();
             extractImageFiles(eventData, formData);
@@ -521,28 +516,19 @@ export default function ProfileDashboardComponent() {
                     credentials: 'include',
                 },
             );
-
-            if (response.ok) {
-                console.log('✅ ', response.body);
-            } else {
-                console.log('❌ Error creating event: ', response.body);
+            if(!response.ok){
+                throw new Error('failed to create event');
             }
-        } catch (error) {
-            console.log('❌ Error creating event: ', error);
+        } catch {
             alert('❌ Failed to create event. Please try again.');
         } finally {
             setLoading(false);
         }
 
-        // Reset form
         setEventData(initialEventData);
         handleModalClose();
-
-        // Refresh events
         fetchAvailableEvents();
     };
-
-    //fetch available events logic
     const fetchAvailableEvents = async () => {
         try {
             const response = await fetch(
@@ -563,7 +549,6 @@ export default function ProfileDashboardComponent() {
 
             const data = await response.json();
 
-            // Filter only available events
             const filteredEvents = data.filter((event) =>
                 dayjs(event.startDate).isSameOrAfter(dayjs(), 'day'),
             );
@@ -579,7 +564,6 @@ export default function ProfileDashboardComponent() {
         }
     }, [user, selectedEvents]);
 
-    // searching in available events logic
     const handleEventSearchChange = (event) => {
         setSearchQuery(event.target.value.toLowerCase());
     };
@@ -596,7 +580,6 @@ export default function ProfileDashboardComponent() {
         }
     }, [user, selectedPets]);
 
-    // searching in available pets logic
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value.toLowerCase());
     };
@@ -621,7 +604,6 @@ export default function ProfileDashboardComponent() {
                 .includes(searchQuery.toLowerCase()),
     );
 
-    // update adoption center logic
     useEffect(() => {
         if (user) {
             setAdoptionCenterName(user.adoptionCenterName || '');
@@ -701,7 +683,6 @@ export default function ProfileDashboardComponent() {
             );
 
             if (response.ok) {
-                console.log('✅ Adoption center name updated successfully');
                 setIsUpdated(false);
             } else {
                 console.error('Failed to update adoption center name');
@@ -732,7 +713,6 @@ export default function ProfileDashboardComponent() {
             );
 
             if (response.ok) {
-                console.log('✅ Website link updated successfully');
                 setIsUpdated(false);
             } else {
                 console.error('Failed to update website link');
@@ -763,7 +743,6 @@ export default function ProfileDashboardComponent() {
             );
 
             if (response.ok) {
-                console.log('✅ Bio updated successfully');
                 setIsUpdated(false);
             } else {
                 console.error('Failed to update bio');
@@ -794,7 +773,6 @@ export default function ProfileDashboardComponent() {
             );
 
             if (response.ok) {
-                console.log('✅ Phone number updated successfully');
                 setIsUpdated(false);
             } else {
                 console.error('Failed to update phone number');
@@ -808,8 +786,7 @@ export default function ProfileDashboardComponent() {
     };
 
     const handlePetClick = (petId) => {
-        console.log('Pet ID:', petId);
-        const encodedId = btoa(petId.toString()); // base64 encode
+        const encodedId = btoa(petId.toString());
         Router.push(`/pet-info/${encodedId}`);
     };
 
@@ -1046,7 +1023,6 @@ export default function ProfileDashboardComponent() {
                                                                 {' '}
                                                                 Upload photos
                                                             </h3>
-                                                            {/* Image Upload Grid */}
                                                             <Box
                                                                 className={
                                                                     styles.imagePreviewContainer
@@ -1065,7 +1041,6 @@ export default function ProfileDashboardComponent() {
                                                                                 styles.imageWrapper
                                                                             }
                                                                         >
-                                                                            {/* Hidden File Input */}
                                                                             <input
                                                                                 type='file'
                                                                                 accept='image/*'
@@ -1082,8 +1057,6 @@ export default function ProfileDashboardComponent() {
                                                                                 }
                                                                                 id={`file-input-${index}`}
                                                                             />
-
-                                                                            {/* Remove Button */}
                                                                             {imgObj &&
                                                                                 imgObj.preview && (
                                                                                     <button
@@ -1113,8 +1086,6 @@ export default function ProfileDashboardComponent() {
                                                                                         ✕
                                                                                     </button>
                                                                                 )}
-
-                                                                            {/* Image Preview */}
                                                                             {imgObj &&
                                                                             imgObj.preview ? (
                                                                                 <img
@@ -1146,8 +1117,6 @@ export default function ProfileDashboardComponent() {
                                                                     ),
                                                                 )}
                                                             </Box>
-
-                                                            {/* Text Fields */}
                                                             <TextField
                                                                 label='Name'
                                                                 name='name'
@@ -1405,8 +1374,6 @@ export default function ProfileDashboardComponent() {
                                                                 rows={3}
                                                                 sx={{ mb: 2 }}
                                                             />
-
-                                                            {/* Extra Sections */}
                                                             <Typography
                                                                 variant='subtitle1'
                                                                 sx={{ mt: 2 }}
@@ -1452,8 +1419,6 @@ export default function ProfileDashboardComponent() {
                                                                 required
                                                                 sx={{ mb: 2 }}
                                                             />
-
-                                                            {/* Buttons */}
                                                             <Box
                                                                 sx={{
                                                                     display:
@@ -1587,7 +1552,6 @@ export default function ProfileDashboardComponent() {
                                             <div
                                                 className={styles.addPetButton}
                                             >
-                                                {/* Search Bar */}
                                                 <TextField
                                                     label='Search Pets'
                                                     variant='outlined'
@@ -1862,8 +1826,6 @@ export default function ProfileDashboardComponent() {
                                                                     </Box>
                                                                 )}
                                                             </Box>
-
-                                                            {/* Text Fields */}
                                                             <TextField
                                                                 label='Event Title'
                                                                 name='title'
@@ -1897,7 +1859,6 @@ export default function ProfileDashboardComponent() {
                                                                     AdapterDayjs
                                                                 }
                                                             >
-                                                                {/* Start Date Picker */}
                                                                 <DatePicker
                                                                     label='Start Date'
                                                                     value={
@@ -1922,7 +1883,7 @@ export default function ProfileDashboardComponent() {
                                                                         date.isBefore(
                                                                             dayjs(),
                                                                         )
-                                                                    } // Disable past dates
+                                                                    }
                                                                     slotProps={{
                                                                         textField:
                                                                             {
@@ -1934,8 +1895,6 @@ export default function ProfileDashboardComponent() {
                                                                             },
                                                                     }}
                                                                 />
-
-                                                                {/* End Date Picker */}
                                                                 <DatePicker
                                                                     label='End Date'
                                                                     value={
@@ -1960,13 +1919,13 @@ export default function ProfileDashboardComponent() {
                                                                         ) =>
                                                                             date.isBefore(
                                                                                 dayjs(),
-                                                                            ) || // Prevent selecting past dates
+                                                                            ) ||
                                                                             (eventData.startDate &&
                                                                                 date.isBefore(
                                                                                     dayjs(
                                                                                         eventData.startDate,
                                                                                     ),
-                                                                                )) // Prevent selecting before start date
+                                                                                ))
                                                                     }
                                                                     slotProps={{
                                                                         textField:
@@ -1980,8 +1939,6 @@ export default function ProfileDashboardComponent() {
                                                                     }}
                                                                 />
                                                             </LocalizationProvider>
-
-                                                            {/* Buttons */}
                                                             <Box
                                                                 sx={{
                                                                     display:

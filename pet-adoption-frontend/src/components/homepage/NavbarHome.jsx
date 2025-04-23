@@ -1,3 +1,19 @@
+/**
+ * Navbar Component (Homepage)
+ * -----------------------------------------------------------
+ * This component renders the primary navigation bar for the app,
+ * including brand/logo, main links, and user authentication menu.
+ *
+ * Main Features:
+ *  - Displays app logo and navigation links (Learn, Locations, Gallery)
+ *  - Shows user avatar and dropdown menu if logged in, with Dashboard, Likes, Messages, Settings, and Logout
+ *  - Fetches current user session and unread message count on mount
+ *  - Integrates with WebSocket/STOMP for real-time chat notifications
+ *  - Role-based navigation for Adoption Centers and Adopters
+ *  - Handles login, logout, and profile photo/initials display
+ *  - Responsive and styled for homepage/global use
+ */
+
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import styles from "@/styles/NavbarHome.module.css";
@@ -40,7 +56,6 @@ export default function Navbar() {
             }
 
             const data = await response.json();
-            console.log("✅ Session found:", data);
             setUser(data.user);
             fetchUnreadCount();
         } catch (error) {
@@ -119,8 +134,6 @@ export default function Navbar() {
             if (!response.ok) {
                 throw new Error("Error logging out");
             }
-
-            console.log("✅ Logged out");
             setUser(null);
             setOpen(false);
         } catch (error) {

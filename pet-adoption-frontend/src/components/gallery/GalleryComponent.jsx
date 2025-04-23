@@ -1,3 +1,17 @@
+/**
+ * GalleryPage
+ * -----------------------------------------------------------
+ * This component renders a gallery of featured adoptable pets,
+ * giving users a visually engaging way to browse pets and learn
+ * a little about each one.
+ *
+ * Main Features:
+ *  - Displays a grid of pet cards with images, names, breeds, and short bios
+ *  - Static mock data for demonstration (replaceable with dynamic data)
+ *  - Responsive, styled layout for modern visual appeal
+ *  - Welcoming heading and engaging pet showcase design
+ */
+
 import React from 'react';
 import styles from '@/styles/GalleryPage.module.css';
 

@@ -1,3 +1,16 @@
+/**
+ * ChatSkeleton
+ * -----------------------------------------------------------
+ * This component displays a skeleton loader UI for the chat page
+ * while chat data (messages, conversations) is loading.
+ *
+ * Main Features:
+ *  - Mimics the chat sidebar, chat bubbles, and input area using Material-UI Skeletons
+ *  - Helps reduce layout shifts and provides smooth loading feedback
+ *  - Styled to match the ChatComponent layout for a seamless user experience
+ *  - Useful as a placeholder during async fetches or Suspense boundaries
+ */
+
 import React from "react";
 import Skeleton from "@mui/material/Skeleton";
 import styles from "@/styles/ChatComponent.module.css";

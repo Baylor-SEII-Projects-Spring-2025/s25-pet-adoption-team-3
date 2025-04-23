@@ -1,3 +1,17 @@
+/**
+ * Home Page
+ * -----------------------------------------------------------
+ * This is the main landing page of the application, welcoming users and
+ * introducing them to the pet adoption platform.
+ *
+ * Main Features:
+ *  - Renders the homepage navigation bar (NavbarHome)
+ *  - Displays a hero section with headline and call-to-action
+ *  - Provides an about section, pet adoption options, and a prominent CTA
+ *  - Includes a footer with social links and copyright
+ *  - Designed to orient users and guide them to explore or begin adopting
+ */
+
 import React from "react";
 import NavbarHome from "@/components/homepage/NavbarHome";
 import HeroSection from "@/components/homepage/HeroSection";

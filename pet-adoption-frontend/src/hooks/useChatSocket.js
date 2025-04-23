@@ -12,7 +12,6 @@ export default function useChatSocket(onMessage) {
         const stompClient = new Client({
             webSocketFactory: () => socket,
             onConnect: () => {
-                console.log("🔌 Connected");
                 stompClient.subscribe("/topic/messages", (msg) => {
                     onMessage(JSON.parse(msg.body));
                 });

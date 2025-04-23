@@ -1,3 +1,18 @@
+/**
+ * RegisterComponent
+ * -----------------------------------------------------------
+ * This component renders the registration form for new adopters,
+ * supporting email/password sign-up and Google OAuth registration.
+ *
+ * Main Features:
+ *  - Collects user first name, last name, email, and password with confirmation
+ *  - Live password strength and match validation with PasswordStrengthBar
+ *  - Handles registration with backend API, error messages, and loading state
+ *  - Google sign-up option for easier onboarding
+ *  - Redirects users on success and checks session on mount
+ *  - Responsive, styled layout with illustration for visual appeal
+ */
+
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { TextField, Button } from "@mui/material";
@@ -40,7 +55,6 @@ export default function RegisterComponent() {
             }
 
             const data = await response.json();
-            console.log("✅ Session found:", data);
             setUser(data.user);
 
             router.push("/");

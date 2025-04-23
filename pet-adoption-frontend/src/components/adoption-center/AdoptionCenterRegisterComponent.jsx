@@ -1,3 +1,21 @@
+/**
+ * AdoptionCenterRegisterComponent
+ * -----------------------------------------------------------
+ * This component handles the multi-step registration process
+ * for new Adoption Centers joining the platform. It collects
+ * user input, validates form fields, manages photo uploads,
+ * and integrates with Google Places Autocomplete for address entry.
+ *
+ * Main Features:
+ *  - Step 1: Account creation (name, email, password, confirm password with strength check)
+ *  - Step 2: Center details (phone, website, address with Google Places autocomplete)
+ *  - Step 3: Bio and profile photo upload (with preview and file size validation)
+ *  - Live validation for passwords and all fields before navigation or submission
+ *  - Submits new center info to the backend API and uploads photo if provided
+ *  - Responsive design, styled to fit app theme with Material-UI components
+ *  - Shows a registration progress spinner and error alerts as needed
+ */
+
 import React, { useRef, useEffect, useState } from "react";
 import Router from "next/router";
 import { TextField, Button, CircularProgress } from "@mui/material";
@@ -141,12 +159,10 @@ export default function AdoptionCenterRegisterComponent() {
 
     const isStep3Valid = formData.bio.trim() && formData.photo;
 
-    // Single function to initialize Google Places Autocomplete
     const initializeAutocomplete = () => {
         if (!inputRef.current || autoCompleteRef.current) return;
 
         try {
-            // Check if Google API is available
             if (
                 !window.google ||
                 !window.google.maps ||
@@ -182,9 +198,7 @@ export default function AdoptionCenterRegisterComponent() {
         }
     };
 
-    // Single useEffect to initialize Autocomplete when component mounts or Google API loads
     useEffect(() => {
-        // Only try to initialize if we're on step 2 and the input ref exists
         if (step === 2 && inputRef.current) {
             initializeAutocomplete();
         }

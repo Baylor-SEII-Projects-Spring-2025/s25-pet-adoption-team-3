@@ -108,9 +108,6 @@ public class PetController {
 
     @PostMapping("/add-pet")
     public ResponseEntity<String> addPet(HttpSession session, @RequestBody @Valid PetRequestDTO petRequestDTO) {
-//        User user = (User) session.getAttribute("user");
-//        if (user == null) return ResponseEntity.status(401).body("No active session.");
-//        if (user.getRole() != User.Role.ADOPTION_CENTER) return ResponseEntity.status(403).body("Unauthorized action.");
         User user = userRepository.getOne(1L);
         logger.info("adding pet "+petRequestDTO.getName());
         for(Characteristic ch : petRequestDTO.getCharacteristics()){
@@ -175,7 +172,6 @@ public class PetController {
     @GetMapping("/get-all-pets/{adoptionCenterID}")
     public ResponseEntity<?> getAllPets(@PathVariable Long adoptionCenterID) {
         List<Pet> pets = petService.getAllPets(adoptionCenterID);
-        System.out.println("Pets: " + pets);
 
         List<Map<String, Object>> result = pets.stream()
                 .map(pet -> {
@@ -225,7 +221,6 @@ public class PetController {
         }
         User user = (User) validationResponse.getBody();
 
-        //User user = userRepository.getOne(1L);
         String response = recEngineService.likePet(user, petService.getPetDetail(petId));
         if(response.contains("Error"))
             return ResponseEntity.status(400).body(response);
@@ -240,26 +235,22 @@ public class PetController {
         }
         User user = (User) validationResponse.getBody();
 
-        //User user = userRepository.getOne(1L);
         String response = recEngineService.dislikePet(user, petService.getPetDetail(petId));
         if(response.contains("Error"))
             return ResponseEntity.status(400).body(response);
         return ResponseEntity.status(200).body(response);
     }
 
-    // DEV ONLY
     @PostMapping("/add-characteristics")
     @Transactional
     public void addCharacteristics(@RequestParam("c") String[] characteristics) {
         for(String characteristicStr : characteristics) {
-            // System.out.println(characteristic);
             Characteristic characteristic = new Characteristic();
             characteristic.setName(characteristicStr);
             characteristicRepository.save(characteristic);
         }
     }
 
-    // temporary swipe get pets
     @GetMapping("/swipe/temp-get-pets")
     public ResponseEntity<List<SwipePetDTO>> getSwipePets(HttpSession session) {
         ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTER);

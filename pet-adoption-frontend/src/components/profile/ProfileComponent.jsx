@@ -1,3 +1,20 @@
+/**
+ * ProfileDashboardComponent
+ * -----------------------------------------------------------
+ * This component renders the main profile dashboard for adopters,
+ * providing navigation between dashboard, liked pets, and settings.
+ *
+ * Main Features:
+ *  - Fetches user session and handles redirects for user roles (adopter, adoption center, etc.)
+ *  - Displays user profile info, matches, and messages
+ *  - Allows users to view and manage liked pets and "super likes"
+ *  - Includes modal and form for updating/deleting profile photo
+ *  - Enables editing of first and last name in settings tab
+ *  - Handles loading states and error messages for a smooth UX
+ *  - Provides quick chat initiation with adoption centers from liked pets
+ *  - Responsive, styled layout matching app dashboard standards
+ */
+
 import React, { useEffect, useState, useRef, Suspense } from "react";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
@@ -65,7 +82,6 @@ export default function ProfileDashboardComponent() {
             }
 
             const data = await response.json();
-            console.log("User session data:", data);
 
             const fetchedUser = data.user;
 
@@ -103,7 +119,6 @@ export default function ProfileDashboardComponent() {
             }
 
             const data = await response.json();
-            console.log("🐾 Liked pets:", data);
             setLikedPets(data);
         } catch (error) {
             console.error("Error fetching liked pets:", error);
@@ -134,13 +149,11 @@ export default function ProfileDashboardComponent() {
             );
 
             if (response.status === 400) {
-                console.log("User not found");
                 alert("User not found.");
                 return;
             }
 
             if (response.ok) {
-                console.log("✅ Profile photo deleted successfully");
                 window.location.reload();
             } else {
                 console.error("Failed to delete profile photo");
@@ -180,7 +193,6 @@ export default function ProfileDashboardComponent() {
 
             if (response.ok) {
                 const updatedUser = await response.json();
-                console.log("✅ Photo uploaded, updated user:", updatedUser);
                 setUser(updatedUser);
                 setUploadError("");
                 window.location.reload();

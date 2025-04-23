@@ -1,9 +1,21 @@
+/**
+ * ViewPetSkeleton
+ * -----------------------------------------------------------
+ * This component provides a skeleton loader for the "View Pet" page,
+ * visually mimicking the pet profile and image carousel while data loads.
+ *
+ * Main Features:
+ *  - Skeleton loader for pet image carousel and navigation buttons
+ *  - Placeholder skeletons for pet info, traits, and extra details
+ *  - Prevents layout shifts and keeps UI consistent during async fetches
+ *  - Styled to match the SwipeComponent/ViewPetComponent layout
+ */
+
 import React, { useState } from "react";
 import Skeleton from "@mui/material/Skeleton";
 import styles from "@/styles/SwipeComponent.module.css";
 
 export default function ViewPetSkeleton() {
-  // For carousel nav, just mock a single slide
   const [imageIndex] = useState(0);
 
   return (

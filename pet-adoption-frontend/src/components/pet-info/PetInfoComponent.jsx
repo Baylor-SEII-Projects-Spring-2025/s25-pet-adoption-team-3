@@ -1,3 +1,19 @@
+/**
+ * PetInfoComponent
+ * -----------------------------------------------------------
+ * This component displays detailed information about a selected pet,
+ * along with a list of users who have liked the pet and adoption actions.
+ *
+ * Main Features:
+ *  - Fetches and displays pet details (name, breed, status, birthdate, about)
+ *  - Shows users who have liked the pet, including avatars and emails
+ *  - Allows adoption center to adopt the pet for a user via a menu action
+ *  - Includes interactive avatar, chat launch, and adoption options
+ *  - Uses skeleton loader during fetch and error messaging on failure
+ *  - Snackbar notifications for adoption success or error
+ *  - Responsive, styled layout matching the app’s design
+ */
+
 import React, { useEffect, useState } from 'react';
 import styles from '@/styles/PetInfoComponent.module.css';
 import PropTypes from 'prop-types';
@@ -40,7 +56,6 @@ export default function PetInfoComponent({ petUUID }) {
                 }
 
                 const data = await response.json();
-                console.log('✅ Session found:', data);
 
                 if (data.user.role == 'ADOPTER') {
                     Router.push('/profile');
@@ -231,8 +246,8 @@ export default function PetInfoComponent({ petUUID }) {
                                         pet.image?.[0] ||
                                         '/images/no_image_available.png',
                                     breed: pet.breed,
-                                    age: calculateAge(pet.birthdate), // optionally format/calculate age
-                                    gender: pet.spayedStatus || 'Unknown', // adjust if you have gender separate
+                                    age: calculateAge(pet.birthdate),
+                                    gender: pet.spayedStatus || 'Unknown',
                                 };
 
                                 sessionStorage.setItem(
@@ -279,7 +294,7 @@ export default function PetInfoComponent({ petUUID }) {
                                         </Avatar>
                                         <IconButton
                                             onClick={(e) => {
-                                                e.stopPropagation(); // prevent parent onClick
+                                                e.stopPropagation();
                                                 handleMenuOpen(e, user.id);
                                             }}
                                         >

@@ -174,7 +174,6 @@ public class PetService {
         return pets;
     }
 
-    // TODO: Use recengine service
     public Optional<Pet> getSwipePet() {
         List<Pet> availablePets = petRepository.findByAvailabilityStatus(Pet.PetStatus.AVAILABLE);
         if (availablePets.isEmpty()) {
