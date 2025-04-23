@@ -272,7 +272,8 @@ public class PetController {
                 pet.getAboutMe(),
                 pet.getExtra1(),
                 pet.getExtra2(),
-                pet.getExtra3()
+                pet.getExtra3(),
+                pet.getAvailabilityStatus()
         );
 
         return ResponseEntity.ok(dto);

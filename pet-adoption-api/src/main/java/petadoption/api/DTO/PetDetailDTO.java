@@ -1,5 +1,7 @@
 package petadoption.api.DTO;
 
+import petadoption.api.models.Pet;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -14,5 +16,6 @@ public record PetDetailDTO(
         String aboutMe,
         String extra1,
         String extra2,
-        String extra3
+        String extra3,
+        Pet.PetStatus availabilityStatus
 ) {}

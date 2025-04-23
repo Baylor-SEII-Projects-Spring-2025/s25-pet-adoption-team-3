@@ -14,14 +14,14 @@
  *  - Responsive, styled layout matching the app’s design
  */
 
-import React, { useEffect, useState } from 'react';
-import styles from '@/styles/PetInfoComponent.module.css';
-import PropTypes from 'prop-types';
-import Avatar from '@mui/material/Avatar';
-import Router from 'next/router';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import IconButton from '@mui/material/IconButton';
-import { Menu, MenuItem, Snackbar, Alert } from '@mui/material';
+import React, { useEffect, useState } from "react";
+import styles from "@/styles/PetInfoComponent.module.css";
+import PropTypes from "prop-types";
+import Avatar from "@mui/material/Avatar";
+import Router from "next/router";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import IconButton from "@mui/material/IconButton";
+import { Menu, MenuItem, Snackbar, Alert } from "@mui/material";
 import PetInfoSkeleton from "@/components/loading/PetInfoSkeleton";
 
 export default function PetInfoComponent({ petUUID }) {
@@ -32,8 +32,8 @@ export default function PetInfoComponent({ petUUID }) {
     const [menuAnchorEl, setMenuAnchorEl] = useState(null);
     const [menuUserId, setMenuUserId] = useState(null);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState('');
-    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+    const [snackbarMessage, setSnackbarMessage] = useState("");
+    const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
     const decodedPetId = petUUID ? atob(petUUID) : null;
@@ -42,26 +42,26 @@ export default function PetInfoComponent({ petUUID }) {
         const fetchUserSession = async () => {
             try {
                 const response = await fetch(`${API_URL}/auth/session`, {
-                    method: 'GET',
-                    credentials: 'include',
+                    method: "GET",
+                    credentials: "include",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
                 });
 
                 if (response.status === 401) {
-                    Router.push('/login');
-                    console.warn('No active session.');
+                    Router.push("/login");
+                    console.warn("No active session.");
                     return;
                 }
 
                 const data = await response.json();
 
-                if (data.user.role == 'ADOPTER') {
-                    Router.push('/profile');
+                if (data.user.role == "ADOPTER") {
+                    Router.push("/profile");
                 }
             } catch (error) {
-                console.error('Error fetching session:', error);
+                console.error("Error fetching session:", error);
             }
         };
         fetchUserSession();
@@ -74,21 +74,22 @@ export default function PetInfoComponent({ petUUID }) {
             try {
                 const petRes = await fetch(
                     `${API_URL}/api/pet/get-pet-detail/${decodedPetId}`,
-                    { credentials: 'include' },
+                    { credentials: "include" },
                 );
                 const petData = await petRes.json();
                 if (!petRes.ok) throw new Error(petData);
+                console.log("Pet data:", petData);
                 setPet(petData);
 
                 const userRes = await fetch(
                     `${API_URL}/api/adoption-center/users-who-liked/${decodedPetId}`,
-                    { credentials: 'include' },
+                    { credentials: "include" },
                 );
                 const userData = await userRes.json();
                 if (!userRes.ok) throw new Error(userData);
                 setLikedUsers(userData);
             } catch (err) {
-                setError(err.message || 'Error fetching data');
+                setError(err.message || "Error fetching data");
             } finally {
                 setLoading(false);
             }
@@ -98,7 +99,7 @@ export default function PetInfoComponent({ petUUID }) {
     }, [decodedPetId]);
 
     const generateGradient = (name) => {
-        if (!name) return '#f50057';
+        if (!name) return "#f50057";
 
         let hash = 0;
         for (let i = 0; i < name.length; i++) {
@@ -112,7 +113,7 @@ export default function PetInfoComponent({ petUUID }) {
     };
 
     const calculateAge = (birthdateStr) => {
-        if (!birthdateStr) return 'Unknown';
+        if (!birthdateStr) return "Unknown";
         const birthdate = new Date(birthdateStr);
         const today = new Date();
 
@@ -136,8 +137,8 @@ export default function PetInfoComponent({ petUUID }) {
             const response = await fetch(
                 `${API_URL}/api/adoption-center/adopt-pet/${pet.id}/by/${userId}`,
                 {
-                    method: 'PUT',
-                    credentials: 'include',
+                    method: "PUT",
+                    credentials: "include",
                 },
             );
 
@@ -146,12 +147,12 @@ export default function PetInfoComponent({ petUUID }) {
                 throw new Error(errText);
             }
 
-            setSnackbarMessage('Pet successfully adopted!');
-            setSnackbarSeverity('success');
+            setSnackbarMessage("Pet successfully adopted!");
+            setSnackbarSeverity("success");
             setSnackbarOpen(true);
         } catch (error) {
             setSnackbarMessage(error.message);
-            setSnackbarSeverity('error');
+            setSnackbarSeverity("error");
             setSnackbarOpen(true);
         }
     };
@@ -172,139 +173,169 @@ export default function PetInfoComponent({ petUUID }) {
 
             <div className={styles.petInfoContainer}>
                 <img
-                    src={pet.image?.[0] || '/images/no_image_available.png'}
+                    src={pet.image?.[0] || "/images/no_image_available.png"}
                     alt={pet.name}
                     className={styles.petInfoImage}
                 />
 
                 <div className={styles.petDetailsContent}>
                     <p>
-                        <strong>✨Name:</strong> {pet.name}
+                        <strong>✨ Name:</strong> {pet.name}
                     </p>
                     <p>
-                        <strong>🐶Breed:</strong> {pet.breed}
+                        <strong>🐶 Breed:</strong> {pet.breed}
                     </p>
                     <p>
-                        <strong>❔Status:</strong> {pet.availabilityStatus}
-                    </p>
-                    <p>
-                        <strong>📅Birthdate:</strong>{' '}
+                        <strong>📅 Birthdate:</strong>{" "}
                         {pet.birthdate
                             ? new Date(pet.birthdate).toLocaleDateString(
-                                  'en-US',
+                                  "en-US",
                                   {
-                                      year: 'numeric',
-                                      month: 'long',
-                                      day: 'numeric',
+                                      year: "numeric",
+                                      month: "long",
+                                      day: "numeric",
                                   },
                               )
-                            : 'Unknown'}
+                            : "Unknown"}
                     </p>
 
                     <p>
-                        <strong>📝About:</strong> {pet.aboutMe}
+                        <strong>📝 About:</strong> {pet.aboutMe}
                     </p>
                     <p>
-                        <strong>🏠Availability:</strong> {pet.availabilityStatus}
+                        <strong>🏠 Availability:</strong>{" "}
+                        {pet.availabilityStatus}
                     </p>
                 </div>
             </div>
+            {pet.availabilityStatus === "AVAILABLE" && (
+                <div>
+                    <h3 className={styles.eventTitle}>Liked by Users</h3>
 
-            <h3 className={styles.eventTitle}>Liked by Users</h3>
-            {likedUsers.length === 0 ? (
-                <p className={styles.noLikesMessage}>
-                    <p>No users have liked this pet yet. 💔</p>
-                </p>
-            ) : (
-                <div className={styles.eventsGrid}>
-                    <Menu
-                        anchorEl={menuAnchorEl}
-                        open={Boolean(menuAnchorEl)}
-                        onClose={handleMenuClose}
-                    >
-                        <MenuItem
-                            onClick={() => {
-                                handleAdoptPet(menuUserId);
-                                handleMenuClose();
-                            }}
-                        >
-                            Adopt for this user
-                        </MenuItem>
-                    </Menu>
+                    {likedUsers.length === 0 ? (
+                        <p className={styles.noLikesMessage}>
+                            No users have liked this pet yet
+                        </p>
+                    ) : (
+                        <div className={styles.eventsGrid}>
+                            <Menu
+                                anchorEl={menuAnchorEl}
+                                open={Boolean(menuAnchorEl)}
+                                onClose={handleMenuClose}
+                            >
+                                <MenuItem
+                                    onClick={() => {
+                                        handleAdoptPet(menuUserId);
+                                        handleMenuClose();
+                                    }}
+                                >
+                                    Adopt for this user
+                                </MenuItem>
+                            </Menu>
 
-                    {likedUsers.map((user) => (
-                        <div
-                            key={user.id}
-                            className={styles.eventCard}
-                            onClick={() => {
-                                if (!pet || !user) return;
+                            {likedUsers.map((user) => (
+                                <div
+                                    key={user.id}
+                                    className={styles.eventCard}
+                                    onClick={() => {
+                                        if (!pet || !user) return;
 
-                                const petContext = {
-                                    petId: pet.id,
-                                    name: pet.name,
-                                    image:
-                                        pet.image?.[0] ||
-                                        '/images/no_image_available.png',
-                                    breed: pet.breed,
-                                    age: calculateAge(pet.birthdate),
-                                    gender: pet.spayedStatus || 'Unknown',
-                                };
+                                        const petContext = {
+                                            petId: pet.id,
+                                            name: pet.name,
+                                            image:
+                                                pet.image?.[0] ||
+                                                "/images/no_image_available.png",
+                                            breed: pet.breed,
+                                            age: calculateAge(pet.birthdate),
+                                            gender:
+                                                pet.spayedStatus || "Unknown",
+                                        };
 
-                                sessionStorage.setItem(
-                                    'petContext',
-                                    JSON.stringify(petContext),
-                                );
-                                Router.push(`/chat/${user.id}`);
-                            }}
-                        >
-                            <div className={styles.eventDetails}>
-                                <div className={styles.petNameRow}>
-                                    <div>
-                                        <p className={styles.eventTitle}>
-                                            {user.firstName} {user.lastName}
-                                        </p>
-                                        <p className={styles.eventDescription}>
-                                            {user.email}
-                                        </p>
-                                    </div>
+                                        sessionStorage.setItem(
+                                            "petContext",
+                                            JSON.stringify(petContext),
+                                        );
+                                        Router.push(`/chat/${user.id}`);
+                                    }}
+                                >
+                                    <div className={styles.eventDetails}>
+                                        <div className={styles.petNameRow}>
+                                            <div>
+                                                <p
+                                                    className={
+                                                        styles.eventTitle
+                                                    }
+                                                >
+                                                    {user.firstName}{" "}
+                                                    {user.lastName}
+                                                </p>
+                                                <p
+                                                    className={
+                                                        styles.eventDescription
+                                                    }
+                                                >
+                                                    {user.email}
+                                                </p>
+                                            </div>
 
-                                    <div>
-                                        <Avatar
-                                            sx={{
-                                                background: user.profilePhoto
-                                                    ? 'transparent'
-                                                    : generateGradient(user.firstName + (user.lastName || ''),),
-                                                cursor: 'pointer',
-                                                color: '#fff',
-                                                zIndex: 100000,
-                                                marginRight: '8px',
-                                            }}
-                                            src={user.profilePhoto || undefined}
-                                        >
-                                            {!user.profilePhoto && (
-                                                <>
-                                                    {user.firstName.charAt(0)}
-                                                    {user.lastName
-                                                        ? user.lastName.charAt(
-                                                              0,
-                                                          )
-                                                        : ''}
-                                                </>
-                                            )}
-                                        </Avatar>
-                                        <IconButton
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleMenuOpen(e, user.id);
-                                            }}
-                                        >
-                                            <MoreVertIcon />
-                                        </IconButton>
+                                            <div
+                                                style={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                }}
+                                            >
+                                                <Avatar
+                                                    sx={{
+                                                        background:
+                                                            user.profilePhoto
+                                                                ? "transparent"
+                                                                : generateGradient(
+                                                                      user.firstName +
+                                                                          (user.lastName ||
+                                                                              ""),
+                                                                  ),
+                                                        cursor: "pointer",
+                                                        color: "#fff",
+                                                        zIndex: 100000,
+                                                        marginRight: "8px",
+                                                    }}
+                                                    src={
+                                                        user.profilePhoto ||
+                                                        undefined
+                                                    }
+                                                >
+                                                    {!user.profilePhoto && (
+                                                        <>
+                                                            {user.firstName.charAt(
+                                                                0,
+                                                            )}
+                                                            {user.lastName
+                                                                ? user.lastName.charAt(
+                                                                      0,
+                                                                  )
+                                                                : ""}
+                                                        </>
+                                                    )}
+                                                </Avatar>
+                                                <IconButton
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleMenuOpen(
+                                                            e,
+                                                            user.id,
+                                                        );
+                                                    }}
+                                                >
+                                                    <MoreVertIcon />
+                                                </IconButton>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            ))}
                         </div>
-                    ))}
+                    )}
                 </div>
             )}
 
@@ -312,12 +343,12 @@ export default function PetInfoComponent({ petUUID }) {
                 open={snackbarOpen}
                 autoHideDuration={4000}
                 onClose={() => setSnackbarOpen(false)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
             >
                 <Alert
                     onClose={() => setSnackbarOpen(false)}
                     severity={snackbarSeverity}
-                    sx={{ width: '100%' }}
+                    sx={{ width: "100%" }}
                 >
                     {snackbarMessage}
                 </Alert>
