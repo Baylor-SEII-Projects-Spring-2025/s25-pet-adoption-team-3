@@ -14,11 +14,11 @@ import java.nio.charset.StandardCharsets;
 public class GeocodeService {
     public Double[] getCoordinatesFromAddress(String address) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
-        String URL = "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address="+ address + "&benchmark=4";
-        String encodedURL = URLEncoder.encode(address, StandardCharsets.UTF_8);
+        String URL = "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address="+ URLEncoder.encode(address, StandardCharsets.UTF_8)   + "&benchmark=4";
+        System.out.println(URL);
         // Build the HttpRequest
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(encodedURL))
+                .uri(URI.create(URL))
                 .GET()
                 .build();
 
@@ -40,8 +40,8 @@ public class GeocodeService {
         latIdx = body.indexOf("Interpolated Latitude (Y) Coordinates: </b><span>") + "Interpolated Latitude (Y) Coordinates: </b><span>".length();
         longIdx = body.indexOf("Interpolated Longitude (X) Coordinates: </b><span>") + "Interpolated Longitude (X) Coordinates: </b><span>".length();
 
-        latitude = Double.parseDouble(body.substring(latIdx, latIdx+7));
-        longitude = Double.parseDouble(body.substring(longIdx, longIdx+7));
+        latitude = Double.parseDouble(body.substring(latIdx, body.indexOf("<", latIdx)));
+        longitude = Double.parseDouble(body.substring(longIdx, body.indexOf("<", longIdx)));
 
         return new Double[]{latitude, longitude};
     }
