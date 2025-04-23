@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import java.time.LocalDate;
 
 import org.springframework.web.multipart.MultipartFile;
+import petadoption.api.DTO.PetDetailDTO;
 import petadoption.api.DTO.PetRequestDTO;
 import petadoption.api.models.Pet;
 import petadoption.api.models.User;
@@ -160,14 +161,38 @@ class PetControllerTest {
         Pet pet = new Pet();
         pet.setId(1L);
         pet.setName("Buddy");
+        pet.setBreed("Golden Retriever");
+        pet.setSpayedStatus("Neutered Male");
+        pet.setBirthdate(LocalDate.of(2020, 5, 15));
+        pet.setAboutMe("Friendly and energetic.");
+        pet.setExtra1("Good with kids");
+        pet.setExtra2("House-trained");
+        pet.setExtra3("Vaccinated");
+        pet.setAvailabilityStatus(Pet.PetStatus.AVAILABLE);
+        pet.setImage(List.of("https://example.com/buddy.jpg"));
 
         when(petService.getPetDetail(1L)).thenReturn(Optional.of(pet));
 
         ResponseEntity<?> response = petController.getPetDetail(1L);
 
+        PetDetailDTO expectedDto = new PetDetailDTO(
+                1L,
+                List.of("https://example.com/buddy.jpg"),
+                "Buddy",
+                "Golden Retriever",
+                "Neutered Male",
+                LocalDate.of(2020, 5, 15),
+                "Friendly and energetic.",
+                "Good with kids",
+                "House-trained",
+                "Vaccinated",
+                Pet.PetStatus.AVAILABLE
+        );
+
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals(pet, response.getBody());
+        assertEquals(expectedDto, response.getBody());
     }
+
 
     @Test
     void testGetPetDetail_NotFound() {
