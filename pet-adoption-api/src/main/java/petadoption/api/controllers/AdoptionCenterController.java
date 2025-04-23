@@ -339,4 +339,30 @@ public class AdoptionCenterController {
 
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/get-pets-dashboard")
+    public ResponseEntity<?> getPetsDashboard(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            return ResponseEntity.status(401).body("User not logged in.");
+        }
+
+        User user = (User) session.getAttribute("user");
+        if (user.getAdoptionCenterName() == null || user.getAdoptionCenterName().isEmpty()) {
+            return ResponseEntity.status(403).body("User is not an adoption center.");
+        }
+
+        List<Pet> pets = petRepository.findByAdoptionCenterId(user.getId());
+
+        List<Map<String, Object>> minimalPets = pets.stream().map(pet -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", pet.getId());
+            map.put("name", pet.getName());
+            map.put("photo", pet.getImage().getFirst());
+            return map;
+        }).toList();
+
+        return ResponseEntity.ok(minimalPets);
+    }
+
 }

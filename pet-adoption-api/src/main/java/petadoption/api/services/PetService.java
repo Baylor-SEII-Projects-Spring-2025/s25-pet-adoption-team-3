@@ -203,7 +203,9 @@ public class PetService {
         List<SwipePetDTO> petDTOs = new ArrayList<>();
 
         for(int i = 0; i < likedPets.size(); i++) {
-            petDTOs.add(new SwipePetDTO(likedPets.get(i)));
+            if(likedPets.get(i).getAvailabilityStatus() == Pet.PetStatus.AVAILABLE) {
+                petDTOs.add(new SwipePetDTO(likedPets.get(i)));
+            }
         }
 
         return petDTOs;

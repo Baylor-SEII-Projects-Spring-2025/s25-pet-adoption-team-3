@@ -28,6 +28,7 @@ import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import MenuItem from "@mui/material/MenuItem";
+import Paper from "@mui/material/Paper";
 import Router from "next/router";
 import styles from "@/styles/AdoptionCenterDashboardComponent.module.css";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -36,7 +37,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { extractImageFiles } from "@/utils/extractImageFiles";
 import { CircularProgress } from "@mui/material";
 import Loading from "@/components/adoption-center/Loading";
-
+import relativeTime from "dayjs/plugin/relativeTime";
+dayjs.extend(relativeTime);
 dayjs.extend(isSameOrAfter);
 
 const style = {
@@ -153,6 +155,8 @@ export default function ProfileDashboardComponent() {
     const [searchQuery, setSearchQuery] = useState("");
     const [isPageLoading, setIsPageLoading] = useState(true);
     const [archivedPets, setArchivedPets] = useState([]);
+    const [conversations, setConversations] = useState([]);
+    const [myPetsDashboard, setMyPetsDashboard] = useState([]);
 
     const handleModalOpen = () => {
         setOpenModal(true);
@@ -205,8 +209,56 @@ export default function ProfileDashboardComponent() {
         }
     };
 
+    const fetchMyPets = async () => {
+        try {
+            const response = await fetch(
+                `${API_URL}/api/adoption-center/get-pets-dashboard`,
+                {
+                    method: "GET",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                },
+            );
+
+            if (!response.ok) {
+                console.error("Failed to fetch my pets");
+                return;
+            }
+
+            const data = await response.json();
+            console.log("🐶 My pets:", data);
+            setMyPetsDashboard(data);
+        } catch (error) {
+            console.error("Error fetching my pets:", error);
+        }
+    };
+
+    const fetchConversations = async () => {
+        try {
+            const response = await fetch(`${API_URL}/api/chat/conversations`, {
+                method: "GET",
+                credentials: "include",
+            });
+
+            if (!response.ok) {
+                console.error("Failed to fetch conversations");
+                return;
+            }
+
+            const data = await response.json();
+            console.log("💬 Conversations:", data);
+            setConversations(data);
+        } catch (error) {
+            console.error("Error fetching conversations:", error);
+        }
+    };
+
     useEffect(() => {
         fetchUserSession();
+        fetchMyPets();
+        fetchConversations();
     }, []);
 
     useEffect(() => {
@@ -521,7 +573,6 @@ export default function ProfileDashboardComponent() {
             if (!response.ok) {
                 throw new Error("Failed to create event");
             }
-
         } catch (error) {
             console.error("❌ Error creating event:", error);
             alert("❌ Failed to create event. Please try again.");
@@ -534,7 +585,7 @@ export default function ProfileDashboardComponent() {
         fetchAvailableEvents();
         setLoading(false);
     };
-  
+
     const fetchAvailableEvents = async () => {
         try {
             const response = await fetch(
@@ -873,8 +924,7 @@ export default function ProfileDashboardComponent() {
                                         >
                                             <p>My Messages</p>
 
-                                            {user?.messages?.length === 0 ||
-                                            !user?.messages ? (
+                                            {conversations.length === 0 ? (
                                                 <div
                                                     className={
                                                         styles.noMessages
@@ -890,11 +940,142 @@ export default function ProfileDashboardComponent() {
                                                     </p>
                                                 </div>
                                             ) : (
-                                                <ul>
-                                                    {user?.messages?.map(
-                                                        (message, index) => (
-                                                            <li key={index}>
-                                                                {message}
+                                                <ul
+                                                    style={{
+                                                        listStyle: "none",
+                                                        padding: 0,
+                                                    }}
+                                                >
+                                                    {conversations.map(
+                                                        (conv, index) => (
+                                                            <li
+                                                                key={index}
+                                                                style={{
+                                                                    width: "100%",
+                                                                }}
+                                                            >
+                                                                <Paper
+                                                                    elevation={
+                                                                        3
+                                                                    }
+                                                                    onClick={() =>
+                                                                        Router.push(
+                                                                            `/chat/${conv.id}`,
+                                                                        )
+                                                                    }
+                                                                    style={{
+                                                                        display:
+                                                                            "flex",
+                                                                        alignItems:
+                                                                            "center",
+                                                                        padding:
+                                                                            "10px 16px",
+                                                                        marginBottom:
+                                                                            "12px",
+                                                                        cursor: "pointer",
+                                                                        borderRadius:
+                                                                            "12px",
+                                                                        transition:
+                                                                            "transform 0.2s ease",
+                                                                    }}
+                                                                    onMouseEnter={(
+                                                                        e,
+                                                                    ) =>
+                                                                        (e.currentTarget.style.transform =
+                                                                            "scale(1.02)")
+                                                                    }
+                                                                    onMouseLeave={(
+                                                                        e,
+                                                                    ) =>
+                                                                        (e.currentTarget.style.transform =
+                                                                            "scale(1)")
+                                                                    }
+                                                                >
+                                                                    <Avatar
+                                                                        ref={
+                                                                            anchorRef
+                                                                        }
+                                                                        sx={{
+                                                                            background:
+                                                                                conv?.photo
+                                                                                    ? "transparent"
+                                                                                    : generateGradient(
+                                                                                          conv?.firstName +
+                                                                                              (conv?.lastName ||
+                                                                                                  conv?.name ||
+                                                                                                  ""),
+                                                                                      ),
+                                                                            cursor: "pointer",
+                                                                            color: "#fff",
+                                                                            width: 40,
+                                                                            height: 40,
+                                                                            marginRight:
+                                                                                "20px",
+                                                                            border: "1px solid black",
+                                                                        }}
+                                                                        src={
+                                                                            conv?.profilePhoto ||
+                                                                            undefined
+                                                                        }
+                                                                    >
+                                                                        {!conv?.profilePhoto && (
+                                                                            <>
+                                                                                {conv?.firstName?.charAt(
+                                                                                    0,
+                                                                                )}
+                                                                                {conv?.lastName?.charAt(
+                                                                                    0,
+                                                                                )}
+                                                                                {conv?.name
+                                                                                    ? conv?.name.charAt(
+                                                                                          0,
+                                                                                      )
+                                                                                    : ""}
+                                                                            </>
+                                                                        )}
+                                                                    </Avatar>
+                                                                    <div>
+                                                                        <strong>
+                                                                            {
+                                                                                conv.name
+                                                                            }
+                                                                        </strong>
+                                                                        <p
+                                                                            style={{
+                                                                                fontSize:
+                                                                                    "12px",
+                                                                                color: "#555",
+                                                                                margin: "4px 0",
+                                                                            }}
+                                                                        >
+                                                                            Last
+                                                                            message:{" "}
+                                                                            {conv.lastMessageTime
+                                                                                ? dayjs(
+                                                                                      conv.lastMessageTime,
+                                                                                  ).fromNow()
+                                                                                : "N/A"}
+                                                                        </p>
+                                                                        {parseInt(
+                                                                            conv.unreadCount,
+                                                                        ) >
+                                                                            0 && (
+                                                                            <span
+                                                                                style={{
+                                                                                    color: "red",
+                                                                                    fontSize:
+                                                                                        "12px",
+                                                                                }}
+                                                                            >
+                                                                                🔴{" "}
+                                                                                {
+                                                                                    conv.unreadCount
+                                                                                }{" "}
+                                                                                unread
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </Paper>
                                                             </li>
                                                         ),
                                                     )}
@@ -905,27 +1086,70 @@ export default function ProfileDashboardComponent() {
                                     <div className={styles.profileMatches}>
                                         <p>My Pets</p>
 
-                                        {user?.matches?.length === 0 ||
-                                        !user?.matches ? (
+                                        {myPetsDashboard.length === 0 ? (
                                             <div className={styles.noMatches}>
                                                 <img
                                                     src="/icons/no_matches.png"
                                                     alt="No matches"
                                                 />
                                                 <p>
-                                                    No pets found, add some
-                                                    pets!
+                                                    No pets found. Try adding
+                                                    some!
                                                 </p>
                                             </div>
                                         ) : (
-                                            <ul>
-                                                {user?.matches?.map(
-                                                    (matches, index) => (
-                                                        <li key={index}>
-                                                            {matches}
-                                                        </li>
-                                                    ),
-                                                )}
+                                            <ul className={styles.petCardList}>
+                                                {myPetsDashboard.map((pet) => (
+                                                    <li key={pet.id}>
+                                                        <Paper
+                                                            elevation={3}
+                                                            onClick={() =>
+                                                                handlePetClick(
+                                                                    pet.id,
+                                                                )
+                                                            }
+                                                            style={{
+                                                                display: "flex",
+                                                                alignItems:
+                                                                    "center",
+                                                                justifyContent:
+                                                                    "space-between",
+                                                                padding:
+                                                                    "12px 16px",
+                                                                marginBottom:
+                                                                    "10px",
+                                                                cursor: "pointer",
+                                                            }}
+                                                        >
+                                                            <span
+                                                                style={{
+                                                                    fontWeight: 500,
+                                                                    fontSize:
+                                                                        "16px",
+                                                                }}
+                                                            >
+                                                                {pet.name}
+                                                            </span>
+                                                            <img
+                                                                src={
+                                                                    pet.photo ||
+                                                                    "/icons/no_image.png"
+                                                                }
+                                                                alt={pet.name}
+                                                                style={{
+                                                                    width: "60px",
+                                                                    height: "60px",
+                                                                    objectFit:
+                                                                        "cover",
+                                                                    borderRadius:
+                                                                        "8px",
+                                                                    marginLeft:
+                                                                        "16px",
+                                                                }}
+                                                            />
+                                                        </Paper>
+                                                    </li>
+                                                ))}
                                             </ul>
                                         )}
                                     </div>
