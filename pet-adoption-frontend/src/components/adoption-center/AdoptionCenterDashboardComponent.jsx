@@ -524,6 +524,12 @@ export default function ProfileDashboardComponent() {
         const file = event.target.files[0];
         if (!file) return;
 
+        const maxSize = 5 * 1024 * 1024;
+        if (file.size > maxSize) {
+            alert("❌ File size exceeds 5MB. Please upload a smaller file.");
+            return;
+        }
+
         const newImages = [...eventData.images];
         newImages[0] = {
             preview: URL.createObjectURL(file),
