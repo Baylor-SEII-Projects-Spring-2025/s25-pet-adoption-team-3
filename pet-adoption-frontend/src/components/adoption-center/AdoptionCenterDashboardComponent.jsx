@@ -522,7 +522,6 @@ export default function ProfileDashboardComponent() {
                 throw new Error("Failed to create event");
             }
 
-            console.log("✅ Event successfully created (HTTP 201)");
         } catch (error) {
             console.error("❌ Error creating event:", error);
             alert("❌ Failed to create event. Please try again.");
@@ -535,7 +534,7 @@ export default function ProfileDashboardComponent() {
         fetchAvailableEvents();
         setLoading(false);
     };
-
+  
     const fetchAvailableEvents = async () => {
         try {
             const response = await fetch(
