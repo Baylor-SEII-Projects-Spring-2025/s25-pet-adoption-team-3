@@ -11,6 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import petadoption.api.DTO.PetDetailDTO;
 import petadoption.api.DTO.PetRequestDTO;
 import petadoption.api.DTO.SwipePetDTO;
 import petadoption.api.models.Characteristic;
@@ -259,8 +260,24 @@ public class PetController {
             return ResponseEntity.status(404).body("Pet not found.");
         }
 
-        return ResponseEntity.ok(petOptional.get());
+        Pet pet = petOptional.get();
+
+        PetDetailDTO dto = new PetDetailDTO(
+                pet.getId(),
+                pet.getImage(),
+                pet.getName(),
+                pet.getBreed(),
+                pet.getSpayedStatus(),
+                pet.getBirthdate(),
+                pet.getAboutMe(),
+                pet.getExtra1(),
+                pet.getExtra2(),
+                pet.getExtra3()
+        );
+
+        return ResponseEntity.ok(dto);
     }
+
 
     /**
      * Retrieves a random or recommended pet for swipe view (single pet).

@@ -128,6 +128,7 @@ public class ChatController {
 
                     return Map.of(
                             "id", user.getId().toString(),
+                            "photo", user.getProfilePhoto() != null ? user.getProfilePhoto() : "",
                             "name", name,
                             "profilePhoto", profilePhoto,
                             "lastMessageTime", lastTime != null ? lastTime : "",
