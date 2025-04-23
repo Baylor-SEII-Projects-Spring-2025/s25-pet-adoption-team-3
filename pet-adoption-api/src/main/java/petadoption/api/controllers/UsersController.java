@@ -238,6 +238,10 @@ public class UsersController {
     public ResponseEntity<String> setLocation(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude, HttpSession session) {
         User user = (User) session.getAttribute("user");
 
+        if(user == null){
+            return ResponseEntity.status(400).body("Login to set location");
+        }
+
         String response = userService.setLocation(user, latitude, longitude);
 
         if(response != null) {
