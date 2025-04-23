@@ -114,8 +114,6 @@ class AdoptionCenterServiceTest {
 
         ResponseEntity<?> response = adoptionCenterService.registerAdoptionCenter(testCenterDTO);
 
-        System.out.println("Actual Response Body: " + response.getBody());
-
         assertEquals(201, response.getStatusCode().value());
         assertNotNull(response.getBody(), "Response body is null!");
 

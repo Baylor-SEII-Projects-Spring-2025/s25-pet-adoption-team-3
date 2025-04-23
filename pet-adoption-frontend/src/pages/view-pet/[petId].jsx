@@ -30,7 +30,6 @@ export default function ViewPetPage() {
 
   useEffect(() => {
     if (!router.isReady) {
-      console.log("Router not ready yet.");
       return;
     }
 
@@ -52,7 +51,6 @@ export default function ViewPetPage() {
       }
 
       if (!petId) {
-        console.log("No petId found.");
         return;
       }
 
@@ -65,8 +63,6 @@ export default function ViewPetPage() {
 
         const contentType = res.headers.get("content-type");
         const raw = await res.text();
-        console.log("Fetch status:", res.status);
-        console.log("Raw response:", raw);
 
         if (!res.ok) {
           setError(`HTTP error: ${res.status}`);
@@ -82,7 +78,6 @@ export default function ViewPetPage() {
             data.adoptionCenterName = data.adoptionCenter?.name || "Happy Paws Rescue";
           }
 
-          console.log("Parsed pet data:", data);
           setPet(data);
         } else {
           setError("Unexpected format from server");

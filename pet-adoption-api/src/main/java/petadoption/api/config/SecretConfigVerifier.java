@@ -17,8 +17,5 @@ public class SecretConfigVerifier {
     public void verifySecrets() {
         googleClientId = googleClientId.trim();
         googleClientSecret = googleClientSecret.trim();
-
-        System.out.println("✅ Retrieved Google Client ID: " + googleClientId);
-        System.out.println("✅ Retrieved Google Client Secret: " + googleClientSecret);
     }
 }
