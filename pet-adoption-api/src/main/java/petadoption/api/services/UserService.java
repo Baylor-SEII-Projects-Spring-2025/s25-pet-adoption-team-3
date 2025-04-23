@@ -117,4 +117,18 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
+    public String setLocation(User user, Double latitude, Double longitude) {
+        Optional<User> optionalUser = userRepository.findById(user.getId());
+        if (optionalUser.isEmpty()) {
+            return null;
+        }
+
+        User userWithTransaction = optionalUser.get();
+        userWithTransaction.setLatitude(latitude);
+        userWithTransaction.setLongitude(longitude);
+
+        userRepository.save(userWithTransaction);
+
+        return "Successfully set location";
+    }
 }

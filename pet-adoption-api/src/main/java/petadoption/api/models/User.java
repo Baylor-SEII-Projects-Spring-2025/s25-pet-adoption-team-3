@@ -70,6 +70,12 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
     private Set<Weight> weights = new HashSet<>();
 
+    @Column(name = "latitude", nullable = true)
+    private Double latitude;
+
+    @Column(name = "longitude", nullable = true)
+    private Double longitude;
+
     public enum Role {
         ADOPTER,
         ADOPTION_CENTER
