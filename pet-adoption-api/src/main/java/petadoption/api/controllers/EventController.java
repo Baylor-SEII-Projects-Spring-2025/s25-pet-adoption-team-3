@@ -178,4 +178,20 @@ public class EventController {
 
         return ResponseEntity.ok().body(eventDetailsDTOList);
     }
+
+
+    @PostMapping("/register-to-event/{eventId}")
+    public ResponseEntity<String> registerUserToEvent(HttpSession session, @PathVariable Long eventId) {
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTER);
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body("Unauthorized");
+        }
+
+        User user = (User) validationResponse.getBody();
+        boolean registered = eventService.registerUserToEvent(user, eventId);
+
+        return registered
+                ? ResponseEntity.ok("User successfully registered to the event.")
+                : ResponseEntity.status(404).body("Event not found or already registered.");
+    }
 }

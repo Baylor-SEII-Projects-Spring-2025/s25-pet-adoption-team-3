@@ -208,4 +208,8 @@ public class PetService {
 
         return petDTOs;
     }
+
+    public List<Pet> getMyAdoptedPets(User user) {
+        return petRepository.findArchivedPetsByAdopterId(user.getId());
+    }
 }

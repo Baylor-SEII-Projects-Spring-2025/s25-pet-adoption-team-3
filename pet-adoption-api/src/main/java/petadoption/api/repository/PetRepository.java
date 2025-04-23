@@ -38,4 +38,7 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
 
     List<Pet> findByAdoptionCenterIdAndAvailabilityStatus(Long adoptionCenterId, Pet.PetStatus status);
 
+    @Query("SELECT p FROM Pet p WHERE p.adopter.id = :userId AND p.availabilityStatus = 'ARCHIVED'")
+    List<Pet> findArchivedPetsByAdopterId(@Param("userId") Long userId);
+
 }
