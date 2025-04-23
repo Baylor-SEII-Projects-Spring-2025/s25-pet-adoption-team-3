@@ -386,13 +386,12 @@ public class PetController {
 
     @GetMapping("/get-my-pets")
     public ResponseEntity<List<Pet>> getMyPets(HttpSession session) {
-        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTER);
         if (!validationResponse.getStatusCode().is2xxSuccessful()) {
             return ResponseEntity.status(validationResponse.getStatusCode()).body(null);
         }
         User user = (User) validationResponse.getBody();
-        return ResponseEntity.ok(petService.getAllPets(user.getId()));
+        List<Pet> adoptedPets = petService.getMyAdoptedPets(user);
+        return ResponseEntity.ok(adoptedPets);
     }
-
-
 }
