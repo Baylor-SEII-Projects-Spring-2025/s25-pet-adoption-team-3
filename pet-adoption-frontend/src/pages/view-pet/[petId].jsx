@@ -1,3 +1,17 @@
+/**
+ * View Pet Page
+ * -----------------------------------------------------------
+ * This page displays a detailed profile for a specific pet, as seen
+ * by adopters browsing or viewing their liked pets.
+ *
+ * Main Features:
+ *  - Renders the ProfileNavbar for authenticated user navigation
+ *  - Fetches pet details using petId from the route and checks user session
+ *  - Displays loading and error states with skeletons and messages
+ *  - Renders the ViewPetComponent with all pet info if data is found
+ *  - Handles route-level data validation and error fallback
+ */
+
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import ProfileNavbar from "@/components/profile/ProfileNavbar";

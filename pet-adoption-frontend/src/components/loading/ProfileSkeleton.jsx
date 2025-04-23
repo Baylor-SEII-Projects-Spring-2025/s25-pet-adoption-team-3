@@ -1,3 +1,16 @@
+/**
+ * ProfileSkeleton
+ * -----------------------------------------------------------
+ * This component displays a skeleton loader for the user profile dashboard,
+ * showing placeholder UI elements while profile data is loading.
+ *
+ * Main Features:
+ *  - Mimics the layout of the ProfileDashboardComponent (sidebar, header, content, messages, matches)
+ *  - Uses Material-UI Skeletons and responsive Stack/Box layouts
+ *  - Prevents layout shifts and provides smooth loading feedback to the user
+ *  - Temporarily disables body scrolling during skeleton display for UX consistency
+ */
+
 import React, { useEffect } from "react";
 import { Skeleton, Box, Stack, Avatar } from "@mui/material";
 import styles from "@/styles/ProfileDashboardComponent.module.css";

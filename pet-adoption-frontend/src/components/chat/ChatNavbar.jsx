@@ -1,3 +1,20 @@
+
+/**
+ * ChatNavbar Component
+ * -----------------------------------------------------------
+ * This component renders the navigation bar for chat pages,
+ * providing consistent navigation and user profile controls during chat sessions.
+ *
+ * Main Features:
+ *  - Displays logo and main navigation links (Learn, Locations, Gallery)
+ *  - Shows user avatar with dropdown menu for Dashboard, Likes, Messages, Settings, and Logout
+ *  - Fetches current user session and unread message count on mount
+ *  - Integrates with WebSocket/STOMP for real-time unread chat notifications
+ *  - Supports role-based navigation (Adoption Center or Adopter)
+ *  - Handles login, logout, and redirects on auth failure
+ *  - Responsive and styled to match the app’s theme
+ */
+
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import styles from "@/styles/ChatNavbar.module.css";

@@ -1,3 +1,21 @@
+/**
+ * ChatComponent
+ * -----------------------------------------------------------
+ * This component provides a full-featured chat interface between users.
+ * It handles real-time messaging, message history, unread notifications,
+ * and context-aware conversations (including chatting about specific pets).
+ *
+ * Main Features:
+ *  - Displays a sidebar of recent conversations with unread indicators
+ *  - Shows chat history and supports real-time WebSocket/STOMP messaging
+ *  - Handles chat context (e.g., sending pet details for pet-related chats)
+ *  - Tracks and displays unread message counts per conversation
+ *  - Auto-scrolls to the latest message; marks messages as read when viewed
+ *  - Fetches user session and chat history on mount, with loading skeleton
+ *  - Clean, responsive UI using CSS modules
+ *  - Designed for both adoption centers and adopters to chat efficiently
+ */
+
 import React, { useState, useEffect, useRef } from "react";
 import Router from "next/router";
 import SockJS from "sockjs-client";

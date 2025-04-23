@@ -1,3 +1,17 @@
+/**
+ * ResetPasswordComponent
+ * -----------------------------------------------------------
+ * This component provides the UI and logic for users to reset their password
+ * using a token-based system (typically accessed via a link sent to their email).
+ *
+ * Main Features:
+ *  - Reads the reset token from the URL query parameters
+ *  - Collects and validates new password and confirmation (strength and match)
+ *  - Sends a request to the backend API to update the password
+ *  - Shows loading state, feedback messages, and alerts on success/error
+ *  - Responsive, styled layout with illustration for visual clarity
+ */
+
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { TextField, Button } from "@mui/material";

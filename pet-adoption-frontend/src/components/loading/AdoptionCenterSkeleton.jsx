@@ -1,3 +1,16 @@
+/**
+ * AdoptionCenterSkeleton
+ * -----------------------------------------------------------
+ * This component displays a skeleton loader UI for the adoption center
+ * dashboard and related pages while data is loading.
+ *
+ * Main Features:
+ *  - Uses Material-UI Skeletons to mimic the layout of dashboard content
+ *  - Includes sidebar skeletons and main content area placeholders
+ *  - Helps improve perceived performance and avoid layout shifts
+ *  - Can be wrapped in a Suspense fallback for async page loading
+ */
+
 import React, { Suspense } from "react";
 import Skeleton from "@mui/material/Skeleton";
 import Box from "@mui/material/Box";

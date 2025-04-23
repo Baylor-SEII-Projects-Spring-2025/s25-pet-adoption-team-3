@@ -1,3 +1,18 @@
+/**
+ * ForgotPasswordComponent
+ * -----------------------------------------------------------
+ * This component provides the "Forgot Password" functionality for users.
+ * It allows users to request a password reset email by entering their
+ * registered email address.
+ *
+ * Main Features:
+ *  - Email input form with live validation
+ *  - Sends password reset link via backend API on submission
+ *  - Loading spinner and button disable state while submitting
+ *  - Displays feedback alerts for success or errors
+ *  - Responsive, styled layout with illustration and navigation link to login
+ */
+
 import React, { useState, useEffect } from "react";
 import { TextField } from "@mui/material";
 import { Button } from "@mui/material";

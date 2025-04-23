@@ -1,3 +1,17 @@
+/**
+ * LearnPage
+ * -----------------------------------------------------------
+ * This component educates users about the benefits of pet adoption,
+ * using engaging visuals and concise reasons to adopt.
+ *
+ * Main Features:
+ *  - Four themed sections: Save a Life, Reduce Pet Overpopulation,
+ *    Find the Perfect Match, and Support Ethical Pet Ownership
+ *  - Each section has a compelling image, headline, and supporting text
+ *  - Organized in a responsive grid for readability and appeal
+ *  - Designed to encourage and inform users on the "Why Adopt?" page
+ */
+
 import React from "react";
 import styles from "@/styles/LearnPage.module.css";
 

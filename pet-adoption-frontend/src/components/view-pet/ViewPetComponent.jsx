@@ -1,3 +1,17 @@
+/**
+ * ViewPetComponent
+ * -----------------------------------------------------------
+ * This component displays a detailed profile card for a selected pet,
+ * including a carousel for multiple images and rich info about the pet.
+ *
+ * Main Features:
+ *  - Displays pet images with carousel navigation if multiple are available
+ *  - Shows key pet details: name, location, adoption center, breed, spayed status, birthdate, and age
+ *  - Renders "About Me" and three extra fun facts for personality
+ *  - Responsive, visually engaging layout for individual pet profiles
+ *  - PropTypes validation for clean and predictable usage
+ */
+
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import styles from "@/styles/SwipeComponent.module.css";

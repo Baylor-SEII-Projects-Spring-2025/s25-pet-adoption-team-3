@@ -1,3 +1,20 @@
+/**
+ * SwipeComponent
+ * -----------------------------------------------------------
+ * This component provides the interactive pet swipe interface,
+ * enabling users to browse adoptable pets in a card-stack format similar
+ * to popular swipe apps.
+ *
+ * Main Features:
+ *  - Fetches available pets for the user to swipe on, with authentication check
+ *  - Displays pet details, multiple images with carousel navigation, and extra personality facts
+ *  - Handles swipe gestures using react-spring and react-use-gesture for smooth animations
+ *  - Like/dislike actions update backend and control card animations
+ *  - Handles reloading of new pets when the stack runs low
+ *  - Responsive, visually appealing, and provides helpful swipe hints
+ *  - Suspense fallback and loading indicator for async fetches
+ */
+
 import React, { useEffect, useState, useRef, Suspense } from "react";
 import { useSprings, animated } from "react-spring";
 import { useDrag } from "react-use-gesture";

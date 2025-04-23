@@ -1,3 +1,21 @@
+/**
+ * NotFound Component (404 Page)
+ * -----------------------------------------------------------
+ * This component renders a custom 404 "Page Not Found" screen.
+ * It displays a visually engaging error message with colorful
+ * abstract icons and shapes to indicate a missing page or
+ * invalid route within the application. Users are provided a
+ * prominent "Back to Home" link to guide them safely back
+ * to the homepage. Styling and layout are handled via
+ * 404Component.module.css to match the overall app theme.
+ *
+ * Main Features:
+ *  - Large "OOPS" and "PAGE NOT FOUND" headings
+ *  - Playful iconography for visual interest
+ *  - Clear navigation link back to the home page
+ *  - Fully responsive and styled to fit the app's design
+ */
+
 import React from "react";
 import styles from "@/styles/404Component.module.css";
 

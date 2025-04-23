@@ -1,3 +1,20 @@
+/**
+ * AdoptionNavbar Component
+ * -----------------------------------------------------------
+ * This component renders the top navigation bar for logged-in users
+ * (primarily Adoption Centers, but also supports Adopters) and manages
+ * user authentication, navigation links, and live message notifications.
+ *
+ * Main Features:
+ *  - Displays the app logo and navigation links (Learn, Locations, Gallery)
+ *  - Shows user avatar with a profile dropdown for navigation and settings
+ *  - Fetches the current user session and user-specific unread message count
+ *  - Integrates with WebSocket/STOMP for real-time unread message badge updates
+ *  - Role-based routing (Adoption Center vs Adopter) for dashboard, likes, settings, etc.
+ *  - Handles logout, redirects on auth failure, and profile photo logic
+ *  - Responsive, using MUI components and custom styles for a consistent look
+ */
+
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import styles from "@/styles/ProfileNavbar.module.css";

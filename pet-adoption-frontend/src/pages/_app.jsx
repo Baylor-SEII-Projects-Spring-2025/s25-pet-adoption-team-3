@@ -1,3 +1,18 @@
+/**
+ * Custom App Component (_app.js)
+ * -----------------------------------------------------------
+ * This is the root component for the Next.js application. It provides
+ * global context, theme, and providers needed across all pages.
+ *
+ * Main Features:
+ *  - Sets up Redux for global state management (with SSR-safe store initialization)
+ *  - Integrates Material-UI (MUI) theming and caching for styling consistency
+ *  - Applies a custom PetAdoptionThemeProvider for global theme support
+ *  - Includes CSS baseline for consistent styling across browsers
+ *  - Injects global font and favicon links and viewport meta tags
+ *  - Ensures all pages have access to shared context, Redux, and styles
+ */
+
 import React from "react";
 import PropTypes from "prop-types";
 import Head from "next/head";

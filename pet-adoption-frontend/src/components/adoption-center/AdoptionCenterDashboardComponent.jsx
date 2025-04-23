@@ -1,3 +1,22 @@
+/**
+ * AdoptionCenterDashboardComponent
+ * -----------------------------------------------------------
+ * This component provides the main dashboard for Adoption Center users.
+ * It enables adoption centers to manage their profiles, pets, and events,
+ * and view messages and matches. The dashboard is divided into four
+ * main tabs: Dashboard, My Pets, My Events, and Settings.
+ *
+ * Main Features:
+ *  - Dashboard: Overview section showing center name, messages, and pet matches.
+ *  - My Pets: View, search, and manage active or archived pets; add new pets with image and details forms.
+ *  - My Events: View, search, and manage current or archived events; add new events with images and details.
+ *  - Settings: Edit adoption center profile, upload/delete profile photo, and update details like name, bio, and phone number.
+ *  - Includes modal forms for adding pets/events, and advanced search/filtering options.
+ *  - Uses Material-UI for form controls and layout.
+ *  - Responsive and styled to match the app's overall design.
+ *  - Handles user authentication and role-based redirect logic.
+ */
+
 import dayjs from 'dayjs';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 

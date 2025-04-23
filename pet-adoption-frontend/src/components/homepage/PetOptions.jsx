@@ -1,3 +1,16 @@
+/**
+ * PetOptions Component
+ * -----------------------------------------------------------
+ * This component displays two main adoption categories—dogs and cats—
+ * offering users quick visual options to explore available pets.
+ *
+ * Main Features:
+ *  - Showcases separate sections for finding a dog or a cat
+ *  - Includes fun images, catchy headings, and playful descriptions
+ *  - Visually guides users toward their preferred pet type
+ *  - Styled for a welcoming, engaging landing or category page section
+ */
+
 import React from "react";
 import styles from "@/styles/PetOptions.module.css";
 
