@@ -141,12 +141,10 @@ export default function AdoptionCenterRegisterComponent() {
 
     const isStep3Valid = formData.bio.trim() && formData.photo;
 
-    // Single function to initialize Google Places Autocomplete
     const initializeAutocomplete = () => {
         if (!inputRef.current || autoCompleteRef.current) return;
 
         try {
-            // Check if Google API is available
             if (
                 !window.google ||
                 !window.google.maps ||
@@ -182,9 +180,7 @@ export default function AdoptionCenterRegisterComponent() {
         }
     };
 
-    // Single useEffect to initialize Autocomplete when component mounts or Google API loads
     useEffect(() => {
-        // Only try to initialize if we're on step 2 and the input ref exists
         if (step === 2 && inputRef.current) {
             initializeAutocomplete();
         }

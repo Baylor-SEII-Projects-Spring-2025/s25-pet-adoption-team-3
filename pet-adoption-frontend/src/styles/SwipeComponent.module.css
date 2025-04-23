@@ -50,7 +50,6 @@
 
 .carousel {
     width: 50%;
-    /* Set to 50% to make equal with pet info */
     height: 100%;
 }
 
@@ -263,11 +262,9 @@
     color: #F5F5F5;
   }
 
-/* Media query for mobile devices in portrait orientation */
 @media (max-width: 768px) {
     .cardContent {
         flex-direction: column;
-        /* Stack vertically on mobile */
     }
 
     .carousel {

@@ -9,10 +9,8 @@ export default function AdoptionCenterSkeleton() {
     return (
         <Box p={0} maxWidth={"2000px"} margin="0 auto">
             <Stack direction="row" spacing={4}>
-                {/* Left: Large rectangular skeleton */}
                 <Skeleton variant="rectangular" width="50%" height={640} />
                 <Stack direction="column" width="50%">
-                    {/* Right: Text skeletons */}
                     <Stack spacing={1} width="50%" marginTop={3}>
                         <Stack spacing={1} width="80%">
                             <Skeleton variant="text" height={80} />

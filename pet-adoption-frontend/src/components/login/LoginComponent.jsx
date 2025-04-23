@@ -43,7 +43,6 @@ export default function LoginComponent() {
             }
 
             const data = await response.json();
-            console.log("Login successful:", data);
             setUser(data.user);
 
             if (data.role === "ADOPTION_CENTER") {
@@ -78,7 +77,6 @@ export default function LoginComponent() {
             }
 
             const data = await response.json();
-            console.log("✅ Session found:", data);
             setUser(data.user);
 
             router.push("/");

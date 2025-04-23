@@ -3,7 +3,6 @@ import Skeleton from "@mui/material/Skeleton";
 import styles from "@/styles/SwipeComponent.module.css";
 
 export default function ViewPetSkeleton() {
-  // For carousel nav, just mock a single slide
   const [imageIndex] = useState(0);
 
   return (

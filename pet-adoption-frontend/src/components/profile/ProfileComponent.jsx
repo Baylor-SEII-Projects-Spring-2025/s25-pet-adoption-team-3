@@ -65,7 +65,6 @@ export default function ProfileDashboardComponent() {
             }
 
             const data = await response.json();
-            console.log("User session data:", data);
 
             const fetchedUser = data.user;
 
@@ -103,7 +102,6 @@ export default function ProfileDashboardComponent() {
             }
 
             const data = await response.json();
-            console.log("🐾 Liked pets:", data);
             setLikedPets(data);
         } catch (error) {
             console.error("Error fetching liked pets:", error);
@@ -134,13 +132,11 @@ export default function ProfileDashboardComponent() {
             );
 
             if (response.status === 400) {
-                console.log("User not found");
                 alert("User not found.");
                 return;
             }
 
             if (response.ok) {
-                console.log("✅ Profile photo deleted successfully");
                 window.location.reload();
             } else {
                 console.error("Failed to delete profile photo");
@@ -180,7 +176,6 @@ export default function ProfileDashboardComponent() {
 
             if (response.ok) {
                 const updatedUser = await response.json();
-                console.log("✅ Photo uploaded, updated user:", updatedUser);
                 setUser(updatedUser);
                 setUploadError("");
                 window.location.reload();

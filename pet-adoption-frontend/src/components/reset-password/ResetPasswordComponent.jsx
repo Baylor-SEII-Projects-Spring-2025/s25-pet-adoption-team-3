@@ -29,7 +29,6 @@ export default function ResetPasswordComponent() {
     }, [searchParams]);
 
     useEffect(() => {
-        console.log("Token:", token);
     }, [token]);
 
     const handleResetPassword = async (e) => {

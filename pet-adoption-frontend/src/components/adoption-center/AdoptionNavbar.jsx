@@ -122,8 +122,6 @@ export default function AdoptionNavbar() {
             if (!response.ok) {
                 throw new Error("Error logging out");
             }
-
-            console.log("✅ Logged out");
             Router.push("/");
             setUser(null);
             setOpen(false);

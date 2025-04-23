@@ -86,7 +86,6 @@
     background-color: #FF4757;
     border-radius: 50%;
     border: 2px solid #8B80F9;
-    /* Match with navbar background */
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3);
 }
 
@@ -111,7 +110,6 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    /* space between text and dot */
 }
 
 .notificationDot {
