@@ -20,6 +20,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Controller for real-time chat and messaging REST/WebSocket API endpoints.
+ * Supports sending messages, retrieving conversation history, unread counts,
+ * and marking messages as read for the pet adoption platform.
+ */
 @Controller
 public class ChatController {
 
@@ -32,6 +37,13 @@ public class ChatController {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Handles incoming chat messages over WebSocket using STOMP.
+     * Persists the message, sets timestamp, and broadcasts to /topic/messages.
+     *
+     * @param message the incoming chat message
+     * @return the saved ChatMessage to be sent to subscribers
+     */
     @MessageMapping("/chat")
     @SendTo("/topic/messages")
     public ChatMessage handleMessage(ChatMessage message) {
@@ -40,6 +52,13 @@ public class ChatController {
         return messageRepository.save(message);
     }
 
+    /**
+     * Retrieves the chat history between the current user and another user.
+     *
+     * @param session the current HTTP session (for user identification)
+     * @param otherUserId the ID of the other user in the conversation
+     * @return ResponseEntity containing the list of ChatMessage objects
+     */
     @GetMapping("/api/chat/history/{otherUserId}")
     public ResponseEntity<List<ChatMessage>> getChatHistory(
             HttpSession session,
@@ -53,7 +72,13 @@ public class ChatController {
         return ResponseEntity.ok(history);
     }
 
-
+    /**
+     * Retrieves a list of previous conversations for the logged-in user,
+     * including name, profile photo, last message time, and unread count.
+     *
+     * @param session the current HTTP session (for user identification)
+     * @return ResponseEntity containing a list of conversation metadata maps
+     */
     @GetMapping("/api/chat/conversations")
     public ResponseEntity<?> getPreviousConversations(HttpSession session) {
         User currentUser = (User) session.getAttribute("user");
@@ -117,6 +142,12 @@ public class ChatController {
         return ResponseEntity.ok(conversations);
     }
 
+    /**
+     * Returns the total count of unread messages for the current user.
+     *
+     * @param session the current HTTP session (for user identification)
+     * @return ResponseEntity with an integer representing unread message count
+     */
     @GetMapping("/api/chat/unread-count")
     public ResponseEntity<Integer> getUnreadCount(HttpSession session) {
         User currentUser = (User) session.getAttribute("user");
@@ -131,6 +162,13 @@ public class ChatController {
         return ResponseEntity.ok(count);
     }
 
+    /**
+     * Marks all messages from a specific conversation as read for the current user.
+     *
+     * @param session the current HTTP session (for user identification)
+     * @param otherUserId the ID of the other user in the conversation
+     * @return ResponseEntity indicating success or failure
+     */
     @PutMapping("/api/chat/mark-read/{otherUserId}")
     public ResponseEntity<?> markMessagesAsRead(
             HttpSession session,

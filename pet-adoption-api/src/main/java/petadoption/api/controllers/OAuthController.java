@@ -20,7 +20,10 @@ import jakarta.transaction.Transactional;
 import petadoption.api.models.User;
 import petadoption.api.repository.UserRepository;
 
-
+/**
+ * REST controller for OAuth2 authentication API endpoints.
+ * Handles Google OAuth login success, session creation, and user registration.
+ */
 @CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000" })
 @RestController
 @RequestMapping("/oauth")
@@ -35,6 +38,15 @@ public class OAuthController {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Handles Google OAuth2 login success, registers new users if necessary,
+     * sets up Spring Security context and session, and redirects to the frontend profile page.
+     *
+     * @param token    OAuth2AuthenticationToken containing user authentication details
+     * @param response HTTP servlet response for redirecting the user
+     * @param request  HTTP servlet request for session management
+     * @throws IOException if an error occurs during redirection
+     */
     @GetMapping("/google/success")
     @Transactional
     public void googleLoginSuccess(OAuth2AuthenticationToken token, HttpServletResponse response, HttpServletRequest request) throws IOException {

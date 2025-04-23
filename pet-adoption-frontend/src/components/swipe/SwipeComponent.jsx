@@ -94,7 +94,6 @@ export function SwipeComponent() {
                 return;
             }
             const data = await res.json();
-            console.log("Fetched pets:", data);
 
             const filteredPets = data.filter(
                 (pet) => !swipedPetIds.current.has(pet.id),

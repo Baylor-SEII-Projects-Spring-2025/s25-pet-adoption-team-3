@@ -33,7 +33,10 @@ import petadoption.api.services.RecEngineService;
 import petadoption.api.services.SessionValidation;
 import petadoption.api.services.UserService;
 
-
+/**
+ * REST controller for user-related API endpoints.
+ * Handles profile, authentication, email verification, photo upload, and password reset features.
+ */
 @CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000" })@RestController
 @RequestMapping("/api/users")
 public class UsersController {
@@ -55,6 +58,14 @@ public class UsersController {
         this.sessionValidation = sessionValidation;
     }
 
+
+    /**
+     * Retrieves the profile information for a given user.
+     *
+     * @param userId   The ID of the user whose profile is being requested.
+     * @param request  The HTTP servlet request (session will be updated).
+     * @return         ResponseEntity containing the User object or 404 if not found.
+     */
     @GetMapping("/{userId}")
     public ResponseEntity<User> getUserProfile(@PathVariable Long userId, HttpServletRequest request) {
         User user = userRepository.findById(userId).orElse(null);
@@ -68,7 +79,13 @@ public class UsersController {
         return ResponseEntity.ok(user);
     }
 
-
+    /**
+     * Updates a user's profile photo URL directly.
+     *
+     * @param userId   The ID of the user to update.
+     * @param photoUrl The new photo URL.
+     * @return         ResponseEntity with status and message.
+     */
     @PutMapping("/{userId}/photo")
     public ResponseEntity<String> updateProfilePhoto(@PathVariable Long userId, @RequestParam String photoUrl) {
         Optional<User> userOptional = userRepository.findById(userId);
@@ -83,6 +100,14 @@ public class UsersController {
         return ResponseEntity.ok("Profile photo updated successfully!");
     }
 
+
+    /**
+     * Verifies a user's email using a token and redirects to the frontend.
+     *
+     * @param token    The verification token sent via email.
+     * @param response The HTTP servlet response for redirection.
+     * @throws IOException If there is a redirect error.
+     */
     @GetMapping("/verify-email")
     public void verifyUserEmail(@RequestParam String token, HttpServletResponse response) throws IOException {
         Optional<Token> verificationTokenOptional = tokenRepository.findByTokenAndTokenType(token, Token.TokenType.EMAIL_VERIFICATION);
@@ -105,11 +130,26 @@ public class UsersController {
         response.sendRedirect(frontendUrl + "/email-verified");
     }
 
+
+    /**
+     * Resends the verification email to the user.
+     *
+     * @param email The user's email address.
+     * @return      ResponseEntity with status and result message.
+     */
     @PutMapping("/resend-verification")
     public ResponseEntity<String> resendVerificationEmail(@RequestParam String email) {
         return userService.resendVerificationEmail(email);
     }
 
+    /**
+     * Updates a user's first name.
+     *
+     * @param userId   The ID of the user to update.
+     * @param userDTO  UserDTO containing the new first name.
+     * @param request  HTTP request to refresh the session.
+     * @return         ResponseEntity with status and result message.
+     */
     @PutMapping("/changeFirstName/{userId}")
     public ResponseEntity<String> changeFirstName(@PathVariable Long userId, @RequestBody UserDTO userDTO, HttpServletRequest request) {
         if(userDTO.getFirstName() == null || userDTO.getFirstName().isEmpty()) {
@@ -131,6 +171,14 @@ public class UsersController {
         return ResponseEntity.ok("First name updated to: " + userDTO.getFirstName());
     }
 
+    /**
+     * Updates a user's last name.
+     *
+     * @param userId   The ID of the user to update.
+     * @param userDTO  UserDTO containing the new last name.
+     * @param request  HTTP request to refresh the session.
+     * @return         ResponseEntity with status and result message.
+     */
     @PutMapping("/changeLastName/{userId}")
     public ResponseEntity<String> changeLastName(@PathVariable Long userId, @RequestBody UserDTO userDTO, HttpServletRequest request) {
         if(userDTO.getLastName() == null || userDTO.getLastName().isEmpty()) {
@@ -151,6 +199,13 @@ public class UsersController {
         return ResponseEntity.ok("Last name updated to: " + userDTO.getLastName());
     }
 
+    /**
+     * Updates a user's email address.
+     *
+     * @param userId   The ID of the user to update.
+     * @param userDTO  UserDTO containing the new email address.
+     * @return         ResponseEntity with status and result message.
+     */
     @PutMapping("/changeEmail/{userId}")
     public ResponseEntity<String> changeEmail(@PathVariable Long userId, @RequestBody UserDTO userDTO) {
         if(userDTO.getEmail() == null || userDTO.getEmail().isEmpty()) {
@@ -168,6 +223,14 @@ public class UsersController {
         return ResponseEntity.ok("Email updated to: " + userDTO.getEmail());
     }
 
+
+    /**
+     * Deletes a user's profile photo.
+     *
+     * @param userId   The ID of the user whose photo will be deleted.
+     * @param request  HTTP request to refresh the session.
+     * @return         ResponseEntity with status and result message.
+     */
     @PutMapping("/deleteProfilePhoto/{userId}")
     public ResponseEntity<String> deleteProfilePhoto(@PathVariable Long userId, HttpServletRequest request) {
         Optional<User> userOptional = userRepository.findById(userId);
@@ -187,6 +250,15 @@ public class UsersController {
 
         return ResponseEntity.ok("Profile photo deleted successfully!");
     }
+
+    /**
+     * Uploads a new profile photo for the user and updates their session.
+     *
+     * @param userId   The ID of the user uploading the photo.
+     * @param file     The photo file (multipart form data).
+     * @param request  HTTP request to refresh the session.
+     * @return         ResponseEntity containing the updated User or error.
+     */
     @PostMapping("/{userId}/uploadProfilePhoto")
     public ResponseEntity<User> uploadProfilePhoto(@PathVariable Long userId, @RequestParam("file") MultipartFile file, HttpServletRequest request) {
         Optional<User> userOptional = userRepository.findById(userId);
@@ -216,12 +288,24 @@ public class UsersController {
         }
     }
 
+    /**
+     * Sends a forgot password email with a reset link to the user.
+     *
+     * @param request  JSON body containing the user's email.
+     * @return         ResponseEntity with status and message.
+     */
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPasswordLink(@RequestBody Map<String, String> request) {
         String email = request.get("email");
         return userService.forgotPasswordLink(email);
     }
 
+    /**
+     * Resets a user's password using a reset token and a new password.
+     *
+     * @param request  JSON body containing the reset token and new password.
+     * @return         ResponseEntity with status and message.
+     */
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> request) {
 

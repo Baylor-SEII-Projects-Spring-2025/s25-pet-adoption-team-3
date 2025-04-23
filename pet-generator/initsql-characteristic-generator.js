@@ -104,7 +104,6 @@ const dogBreeds = [...`
 ('Luna', 1, 'Labrador', 'Unspayed Female', '2023-12-18', 'Loves belly rubs and playtime.', 'Good with dogs', 'Microchipped', 'Leash trained'),
 ('Chloe', 1, 'Shih Tzu', 'Unspayed Female', '2022-01-04', 'Loves belly rubs and playtime.', 'Good with kids', 'House-trained', 'Fully vaccinated');
 `.matchAll(/\('.*', 1, '(.*?)',/g)].map(e => e[1]);
-console.log(new Set(dogBreeds));
 
 const breedToCharacteristicMap = {
   'Labrador': ['Short fur', 'Long tail', 'Floppy ears', 'Lean body'],
@@ -175,7 +174,6 @@ const characteristics = [...`(1, 'Short fur'),
 (37, 'Cobby body'),
 (38, 'Athletic body'),
 (39, 'Heavy-boned body');`.matchAll(/\(\d+, '(.*)'/g)].map(e => e[1]);
-console.log(characteristics);
 
 let insertStrings = 'INSERT INTO pet_pet_characteristics(pet_id, pet_characteristics_characteristic_id) VALUES'
 
@@ -189,7 +187,6 @@ for(let i = 0; i < dogBreeds.length; i++){
 }
 insertStrings = insertStrings.substring(0, insertStrings.length-1); // trim trailing comma
 insertStrings+=';'
-console.log(insertStrings);
 
 
 let imageInsertStrings = `INSERT INTO pet_images(pet_id, image_url) VALUES`
@@ -202,7 +199,6 @@ for(let i = 0; i < dogBreeds.length; i++){
 	promises.push((async () => {
 		for(let j = 0; j < 4; j++){
 			const image_url = (await (await fetch(`https://dog.ceo/api/breed/${breedToAPIBreedMap[dogBreeds[i]]}/images/random`)).json()).message
-			console.log(image_url);
 			vals.push(`\n(${dogId}, '${image_url}'),`)
 		}
 	})());
@@ -211,12 +207,9 @@ for(let i = 0; i < dogBreeds.length; i++){
 
 await Promise.all(promises);
 vals.sort((a, b) => {
-	console.log(`a: ${a.match(/\((?<a>\d+)/).groups['a']}`)
 	return Number(a.match(/\((?<a>\d+)/).groups['a']) - Number(b.match(/\((?<a>\d+)/).groups['a']);
 });
 
 imageInsertStrings += vals.join('');
 imageInsertStrings = imageInsertStrings.substring(0, imageInsertStrings.length-1); // trim trailing comma
 imageInsertStrings+=';'
-
-console.log(imageInsertStrings);

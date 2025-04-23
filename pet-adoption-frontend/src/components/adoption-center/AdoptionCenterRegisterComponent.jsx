@@ -168,7 +168,6 @@ export default function AdoptionCenterRegisterComponent() {
                 !window.google.maps ||
                 !window.google.maps.places
             ) {
-                console.log("Google Maps API not loaded yet");
                 return;
             }
 

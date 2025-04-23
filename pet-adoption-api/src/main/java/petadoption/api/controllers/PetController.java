@@ -28,6 +28,10 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * REST controller for pet-related API endpoints.
+ * Handles creation, editing, deletion, details, and swipe/like/dislike actions for pets.
+ */
 @CrossOrigin(origins = { "http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000" })
 @RestController
 @RequestMapping("/api/pet")
@@ -55,6 +59,22 @@ public class PetController {
         this.characteristicRepository = characteristicRepository;
     }
 
+    /**
+     * Adds a new pet to the system with multiple images and characteristics.
+     *
+     * @param session         HTTP session for authentication/authorization
+     * @param name            Pet's name
+     * @param breed           Pet's breed
+     * @param spayedStatus    Pet's spayed/neutered status
+     * @param birthdate       Pet's birthdate
+     * @param aboutMe         Description about the pet
+     * @param extra1          Extra info (e.g., favorite thing)
+     * @param extra2          Extra info (e.g., favorite toy)
+     * @param extra3          Extra info (e.g., best way to win pet over)
+     * @param files           Images to upload (multipart)
+     * @param characteristics List of characteristic names
+     * @return ResponseEntity with created pet data or error
+     */
     @PostMapping("/add-pet-with-images")
     public ResponseEntity<?> addPetWithImages(
             HttpSession session,
@@ -106,6 +126,13 @@ public class PetController {
         return ResponseEntity.status(200).body(new PetRequestDTO(pet));
     }
 
+    /**
+     * Adds a new pet using a JSON DTO (without images).
+     *
+     * @param session       HTTP session for authentication/authorization
+     * @param petRequestDTO DTO with pet data
+     * @return ResponseEntity indicating creation result
+     */
     @PostMapping("/add-pet")
     public ResponseEntity<String> addPet(HttpSession session, @RequestBody @Valid PetRequestDTO petRequestDTO) {
         User user = userRepository.getOne(1L);
@@ -117,7 +144,22 @@ public class PetController {
         return ResponseEntity.status(201).body(petRequestDTO.getName() + " was successfully added.");
     }
 
-
+    /**
+     * Edits an existing pet's information and images.
+     *
+     * @param session      HTTP session for authentication/authorization
+     * @param id           Pet ID
+     * @param name         Pet's name
+     * @param breed        Pet's breed
+     * @param spayedStatus Pet's spayed/neutered status
+     * @param birthdate    Pet's birthdate
+     * @param aboutMe      Description about the pet
+     * @param extra1       Extra info (e.g., favorite thing)
+     * @param extra2       Extra info (e.g., favorite toy)
+     * @param extra3       Extra info (e.g., best way to win pet over)
+     * @param files        Images to upload (multipart)
+     * @return ResponseEntity indicating update status
+     */
     @PutMapping("/edit/{id}")
     public ResponseEntity<String> editPet(
             HttpSession session,
@@ -155,7 +197,13 @@ public class PetController {
                 : ResponseEntity.status(404).body("Pet not found or unauthorized.");
     }
 
-
+    /**
+     * Deletes a pet by ID.
+     *
+     * @param session HTTP session for authentication/authorization
+     * @param id      Pet ID
+     * @return ResponseEntity indicating deletion status
+     */
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deletePet(HttpSession session, @PathVariable Long id) {
         ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
@@ -169,6 +217,12 @@ public class PetController {
         return deleted ? ResponseEntity.ok("Pet successfully deleted.") : ResponseEntity.status(404).body("Pet not found or unauthorized.");
     }
 
+    /**
+     * Retrieves all pets for a given adoption center.
+     *
+     * @param adoptionCenterID Adoption center ID
+     * @return ResponseEntity with a list of pets (brief info)
+     */
     @GetMapping("/get-all-pets/{adoptionCenterID}")
     public ResponseEntity<?> getAllPets(@PathVariable Long adoptionCenterID) {
         List<Pet> pets = petService.getAllPets(adoptionCenterID);
@@ -191,6 +245,12 @@ public class PetController {
         return ResponseEntity.ok(result);
     }
 
+    /**
+     * Retrieves detailed info about a single pet by its ID.
+     *
+     * @param petId Pet ID
+     * @return ResponseEntity with pet details or 404 if not found
+     */
     @GetMapping("/get-pet-detail/{petId}")
     public ResponseEntity<?> getPetDetail(@PathVariable Long petId) {
         Optional<Pet> petOptional = petService.getPetDetail(petId);
@@ -202,6 +262,11 @@ public class PetController {
         return ResponseEntity.ok(petOptional.get());
     }
 
+    /**
+     * Retrieves a random or recommended pet for swipe view (single pet).
+     *
+     * @return ResponseEntity with a single pet for swiping, or 404 if none available
+     */
     @GetMapping("/swipe/get-pet")
     public ResponseEntity<Pet> getSwipePet() {
         Optional<Pet> petOptional = petService.getSwipePet();
@@ -213,6 +278,13 @@ public class PetController {
         return ResponseEntity.ok(petOptional.get());
     }
 
+    /**
+     * Likes a pet for the current (adopter) user.
+     *
+     * @param session HTTP session for authentication/authorization
+     * @param petId   Pet ID to like
+     * @return ResponseEntity indicating like result
+     */
     @PostMapping("/like-pet/{petId}")
     public ResponseEntity<String> likePet(HttpSession session, @PathVariable Long petId) {
         ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTER);
@@ -227,6 +299,13 @@ public class PetController {
         return ResponseEntity.status(200).body(response);
     }
 
+    /**
+     * Dislikes a pet for the current (adopter) user.
+     *
+     * @param session HTTP session for authentication/authorization
+     * @param petId   Pet ID to dislike
+     * @return ResponseEntity indicating dislike result
+     */
     @PostMapping("/dislike-pet/{petId}")
     public ResponseEntity<String> dislikePet(HttpSession session, @PathVariable Long petId) {
         ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTER);
@@ -241,6 +320,11 @@ public class PetController {
         return ResponseEntity.status(200).body(response);
     }
 
+    /**
+     * Bulk adds new characteristics for pets (ADMIN/TESTING ONLY).
+     *
+     * @param characteristics array of characteristic names to add
+     */
     @PostMapping("/add-characteristics")
     @Transactional
     public void addCharacteristics(@RequestParam("c") String[] characteristics) {
@@ -251,6 +335,12 @@ public class PetController {
         }
     }
 
+    /**
+     * Retrieves a list of pets available for the current user to swipe on.
+     *
+     * @param session HTTP session for authentication/authorization
+     * @return ResponseEntity with a list of SwipePetDTOs
+     */
     @GetMapping("/swipe/temp-get-pets")
     public ResponseEntity<List<SwipePetDTO>> getSwipePets(HttpSession session) {
         ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTER);
@@ -262,6 +352,11 @@ public class PetController {
         return ResponseEntity.status(200).body(recEngineService.getSwipePetsV2(user));
     }
 
+    /**
+     * Retrieves all possible pet characteristics in the system.
+     *
+     * @return ResponseEntity with a list of characteristic names
+     */
     @GetMapping("/characteristics")
     public ResponseEntity<List<String>> getCharacteristics(){
         List<Characteristic> chars = characteristicRepository.getAll();
@@ -270,6 +365,12 @@ public class PetController {
         return ResponseEntity.status(200).body(charStrings);
     }
 
+    /**
+     * Retrieves all pets liked by the current (adopter) user.
+     *
+     * @param session HTTP session for authentication/authorization
+     * @return ResponseEntity with a list of liked SwipePetDTOs
+     */
     @GetMapping("/get-liked-pets")
     public ResponseEntity<List<SwipePetDTO>> getLikedPets(HttpSession session) {
         ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTER);

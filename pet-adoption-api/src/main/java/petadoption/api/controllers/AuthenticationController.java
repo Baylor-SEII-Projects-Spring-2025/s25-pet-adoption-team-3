@@ -18,6 +18,10 @@ import petadoption.api.DTO.UserDTO;
 import petadoption.api.models.User;
 import petadoption.api.services.UserService;
 
+/**
+ * REST controller for authentication-related API endpoints,
+ * including user registration, login, logout, and session management.
+ */
 @CrossOrigin(origins = {"http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000"})
 @RestController
 @RequestMapping("/auth")
@@ -28,11 +32,24 @@ public class AuthenticationController {
         this.userService = userService;
     }
 
+    /**
+     * Registers a new user.
+     *
+     * @param userDTO the data transfer object containing registration details
+     * @return ResponseEntity with registration status or errors
+     */
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserDTO userDTO) {
         return userService.registerUser(userDTO);
     }
 
+    /**
+     * Authenticates a user and starts a new session.
+     *
+     * @param loginRequest the DTO containing login credentials
+     * @param request the HTTP request for session handling
+     * @return ResponseEntity containing login status, user name, and role
+     */
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(
             @RequestBody LoginRequestsDTO loginRequest, HttpServletRequest request) {
@@ -56,6 +73,12 @@ public class AuthenticationController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Retrieves the current user session, if available.
+     *
+     * @param session the current HTTP session
+     * @return ResponseEntity containing the user DTO if logged in, or a 401 error otherwise
+     */
     @GetMapping("/session")
     public ResponseEntity<?> getSession(HttpSession session) {
         User user = (User) session.getAttribute("user");
@@ -71,6 +94,12 @@ public class AuthenticationController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Logs out the current user, invalidating their session.
+     *
+     * @param request the HTTP request for session handling
+     * @return ResponseEntity indicating logout status
+     */
     @PostMapping("/logout")
     public ResponseEntity<String> logoutUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false);

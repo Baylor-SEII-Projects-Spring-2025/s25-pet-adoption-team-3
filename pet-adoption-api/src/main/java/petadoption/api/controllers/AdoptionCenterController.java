@@ -21,6 +21,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * REST controller for all adoption center-related API endpoints.
+ * Handles registration, profile updates, pet management, and adoption actions
+ * for adoption centers on the platform.
+ */
 @CrossOrigin(origins = {"http://localhost:3000", "https://adopdontshop.duckdns.org", "http://35.226.72.131:3000"})
 @RestController
 @RequestMapping("/api/adoption-center")
@@ -40,11 +45,25 @@ public class AdoptionCenterController {
         this.petRepository = petRepository;
     }
 
+    /**
+     * Registers a new adoption center.
+     *
+     * @param adoptionCenterDTO the data transfer object containing center details
+     * @return ResponseEntity with registration result
+     */
     @PostMapping("/register")
     public ResponseEntity<?> registerAdoptionCenter(@RequestBody AdoptionCenterDTO adoptionCenterDTO) throws IOException, InterruptedException {
         return adoptionCenterService.registerAdoptionCenter(adoptionCenterDTO);
     }
 
+    /**
+     * Updates the adoption center's display name.
+     *
+     * @param adoptionCenterId  the ID of the adoption center to update
+     * @param adoptionCenterDTO DTO containing the new name
+     * @param request           HTTP request for session management
+     * @return ResponseEntity with status message
+     */
     @PutMapping("/change-name/{adoptionCenterId}")
     public ResponseEntity<String> changeAdoptionCenterName(@PathVariable Long adoptionCenterId, @RequestBody AdoptionCenterDTO adoptionCenterDTO, HttpServletRequest request) {
         if (adoptionCenterDTO.getAdoptionCenterName() == null || adoptionCenterDTO.getAdoptionCenterName().isEmpty()) {
@@ -66,6 +85,14 @@ public class AdoptionCenterController {
         return ResponseEntity.ok("First name updated to: " + adoptionCenterDTO.getAdoptionCenterName());
     }
 
+    /**
+     * Updates the website link for an adoption center.
+     *
+     * @param adoptionCenterId  the ID of the adoption center
+     * @param adoptionCenterDTO DTO containing the new website link
+     * @param request           HTTP request for session management
+     * @return ResponseEntity with status message
+     */
     @PutMapping("/update-website-link/{adoptionCenterId}")
     public ResponseEntity<String> updateWebsiteLink(@PathVariable Long adoptionCenterId, @RequestBody AdoptionCenterDTO adoptionCenterDTO, HttpServletRequest request) {
         if (adoptionCenterDTO.getWebsite() == null || adoptionCenterDTO.getWebsite().isEmpty()) {
@@ -87,6 +114,14 @@ public class AdoptionCenterController {
         return ResponseEntity.ok("Website updated to: " + adoptionCenterDTO.getWebsite());
     }
 
+    /**
+     * Updates the bio for an adoption center.
+     *
+     * @param adoptionCenterId  the ID of the adoption center
+     * @param adoptionCenterDTO DTO containing the new bio
+     * @param request           HTTP request for session management
+     * @return ResponseEntity with status message
+     */
     @PutMapping("/update-bio/{adoptionCenterId}")
     public ResponseEntity<String> updateBio(@PathVariable Long adoptionCenterId, @RequestBody AdoptionCenterDTO adoptionCenterDTO, HttpServletRequest request) {
         if (adoptionCenterDTO.getBio() == null || adoptionCenterDTO.getBio().isEmpty()) {
@@ -108,6 +143,14 @@ public class AdoptionCenterController {
         return ResponseEntity.ok("Bio updated to: " + adoptionCenterDTO.getBio());
     }
 
+    /**
+     * Updates the phone number for an adoption center.
+     *
+     * @param adoptionCenterId  the ID of the adoption center
+     * @param adoptionCenterDTO DTO containing the new phone number
+     * @param request           HTTP request for session management
+     * @return ResponseEntity with status message
+     */
     @PutMapping("/update-phone-number/{adoptionCenterId}")
     public ResponseEntity<String> updatePhoneNumber(@PathVariable Long adoptionCenterId, @RequestBody AdoptionCenterDTO adoptionCenterDTO, HttpServletRequest request) {
         if (adoptionCenterDTO.getPhoneNumber() == null || adoptionCenterDTO.getPhoneNumber().isEmpty()) {
@@ -129,6 +172,14 @@ public class AdoptionCenterController {
         return ResponseEntity.ok("Phone number updated to: " + adoptionCenterDTO.getPhoneNumber());
     }
 
+    /**
+     * Updates the address for an adoption center.
+     *
+     * @param adoptionCenterId  the ID of the adoption center
+     * @param adoptionCenterDTO DTO containing the new address
+     * @param request           HTTP request for session management
+     * @return ResponseEntity with status message
+     */
     @PutMapping("/update-address/{adoptionCenterId}")
     public ResponseEntity<String> updateAddress(@PathVariable Long adoptionCenterId, @RequestBody AdoptionCenterDTO adoptionCenterDTO, HttpServletRequest request) {
         if (adoptionCenterDTO.getAddress() == null || adoptionCenterDTO.getAddress().isEmpty()) {
@@ -152,6 +203,12 @@ public class AdoptionCenterController {
         return ResponseEntity.ok("Address updated to: " + adoptionCenterDTO.getAddress());
     }
 
+    /**
+     * Retrieves all pets belonging to the currently logged-in adoption center.
+     *
+     * @param request HTTP request for session validation
+     * @return ResponseEntity containing a list of pets or error status
+     */
     @GetMapping("/pets")
     public ResponseEntity<?> getPetsForLoggedInAdoptionCenter(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
@@ -168,6 +225,12 @@ public class AdoptionCenterController {
         return ResponseEntity.ok(pets);
     }
 
+    /**
+     * Retrieves a list of users who have liked a specific pet.
+     *
+     * @param petId the ID of the pet
+     * @return ResponseEntity containing a list of users with basic info
+     */
     @GetMapping("/users-who-liked/{petId}")
     public ResponseEntity<?> getUsersWhoLikedPet(@PathVariable Long petId) {
         List<Object[]> results = userRepository.findUsersWhoLikedPet(petId);
@@ -185,6 +248,14 @@ public class AdoptionCenterController {
         return ResponseEntity.ok(users);
     }
 
+    /**
+     * Marks a pet as adopted by a given user (adopter).
+     *
+     * @param petId     the ID of the pet to mark as adopted
+     * @param adopterId the ID of the adopter
+     * @param request   HTTP request for session validation
+     * @return ResponseEntity with operation result or error
+     */
     @PutMapping("/adopt-pet/{petId}/by/{adopterId}")
     public ResponseEntity<?> markPetAsAdopted(
             @PathVariable Long petId,
@@ -221,6 +292,13 @@ public class AdoptionCenterController {
         return ResponseEntity.ok("Pet adopted by user: " + adopterOpt.get().getId());
     }
 
+    /**
+     * Retrieves a list of archived (adopted) pets for the logged-in adoption center,
+     * including information about the adopters.
+     *
+     * @param request HTTP request for session validation
+     * @return ResponseEntity containing archived pet and adopter info
+     */
     @GetMapping("/archived-pets")
     public ResponseEntity<?> getArchivedPetsWithAdopterInfo(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
@@ -261,7 +339,4 @@ public class AdoptionCenterController {
 
         return ResponseEntity.ok(result);
     }
-
-
-
 }
