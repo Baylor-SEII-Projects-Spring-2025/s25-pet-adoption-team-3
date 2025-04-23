@@ -6,6 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.*;
+import petadoption.api.DTO.EventDetailsDTO;
 import petadoption.api.DTO.EventRequestDTO;
 import petadoption.api.models.Event;
 import petadoption.api.models.User;
@@ -15,6 +16,7 @@ import petadoption.api.services.GCSStorageServiceEvents;
 import petadoption.api.services.SessionValidation;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,5 +104,28 @@ public class EventController {
     public ResponseEntity<?> getAllEvents(@PathVariable Long adoptionCenterId) {
         List<Event> events = eventService.getEventsByAdoptionCenterId(adoptionCenterId);
         return ResponseEntity.ok(events);
+    }
+
+    @GetMapping("/get-nearby-events")
+    public ResponseEntity<List<EventDetailsDTO>> getNearbyEvents(HttpSession session) {
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTER);
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body(null);
+        }
+        User user = (User) validationResponse.getBody();
+
+        List<Event> events = eventService.getNearbyEvents(user);
+
+        if(events.isEmpty()) {
+            return ResponseEntity.ok(null);
+        }
+
+        List<EventDetailsDTO> eventDetailsDTOList = new ArrayList<>();
+
+        for (Event event : events) {
+            eventDetailsDTOList.add(new EventDetailsDTO(event));
+        }
+
+        return ResponseEntity.ok().body(eventDetailsDTOList);
     }
 }

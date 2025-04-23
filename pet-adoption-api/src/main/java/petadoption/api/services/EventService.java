@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import petadoption.api.DTO.EventDetailsDTO;
 import petadoption.api.DTO.EventRequestDTO;
 import petadoption.api.models.Event;
 import petadoption.api.models.User;
@@ -130,5 +131,10 @@ public class EventService {
 
     public List<Event> getEventsByAdoptionCenterId(Long adoptionCenterId) {
         return eventRepository.findByAdoptionCenterId(adoptionCenterId);
+    }
+
+    public List<Event> getNearbyEvents(User user) {
+        // Default distance 100 miles
+        return eventRepository.getNearbyEvents(user.getLatitude(), user.getLongitude(), 100);
     }
 }

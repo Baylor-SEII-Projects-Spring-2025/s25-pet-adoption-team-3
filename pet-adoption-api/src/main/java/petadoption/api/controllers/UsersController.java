@@ -231,7 +231,7 @@ public class UsersController {
     }
 
     @PostMapping("/set-location")
-    public ResponseEntity<String> setLocation(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude, HttpSession session) {
+    public ResponseEntity<String> setLocation(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude, HttpSession session, HttpServletRequest request) {
         User user = (User) session.getAttribute("user");
 
         if(user == null){
@@ -240,6 +240,11 @@ public class UsersController {
 
         String response = userService.setLocation(user, latitude, longitude);
 
+        User updatedUser = userRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("User not found after update"));
+
+        request.getSession().invalidate();
+        HttpSession newSession = request.getSession(true);
+        newSession.setAttribute("user", updatedUser);
         if(response != null) {
             return ResponseEntity.ok(response);
         }else{
