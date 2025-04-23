@@ -1,5 +1,6 @@
 package petadoption.api.services;
 
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import petadoption.api.repository.UserRepository;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -128,5 +130,25 @@ public class EventService {
     public List<Event> getNearbyEvents(User user) {
         // Default distance 100 miles
         return eventRepository.getNearbyEvents(user.getLatitude(), user.getLongitude(), 100);
+    }
+
+    @Transactional
+    public boolean registerUserToEvent(User user, Long eventId) {
+        Optional<Event> eventOpt = eventRepository.findById(eventId);
+        if (eventOpt.isEmpty()) return false;
+
+        Event event = eventOpt.get();
+
+        if (event.getAttendees() == null) {
+            event.setAttendees(new HashSet<>());
+        }
+
+        if (!event.getAttendees().contains(user)) {
+            event.getAttendees().add(user);
+            eventRepository.save(event);
+            return true;
+        }
+
+        return false;
     }
 }
