@@ -31,29 +31,21 @@ public class EventService {
         this.gcsStorageServiceEvents = gcsStorageServiceEvents;
     }
 
-    public ResponseEntity<Event> createEventWithImage(User user, Long adoptionCenterId, String title,
-                                                      String description, LocalDate startDate, LocalDate endDate,
-                                                      MultipartFile file) {
-        try {
-            String fileName = "event_photo_" + adoptionCenterId + "_" + UUID.randomUUID();
-            String uploadedFileUrl = gcsStorageServiceEvents.uploadFile(file, fileName);
+    public Event createEventWithImage(User user, Long adoptionCenterId, String title, String description,
+                                      LocalDate startDate, LocalDate endDate, MultipartFile file) throws IOException {
+        String fileName = "event_photo_" + adoptionCenterId + "_" + UUID.randomUUID();
+        String uploadedFileUrl = gcsStorageServiceEvents.uploadFile(file, fileName);
 
-            Event event = new Event();
-            event.setAdoptionCenter(user);
-            event.setTitle(title);
-            event.setDescription(description);
-            event.setStartDate(startDate);
-            event.setEndDate(endDate);
-            event.setImage(uploadedFileUrl);
+        Event event = new Event();
+        event.setAdoptionCenter(user);
+        event.setTitle(title);
+        event.setDescription(description);
+        event.setStartDate(startDate);
+        event.setEndDate(endDate);
+        event.setImage(uploadedFileUrl);
 
-            eventRepository.save(event);
-
-            return ResponseEntity.status(201).body(event);
-        } catch (IOException e) {
-            return ResponseEntity.status(500).body(null);
-        }
+        return eventRepository.save(event);
     }
-
 
     public boolean createEvent(Long adoptionCenterId, EventRequestDTO eventRequestDTO) {
         Optional<User> adoptionCenterOptional = userRepository.findById(adoptionCenterId);

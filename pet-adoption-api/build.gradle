@@ -57,6 +57,8 @@ dependencies {
     implementation 'com.google.protobuf:protobuf-java:3.25.1'
     implementation group: 'com.google.cloud', name: 'google-cloud-storage', version: '2.48.2'
 
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.0'
+
 }
 
 tasks.named('test') {

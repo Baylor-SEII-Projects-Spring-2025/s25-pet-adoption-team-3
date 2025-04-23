@@ -18,6 +18,7 @@ import HeroSection from "@/components/homepage/HeroSection";
 import AboutSection from "@/components/homepage/AboutSection";
 import PetOptions from "@/components/homepage/PetOptions";
 import CTASection from "@/components/homepage/CTASection";
+import FloatingEventFAB from "@/components/homepage/FloatingEventFAB";
 import Footer from "@/components/homepage/Footer";
 
 export default function HomePage() {
@@ -29,6 +30,7 @@ export default function HomePage() {
             <PetOptions />
             <CTASection />
             <Footer />
+            <FloatingEventFAB />
         </>
     );
 }

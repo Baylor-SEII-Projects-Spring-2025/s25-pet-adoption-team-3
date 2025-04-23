@@ -15,6 +15,7 @@ import petadoption.api.services.EventService;
 import petadoption.api.services.GCSStorageServiceEvents;
 import petadoption.api.services.SessionValidation;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,26 +38,26 @@ public class EventController {
     }
 
     @PostMapping("/create-event-with-image/{adoptionCenterId}")
-    public ResponseEntity<Event> createEventWithImage(
+    public ResponseEntity<EventDetailsDTO> createEventWithImage(
             HttpSession session,
             @PathVariable Long adoptionCenterId,
             @RequestParam("title") String title,
             @RequestParam("description") String description,
             @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam("files") MultipartFile files) {
+            @RequestParam("files") MultipartFile file) throws IOException {
 
         ResponseEntity<?> validationResponse = sessionValidation.validateSession(session, User.Role.ADOPTION_CENTER);
         if (!validationResponse.getStatusCode().is2xxSuccessful()) {
             return ResponseEntity.status(validationResponse.getStatusCode()).body(null);
         }
+
         User user = (User) validationResponse.getBody();
+        Event event = eventService.createEventWithImage(user, adoptionCenterId, title, description, startDate, endDate, file);
 
-        ResponseEntity<Event> eventResponse = eventService.createEventWithImage(
-                user, adoptionCenterId, title, description, startDate, endDate, files);
-
-        return eventResponse;
+        return ResponseEntity.status(201).body(new EventDetailsDTO(event));
     }
+
 
 
     @DeleteMapping("/delete-event")

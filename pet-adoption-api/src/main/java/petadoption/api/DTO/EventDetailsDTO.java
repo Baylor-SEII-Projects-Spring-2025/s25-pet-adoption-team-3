@@ -1,6 +1,7 @@
 package petadoption.api.DTO;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
@@ -12,6 +13,10 @@ import java.time.LocalDate;
 
 @Data
 public class EventDetailsDTO {
+    @GeneratedValue
+    @Column(name = "event_id")
+    private Long id;
+
     @NotNull
     private String adoptionCenter;
 
@@ -31,6 +36,7 @@ public class EventDetailsDTO {
     private LocalDate endDate;
 
     public EventDetailsDTO(Event event) {
+        this.id = event.getId();
         this.adoptionCenter = event.getAdoptionCenter().getAdoptionCenterName();
         this.image = event.getImage();
         this.title = event.getTitle();

@@ -1,5 +1,7 @@
 package petadoption.api.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -12,36 +14,39 @@ import java.nio.charset.StandardCharsets;
 
 @Service
 public class GeocodeService {
+
     public Double[] getCoordinatesFromAddress(String address) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
-        String URL = "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address="+ URLEncoder.encode(address, StandardCharsets.UTF_8)   + "&benchmark=4";
-        System.out.println(URL);
-        // Build the HttpRequest
+
+        String url = "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress"
+                + "?address=" + URLEncoder.encode(address, StandardCharsets.UTF_8)
+                + "&benchmark=4&format=json";
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(URL))
+                .uri(URI.create(url))
                 .GET()
                 .build();
 
-        // Send the request and get the response
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        int latIdx, longIdx;
-        Double latitude, longitude;
-        String body;
-        if(response.statusCode() != 200) {
+
+        if (response.statusCode() != 200) {
+            System.err.println("Non-200 from geocoder: " + response.statusCode());
             return null;
         }
 
-        body = response.body();
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(response.body());
 
-        if(body.contains("No Matches")){
+        JsonNode addressMatches = root.path("result").path("addressMatches");
+
+        if (addressMatches.isEmpty() || addressMatches.get(0) == null) {
+            System.out.println("No address matches found for: " + address);
             return null;
         }
 
-        latIdx = body.indexOf("Interpolated Latitude (Y) Coordinates: </b><span>") + "Interpolated Latitude (Y) Coordinates: </b><span>".length();
-        longIdx = body.indexOf("Interpolated Longitude (X) Coordinates: </b><span>") + "Interpolated Longitude (X) Coordinates: </b><span>".length();
-
-        latitude = Double.parseDouble(body.substring(latIdx, body.indexOf("<", latIdx)));
-        longitude = Double.parseDouble(body.substring(longIdx, body.indexOf("<", longIdx)));
+        JsonNode coordinates = addressMatches.get(0).path("coordinates");
+        double longitude = coordinates.path("x").asDouble();
+        double latitude = coordinates.path("y").asDouble();
 
         return new Double[]{latitude, longitude};
     }
