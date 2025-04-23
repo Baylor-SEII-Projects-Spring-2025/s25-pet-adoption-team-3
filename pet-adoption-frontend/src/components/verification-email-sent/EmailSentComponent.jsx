@@ -1,3 +1,16 @@
+/**
+ * EmailSentComponent
+ * -----------------------------------------------------------
+ * This component displays a confirmation screen after a user registers,
+ * indicating that a verification email has been sent.
+ *
+ * Main Features:
+ *  - Shows a success icon and "Verification Email Sent!" message
+ *  - Displays the user's email with instructions to check their inbox
+ *  - Offers a link to resend the verification email if needed
+ *  - Styled with a centered card layout for clear, reassuring user feedback
+ */
+
 import React from "react";
 import PropTypes from "prop-types";
 import styles from "@/styles/EmailSent.module.css";

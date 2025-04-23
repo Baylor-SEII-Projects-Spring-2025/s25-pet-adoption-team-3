@@ -1,3 +1,16 @@
+/**
+ * AboutSection
+ * -----------------------------------------------------------
+ * This component displays an overview of the "Adopt, Don't Shop" platform.
+ * It introduces users to the app's mission, experience, and pet-matching features.
+ *
+ * Main Features:
+ *  - Welcoming heading and engaging introduction text
+ *  - Explains how the service connects adopters to pets
+ *  - Highlights unique features (swipe, match, and meet)
+ *  - Styled as a distinct section for landing or about pages
+ */
+
 import React from "react";
 import styles from "@/styles/AboutSection.module.css";
 

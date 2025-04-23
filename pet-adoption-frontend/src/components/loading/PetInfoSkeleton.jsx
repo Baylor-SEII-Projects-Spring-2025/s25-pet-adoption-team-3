@@ -1,3 +1,16 @@
+/**
+ * PetInfoSkeleton
+ * -----------------------------------------------------------
+ * This component provides a skeleton loader UI for the Pet Info page,
+ * visually indicating loading states for pet details and related events.
+ *
+ * Main Features:
+ *  - Displays skeletons for pet name, image, and main details
+ *  - Includes event cards with skeleton placeholders for event content
+ *  - Matches the layout of PetInfoComponent to prevent layout shifts
+ *  - Improves user experience during asynchronous data fetches
+ */
+
 import React from "react";
 import { Skeleton } from "@mui/material";
 import styles from "@/styles/PetInfoComponent.module.css";

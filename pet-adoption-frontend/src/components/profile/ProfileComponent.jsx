@@ -1,3 +1,20 @@
+/**
+ * ProfileDashboardComponent
+ * -----------------------------------------------------------
+ * This component renders the main profile dashboard for adopters,
+ * providing navigation between dashboard, liked pets, and settings.
+ *
+ * Main Features:
+ *  - Fetches user session and handles redirects for user roles (adopter, adoption center, etc.)
+ *  - Displays user profile info, matches, and messages
+ *  - Allows users to view and manage liked pets and "super likes"
+ *  - Includes modal and form for updating/deleting profile photo
+ *  - Enables editing of first and last name in settings tab
+ *  - Handles loading states and error messages for a smooth UX
+ *  - Provides quick chat initiation with adoption centers from liked pets
+ *  - Responsive, styled layout matching app dashboard standards
+ */
+
 import React, { useEffect, useState, useRef, Suspense } from "react";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";

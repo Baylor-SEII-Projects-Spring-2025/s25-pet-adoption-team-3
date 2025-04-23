@@ -1,3 +1,16 @@
+/**
+ * Footer Component
+ * -----------------------------------------------------------
+ * This component renders the application’s footer, providing social media links
+ * and copyright information.
+ *
+ * Main Features:
+ *  - Social media icons with links (GitHub, Instagram, Facebook)
+ *  - Dynamic copyright notice with current year
+ *  - Responsive, styled layout matching the app’s theme
+ *  - Designed to be included at the bottom of all main pages
+ */
+
 import React from "react";
 import styles from "@/styles/Footer.module.css";
 

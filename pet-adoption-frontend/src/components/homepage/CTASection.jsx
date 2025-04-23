@@ -1,3 +1,17 @@
+/**
+ * CTASection (Call To Action)
+ * -----------------------------------------------------------
+ * This component provides a visually engaging call-to-action section,
+ * encouraging users to start the adoption process.
+ *
+ * Main Features:
+ *  - Prominent heading and supporting message
+ *  - Thematic image to capture attention
+ *  - Bold "Start Swiping Now" button to drive user engagement
+ *  - Encourages users to take action and join the platform
+ *  - Styled for strong visibility on landing or info pages
+ */
+
 import React from "react";
 import styles from "@/styles/CTASection.module.css";
 

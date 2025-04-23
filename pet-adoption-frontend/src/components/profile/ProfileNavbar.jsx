@@ -1,3 +1,19 @@
+/**
+ * ProfileNavbar
+ * -----------------------------------------------------------
+ * This component renders the navigation bar for the user's profile pages,
+ * handling user session, role-based navigation, and live notifications.
+ *
+ * Main Features:
+ *  - Displays logo and main navigation links (Learn, Locations, Gallery)
+ *  - Shows user avatar with dropdown menu for Dashboard, Likes, Messages, Settings, Logout
+ *  - Fetches user session and unread message count on mount
+ *  - Integrates with WebSocket/STOMP for real-time message notifications
+ *  - Handles login, logout, and profile photo/initials logic
+ *  - Role-based routing for adopters and adoption centers
+ *  - Responsive and styled for use on all profile-related pages
+ */
+
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import styles from "@/styles/ProfileNavbar.module.css";
