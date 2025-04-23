@@ -9,7 +9,7 @@ import ChatSkeleton from "@/components/loading/ChatSkeleton";
 export default function ChatComponent({ recipientId }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
-    const [user, setUser] = useState(null); // <- this will be sender
+    const [user, setUser] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const clientRef = useRef(null);
@@ -22,7 +22,6 @@ export default function ChatComponent({ recipientId }) {
     const [previousChats, setPreviousChats] = useState([]);
     const [unreadCounts, setUnreadCounts] = useState({});
 
-    // Generate avatar background gradient based on name
     const generateGradient = (name) => {
         if (!name) return "#f50057";
 
@@ -37,7 +36,6 @@ export default function ChatComponent({ recipientId }) {
         return `linear-gradient(135deg, ${color1}, ${color2})`;
     };
 
-    // Get initials from name
     const getInitials = (name) => {
         if (!name) return "";
 
@@ -50,7 +48,7 @@ export default function ChatComponent({ recipientId }) {
 
     useEffect(() => {
         if (user) {
-            fetchUnreadCounts(); // Only run after user is fetched
+            fetchUnreadCounts();
         }
     }, [user, previousChats]);
 
@@ -65,7 +63,6 @@ export default function ChatComponent({ recipientId }) {
 
             if (res.ok) {
                 const data = await res.json();
-                console.log("Conversations:", data);
                 setPreviousChats(
                     data.map((chat) => ({
                         ...chat,
@@ -83,7 +80,6 @@ export default function ChatComponent({ recipientId }) {
     const fetchUnreadCounts = async () => {
         if (!user) return;
         try {
-            // First get the global unread count
             const countRes = await fetch(`${API_URL}/api/chat/unread-count`, {
                 method: "GET",
                 credentials: "include",
@@ -92,7 +88,6 @@ export default function ChatComponent({ recipientId }) {
 
             if (!countRes.ok) return;
 
-            // Then get unread counts per conversation
             const counts = {};
             for (const chat of previousChats) {
                 const res = await fetch(
@@ -135,7 +130,6 @@ export default function ChatComponent({ recipientId }) {
             try {
                 const parsed = JSON.parse(context);
                 setPetContext(parsed);
-                console.log("Pet context:", parsed);
 
                 const lastPetContextMsg = [...messages]
                     .reverse()
@@ -151,7 +145,6 @@ export default function ChatComponent({ recipientId }) {
                     lastPetContextMsg.petContext.gender === parsed.gender;
 
                 if (!isSameContext && user && recipientId) {
-                    // safe to send petContext
                     const baseMsg = {
                         senderId: user.id,
                         recipientId: recipientId,
@@ -200,14 +193,13 @@ export default function ChatComponent({ recipientId }) {
                 const history = await res.json();
                 setMessages(history);
 
-                // ✅ Mark messages from this chat as read
                 await fetch(`${API_URL}/api/chat/mark-read/${recipientId}`, {
                     method: "PUT",
                     credentials: "include",
                     headers: { "Content-Type": "application/json" },
                 });
 
-                fetchUnreadCounts(); // Refresh UI count
+                fetchUnreadCounts();
             } catch (err) {
                 console.error("Error fetching chat history:", err);
             }
@@ -233,7 +225,6 @@ export default function ChatComponent({ recipientId }) {
                 const data = await res.json();
                 setUser(data.user);
                 fetchConversations();
-                console.log("User session:", data.user);
             } catch (err) {
                 console.error("Failed to fetch user session:", err);
             }
@@ -282,7 +273,7 @@ export default function ChatComponent({ recipientId }) {
         const socket = new SockJS(WS_URL);
         const stompClient = new Client({
             webSocketFactory: () => socket,
-            reconnectDelay: 5000, // auto-reconnect
+            reconnectDelay: 5000,
             onConnect: () => {
                 setIsConnected(true);
                 stompClient.subscribe("/topic/messages", (msg) => {
@@ -319,7 +310,6 @@ export default function ChatComponent({ recipientId }) {
             timestamp: new Date().toISOString(),
         };
 
-        // Check if any message already has petContext in history
         const hasSentContext = messages.some((msg) => msg.petContext);
 
         const msg =
@@ -337,7 +327,7 @@ export default function ChatComponent({ recipientId }) {
             setInput("");
 
             if (!hasSentContext && petContext) {
-                setPetContext(null); // clear after sending once
+                setPetContext(null);
             }
         } else {
             console.warn("❌ STOMP client not connected");
@@ -355,11 +345,9 @@ export default function ChatComponent({ recipientId }) {
             unreadCounts[b.id]?.lastMessageTime || b.lastMessageTime || 0,
         );
 
-        // Sort by unread first
         if (aUnread && !bUnread) return -1;
         if (!aUnread && bUnread) return 1;
 
-        // Then by latest message time
         return bTime - aTime;
     });
 
@@ -453,7 +441,6 @@ export default function ChatComponent({ recipientId }) {
                                             }
                                         >
                                             <div className={styles.chatContent}>
-                                                {/* Show pet context as a message */}
                                                 {msg.petContext ? (
                                                     <>
                                                         <p

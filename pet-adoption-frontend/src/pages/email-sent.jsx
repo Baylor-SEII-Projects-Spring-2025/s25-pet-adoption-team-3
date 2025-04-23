@@ -4,7 +4,7 @@ import EmailSentComponent from "@/components/verification-email-sent/EmailSentCo
 
 export default function EmailSent() {
     const router = useRouter();
-    const { email } = router.query; // Get email from the URL query
+    const { email } = router.query;
 
     return email ? <EmailSentComponent email={email} /> : <p>Loading...</p>;
 }

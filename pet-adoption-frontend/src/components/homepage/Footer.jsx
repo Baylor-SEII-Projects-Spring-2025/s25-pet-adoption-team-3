@@ -10,11 +10,9 @@ export default function Footer() {
                         <img src="/icons/github_icon.png" alt="Github" />
                     </a>
                     <a href="#">
-                        {/* TODO: Add href attribute */}
                         <img src="/icons/instagram_icon.png" alt="Instagram" />
                     </a>
                     <a href="#">
-                        {/* TODO: Add href attribute */}
                         <img src="/icons/facebook_icon.png" alt="Facebook" />
                     </a>
                 </div>

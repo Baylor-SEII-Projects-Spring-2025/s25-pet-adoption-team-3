@@ -40,7 +40,6 @@ export default function Navbar() {
             }
 
             const data = await response.json();
-            console.log("✅ Session found:", data);
             setUser(data.user);
             fetchUnreadCount();
         } catch (error) {
@@ -119,8 +118,6 @@ export default function Navbar() {
             if (!response.ok) {
                 throw new Error("Error logging out");
             }
-
-            console.log("✅ Logged out");
             setUser(null);
             setOpen(false);
         } catch (error) {

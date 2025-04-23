@@ -79,23 +79,15 @@ export function SwipeComponent() {
             const data = await res.json();
             console.log("Fetched pets:", data);
 
-            // Filter out any pets that have already been swiped by ID
             const filteredPets = data.filter(
                 (pet) => !swipedPetIds.current.has(pet.id),
             );
-            console.log(
-                "Filtered pets (removing already swiped):",
-                filteredPets,
-            );
 
-            // Get pets that haven't been swiped yet
             const remainingPets = pets.filter((_, i) => !gone.has(i));
 
-            // Set the new pets array
             setPets([...remainingPets, ...filteredPets]);
             setIsPageLoading(false);
 
-            // Reset the gone set since we're rebuilding the array
             gone.clear();
 
             const newIndices = {};
@@ -106,9 +98,6 @@ export function SwipeComponent() {
         }
     };
 
-    // pos fix for Strict Mode causing useEffects to trigger twice in dev environments.
-    // how tf else are we supposed to have an async call that modifies data?????
-    // the greatest minds at facebook ladies/gents.
     let initialized = false;
     useEffect(() => {
         if(!initialized){
@@ -128,7 +117,6 @@ export function SwipeComponent() {
 
     const handleSwipe = async (petId, liked) => {
         try {
-            console.log(`Swiped ${liked ? "right" : "left"} on pet ${petId}`);
             const response = await fetch(
                 `${API_URL}/api/pet/${liked ? "like" : "dislike"}-pet/${petId}`,
                 {
@@ -387,7 +375,6 @@ export function SwipeComponent() {
                                                 );
                                                 const now = new Date();
 
-                                                // Format birthdate as "Month day, year"
                                                 const options = {
                                                     year: "numeric",
                                                     month: "long",
@@ -399,7 +386,6 @@ export function SwipeComponent() {
                                                         options,
                                                     );
 
-                                                // Calculate age
                                                 let age =
                                                     now.getFullYear() -
                                                     birthDate.getFullYear();

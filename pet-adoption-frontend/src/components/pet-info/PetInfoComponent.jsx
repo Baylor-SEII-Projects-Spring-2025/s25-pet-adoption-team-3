@@ -40,7 +40,6 @@ export default function PetInfoComponent({ petUUID }) {
                 }
 
                 const data = await response.json();
-                console.log('✅ Session found:', data);
 
                 if (data.user.role == 'ADOPTER') {
                     Router.push('/profile');
@@ -231,8 +230,8 @@ export default function PetInfoComponent({ petUUID }) {
                                         pet.image?.[0] ||
                                         '/images/no_image_available.png',
                                     breed: pet.breed,
-                                    age: calculateAge(pet.birthdate), // optionally format/calculate age
-                                    gender: pet.spayedStatus || 'Unknown', // adjust if you have gender separate
+                                    age: calculateAge(pet.birthdate),
+                                    gender: pet.spayedStatus || 'Unknown',
                                 };
 
                                 sessionStorage.setItem(
@@ -279,7 +278,7 @@ export default function PetInfoComponent({ petUUID }) {
                                         </Avatar>
                                         <IconButton
                                             onClick={(e) => {
-                                                e.stopPropagation(); // prevent parent onClick
+                                                e.stopPropagation();
                                                 handleMenuOpen(e, user.id);
                                             }}
                                         >

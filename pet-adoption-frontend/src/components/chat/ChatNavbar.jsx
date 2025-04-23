@@ -40,7 +40,6 @@ export default function ChatNavbar() {
             }
 
             const data = await response.json();
-            console.log("✅ Session found:", data);
             setUser(data.user);
             fetchUnreadCount();
         } catch (error) {
@@ -120,7 +119,6 @@ export default function ChatNavbar() {
                 throw new Error("Error logging out");
             }
 
-            console.log("✅ Logged out");
             Router.push("/");
             setUser(null);
             setOpen(false);

@@ -33,7 +33,6 @@ export default function EmailSentComponent({ email }) {
     );
 }
 
-// Prop validation
 EmailSentComponent.propTypes = {
     email: PropTypes.string.isRequired,
 };

@@ -31,7 +31,6 @@ export default function ForgotPasswordComponent() {
             }
 
             const data = await response.json();
-            console.log("✅ Session found:", data);
             setUser(data.user);
 
             router.push("/");
@@ -69,11 +68,10 @@ export default function ForgotPasswordComponent() {
                 if (!response.ok) {
                     throw new Error("Error sending email");
                 }
-                return response.text(); // Handle plain text response
+                return response.text();
             })
             .then((message) => {
-                console.log("✅ Email sent:", message);
-                alert(message); // Display the actual response message
+                alert(message);
             })
             .catch((error) => {
                 console.error("Error sending email:", error);

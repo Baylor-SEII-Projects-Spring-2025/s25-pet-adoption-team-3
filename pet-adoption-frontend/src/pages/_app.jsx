@@ -8,16 +8,13 @@ import { PetAdoptionThemeProvider } from "@/utils/theme";
 import { buildStore } from "@/utils/redux";
 import "@/styles/globals.css";
 
-// Create a function to initialize the store
 const getOrCreateStore = (initialState = {}) => {
-    // For client-side, reuse the same store
     if (typeof window !== "undefined") {
         if (!window.__reduxStore) {
             window.__reduxStore = buildStore(initialState);
         }
         return window.__reduxStore;
     }
-    // For server-side, create a new store for each request
     return buildStore(initialState);
 };
 
