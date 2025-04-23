@@ -1,5 +1,6 @@
 package petadoption.api.adoptionCenter;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,6 +23,15 @@ import petadoption.api.models.User;
 import petadoption.api.repository.UserRepository;
 import petadoption.api.services.AdoptionCenterService;
 import petadoption.api.services.EmailService;
+import petadoption.api.services.GeocodeService;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 
 import java.util.Optional;
 
@@ -38,6 +48,9 @@ class AdoptionCenterServiceTest {
 
     @Mock
     private EmailService emailService;
+
+    @Mock
+    private GeocodeService geocodeService;
 
     @InjectMocks
     private AdoptionCenterService adoptionCenterService;
@@ -92,7 +105,7 @@ class AdoptionCenterServiceTest {
     }
 
     @Test
-    void testRegisterAdoptionCenter_Success() {
+    void testRegisterAdoptionCenter_Success() throws IOException, InterruptedException {
         when(userRepository.findByEmail(testCenterDTO.getEmail())).thenReturn(Optional.empty());
         when(passwordEncoder.encode(testCenterDTO.getPassword())).thenReturn("hashedPassword");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
@@ -110,7 +123,7 @@ class AdoptionCenterServiceTest {
             return savedUser;
         });
 
-        doNothing().when(emailService).sendVerificationEmail(any(User.class));
+        when(geocodeService.getCoordinatesFromAddress(any())).thenReturn(new Double[]{1d,1d});
 
         ResponseEntity<?> response = adoptionCenterService.registerAdoptionCenter(testCenterDTO);
 
