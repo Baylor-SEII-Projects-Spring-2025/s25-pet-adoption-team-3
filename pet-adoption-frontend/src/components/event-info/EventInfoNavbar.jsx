@@ -1,22 +1,23 @@
 /**
- * Navbar Component (Homepage)
+ * EventInfoNavbar Component
  * -----------------------------------------------------------
- * This component renders the primary navigation bar for the app,
- * including brand/logo, main links, and user authentication menu.
+ * This component renders the top navigation bar for logged-in users
+ * (primarily Adoption Centers, but also supports Adopters) and manages
+ * user authentication, navigation links, and live message notifications.
  *
  * Main Features:
- *  - Displays app logo and navigation links (Learn, Locations, Gallery)
- *  - Shows user avatar and dropdown menu if logged in, with Dashboard, Likes, Messages, Settings, and Logout
- *  - Fetches current user session and unread message count on mount
- *  - Integrates with WebSocket/STOMP for real-time chat notifications
- *  - Role-based navigation for Adoption Centers and Adopters
- *  - Handles login, logout, and profile photo/initials display
- *  - Responsive and styled for homepage/global use
+ *  - Displays the app logo and navigation links (Learn, Locations, Gallery)
+ *  - Shows user avatar with a profile dropdown for navigation and settings
+ *  - Fetches the current user session and user-specific unread message count
+ *  - Integrates with WebSocket/STOMP for real-time unread message badge updates
+ *  - Role-based routing (Adoption Center vs Adopter) for dashboard, likes, settings, etc.
+ *  - Handles logout, redirects on auth failure, and profile photo logic
+ *  - Responsive, using MUI components and custom styles for a consistent look
  */
 
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import styles from "@/styles/NavbarHome.module.css";
+import styles from "@/styles/ProfileNavbar.module.css";
 import Avatar from "@mui/material/Avatar";
 import Popper from "@mui/material/Popper";
 import Grow from "@mui/material/Grow";
@@ -24,17 +25,20 @@ import Paper from "@mui/material/Paper";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import MenuList from "@mui/material/MenuList";
 import MenuItem from "@mui/material/MenuItem";
+import { useRouter } from "next/router";
 
 import SockJS from "sockjs-client";
 import { Client } from "@stomp/stompjs";
 
-export default function Navbar() {
+export default function EventInfoNavbar() {
     const [user, setUser] = useState(null);
     const [open, setOpen] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
     const anchorRef = useRef(null);
-    const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const Router = useRouter();
     const clientRef = useRef(null);
+
+    const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
     const fetchUserSession = async () => {
         try {
@@ -47,59 +51,18 @@ export default function Navbar() {
             });
 
             if (response.status === 401) {
+                Router.push("/login");
                 console.warn("No active session.");
                 return;
-            }
-
-            if (!response.ok) {
-                throw new Error("Error fetching session");
             }
 
             const data = await response.json();
             setUser(data.user);
             fetchUnreadCount();
-            updateUserLocation();
         } catch (error) {
             console.error("Error fetching session:", error);
         }
     };
-
-    const updateUserLocation = () => {
-        if (!navigator.geolocation) {
-            console.error("Geolocation is not supported by your browser.");
-            return;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                const { latitude, longitude } = position.coords;
-
-                try {
-                    const response = await fetch(
-                        `${API_URL}/api/users/set-location?latitude=${latitude}&longitude=${longitude}`,
-                        {
-                            method: "POST",
-                            credentials: "include",
-                        },
-                    );
-
-                    if (!response.ok) {
-                        const text = await response.text();
-                        throw new Error(text || "Failed to set location");
-                    }
-
-                    const message = await response.text();
-                    console.log("📍 Location updated:", message);
-                } catch (error) {
-                    console.error("❌ Error updating location:", error.message);
-                }
-            },
-            (error) => {
-                console.error("Geolocation error:", error.message);
-            },
-        );
-    };
-
 
     const fetchUnreadCount = async () => {
         try {
@@ -172,6 +135,7 @@ export default function Navbar() {
             if (!response.ok) {
                 throw new Error("Error logging out");
             }
+            Router.push("/");
             setUser(null);
             setOpen(false);
         } catch (error) {
@@ -217,7 +181,7 @@ export default function Navbar() {
             <div className={styles.logo}>
                 <Link href="/">
                     <img
-                        src="/logos/adopt_logo_white_text.png"
+                        src="/logos/adopt_logo_black_text.png"
                         alt="Adopt, Don't Shop Logo"
                     />
                 </Link>
@@ -252,7 +216,7 @@ export default function Navbar() {
                                 src={user.profilePhoto || undefined}
                                 onClick={handleToggle}
                             >
-                                {!user.profilePhoto &&
+                                {!user.picture &&
                                     user.role != "ADOPTION_CENTER" && (
                                         <>
                                             {user.firstName.charAt(0)}
@@ -290,7 +254,7 @@ export default function Navbar() {
                             transition
                             disablePortal
                             style={{
-                                zIndex: 100000,
+                                zIndex: 10000,
                             }}
                         >
                             {({ TransitionProps }) => (
@@ -347,7 +311,6 @@ export default function Navbar() {
                                                         </span>
                                                     </Link>
                                                 </MenuItem>
-
                                                 <MenuItem onClick={handleClose}>
                                                     <Link
                                                         href={links.profile}

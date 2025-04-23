@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -28,6 +29,8 @@ import petadoption.api.models.Token;
 import petadoption.api.repository.UserRepository;
 import petadoption.api.repository.TokenRepository;
 import petadoption.api.services.GCSStorageService;
+import petadoption.api.services.RecEngineService;
+import petadoption.api.services.SessionValidation;
 import petadoption.api.services.UserService;
 
 
@@ -38,15 +41,18 @@ public class UsersController {
     private final UserRepository userRepository;
     private final GCSStorageService gcsStorageService;
     private final TokenRepository tokenRepository;
+    private final SessionValidation sessionValidation;
 
     @Value("${frontend.url}")
     private String frontendUrl;
 
-    public UsersController(UserService userService, UserRepository userRepository, TokenRepository tokenRepository) {
+    @Autowired
+    public UsersController(UserService userService, UserRepository userRepository, TokenRepository tokenRepository, SessionValidation sessionValidation) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.gcsStorageService = new GCSStorageService();
         this.tokenRepository = tokenRepository;
+        this.sessionValidation = sessionValidation;
     }
 
     @GetMapping("/{userId}")
@@ -224,4 +230,25 @@ public class UsersController {
         return userService.resetPassword(token, newPassword);
     }
 
+    @PostMapping("/set-location")
+    public ResponseEntity<String> setLocation(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude, HttpSession session, HttpServletRequest request) {
+        User user = (User) session.getAttribute("user");
+
+        if(user == null){
+            return ResponseEntity.status(400).body("Login to set location");
+        }
+
+        String response = userService.setLocation(user, latitude, longitude);
+        userRepository.saveAndFlush(user);
+
+        User updatedUser = userRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("User not found after update"));
+        request.getSession().invalidate();
+        HttpSession newSession = request.getSession(true);
+        newSession.setAttribute("user", updatedUser);
+        if(response != null) {
+            return ResponseEntity.ok(response);
+        }else{
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
 }

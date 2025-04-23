@@ -337,6 +337,17 @@
     color: #1565c0;
 }
 
+.noEventsMessage {
+    margin: 0;
+    text-align: center;
+    width: 100%;
+    font-size: 14px;
+    opacity: 0.5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+}
 
 
 @media (max-width: 1270px) {

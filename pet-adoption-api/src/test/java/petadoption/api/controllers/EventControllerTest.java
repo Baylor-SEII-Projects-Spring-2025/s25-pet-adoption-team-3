@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import petadoption.api.DTO.EventDetailsDTO;
 import petadoption.api.DTO.EventRequestDTO;
 import petadoption.api.models.Event;
 import petadoption.api.models.User;
@@ -17,6 +19,8 @@ import jakarta.servlet.http.HttpSession;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.*;
+
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,9 +63,13 @@ class EventControllerTest {
     }
 
     @Test
-    void testCreateEvent_Success() {
+    void testCreateEvent_Success() throws IOException {
         when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTION_CENTER)))
                 .thenReturn((ResponseEntity) ResponseEntity.ok(adoptionCenter));
+
+        Event event = new Event(); // assuming this is a mock or stub
+        event.setTitle("Adoption Fair");
+        event.setAdoptionCenter(adoptionCenter);
 
         when(eventService.createEventWithImage(
                 eq(adoptionCenter),
@@ -71,19 +79,21 @@ class EventControllerTest {
                 any(LocalDate.class),
                 any(LocalDate.class),
                 any()
-        )).thenReturn(ResponseEntity.status(201).body(new Event()));
+        )).thenReturn(event);
 
-        ResponseEntity<Event> response = eventController.createEventWithImage(
+        ResponseEntity<EventDetailsDTO> response = eventController.createEventWithImage(
                 session,
                 1L,
                 "Adoption Fair",
                 "Join us for a pet adoption event!",
                 LocalDate.of(2025, 3, 20),
                 LocalDate.of(2025, 3, 22),
-                null  // Mock file (no image for this test)
+                null  // You can use a mock MultipartFile here if needed
         );
 
-        assertEquals(CREATED, response.getStatusCode());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Adoption Fair", response.getBody().getTitle());
     }
 
 

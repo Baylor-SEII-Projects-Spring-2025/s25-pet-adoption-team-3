@@ -16,6 +16,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u.id, u.firstName, u.lastName, u.email, u.profilePhoto FROM User u JOIN u.likedPets p WHERE p.id = :petId")
     List<Object[]> findUsersWhoLikedPet(@Param("petId") Long petId);
-
 }
 
