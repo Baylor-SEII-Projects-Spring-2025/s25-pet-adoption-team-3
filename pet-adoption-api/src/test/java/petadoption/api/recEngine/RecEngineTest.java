@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import petadoption.api.DTO.SwipePetDTO;
 import petadoption.api.controllers.PetController;
 import petadoption.api.models.Pet;
@@ -145,5 +147,16 @@ class RecEngineTest {
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(List.of(testSwipePetDTO), response.getBody());
         verify(petService).getLikedPets(testUser);
+    }
+
+    @Test
+    void testGetLikedPet_InvalidSession() {
+        when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTER)))
+                .thenReturn((ResponseEntity) ResponseEntity.status(HttpStatus.FORBIDDEN).body(null));
+
+        ResponseEntity<List<SwipePetDTO>> response = controller.getLikedPets(session);
+
+        assertEquals(403, response.getStatusCodeValue());
+        assertNull(response.getBody());
     }
 }
