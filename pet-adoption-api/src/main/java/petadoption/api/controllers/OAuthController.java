@@ -38,7 +38,6 @@ public class OAuthController {
     @GetMapping("/google/success")
     @Transactional
     public void googleLoginSuccess(OAuth2AuthenticationToken token, HttpServletResponse response, HttpServletRequest request) throws IOException {
-        System.out.println("✅ OAuth Success Route Hit!");
 
         if (token == null) {
             response.sendRedirect(frontendUrl + "/login?error=true");
@@ -51,7 +50,6 @@ public class OAuthController {
         String lastName = (String) attributes.get("family_name");
         String photo = (String) attributes.get("picture");
 
-        // Check if the user exists, otherwise create a new one
         User user = userRepository.findByEmail(email).orElse(null);
         if (user == null) {
             user = new User();
@@ -60,11 +58,9 @@ public class OAuthController {
             user.setLastName(lastName);
             user.setRole(User.Role.ADOPTER);
             user.setEmailVerified(true);
-            user.setPassword(UUID.randomUUID().toString()); // Assign a random password
+            user.setPassword(UUID.randomUUID().toString());
             user.setProfilePhoto(photo);
-            System.out.println("OAUTH: NEW USER CREATED: " + user.getEmail() + " " + user.getFirstName() + " " + user.getLastName() + " " + user.getRole() + " " + user.isEmailVerified() + " " + user.getPassword() + " " + user.getProfilePhoto());
             userRepository.save(user);
-            System.out.println("OAUTH: NEW USER CREATED: " + user.getEmail());
         }
 
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
@@ -75,12 +71,7 @@ public class OAuthController {
         session.setAttribute("SPRING_SECURITY_CONTEXT", securityContext);
         session.setAttribute("user", user);
 
-        // ✅ Set user authentication manually in session
         request.getSession().setAttribute("user", user);
-        System.out.println("Session set for: " + user.getEmail());
-
-        System.out.println("Frontend url: " + frontendUrl);
-        // Redirect to frontend dashboard
         response.sendRedirect(frontendUrl + "/profile");
     }
 

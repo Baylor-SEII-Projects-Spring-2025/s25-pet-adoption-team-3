@@ -46,7 +46,6 @@ public class AuthenticationController {
         User user = (User) authResponse.getBody();
 
         HttpSession session = request.getSession();
-        System.out.println("Session ID: " + session.getId());
         session.setAttribute("user", user);
 
         Map<String, Object> response = new HashMap<>();
@@ -57,7 +56,6 @@ public class AuthenticationController {
         return ResponseEntity.ok(response);
     }
 
-    // Check if user has an active session
     @GetMapping("/session")
     public ResponseEntity<?> getSession(HttpSession session) {
         User user = (User) session.getAttribute("user");
