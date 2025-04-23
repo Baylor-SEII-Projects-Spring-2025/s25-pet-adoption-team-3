@@ -34,7 +34,7 @@ public class RecEngineService {
     public void addWeight(Characteristic characteristic, boolean liked, User user){
         Weight weight = new Weight();
         weight.setCharacteristic(characteristic);
-        weight.setWeight(liked ? 2 : -1); // if liked, 2 and if disliked, -1
+        weight.setWeight(liked ? 2 : -1);
         weight.setUser(user);
         user.getWeights().add(weight);
     }
@@ -94,7 +94,6 @@ public class RecEngineService {
         User user = userRepository.findById(userFromSession.getId()).orElseThrow(() -> new RuntimeException("User not found"));
         List<Pet> potentialRecs = petRepository.getAllPets();
 
-        // Filter out already reccomended pets
         List<PetRecommendation> alreadyShownPets = user.getRecommendedPets();
         logger.info("alrshown: "+alreadyShownPets.size()+" | total: "+potentialRecs.size());
         potentialRecs = potentialRecs.stream().filter(p -> {
@@ -105,14 +104,7 @@ public class RecEngineService {
             return true;
         }).toList();
 
-//        if(potentialRecs.isEmpty()){
-//            // TODO: Recs should be time based. This is a hack
-//            logger.info("Already recommended every possible pet to this user. Clearing previous recs");
-//            user.setRecommendedPets(new ArrayList<>());
-//        }
-
         List<Pair<Double, Pet>> petScores = new ArrayList<>();
-        // Calculate scores.
         for(Pet pet : potentialRecs){
             double score = 0;
             for(Characteristic ch : pet.getPetCharacteristics()){
@@ -122,22 +114,17 @@ public class RecEngineService {
                 score += results.get(0).getWeight();
             }
 
-            // Scores need to be normalized against the fact that some pets may have more listed traits than others.
-            // this makes score the avg of all the pet's characteristics
             score /= pet.getPetCharacteristics().size();
             petScores.add(Pair.of(score, pet));
         }
 
-        // sort by scores
         petScores.sort(Comparator.comparingDouble(Pair<Double, Pet>::getFirst));
 
-        // pull out the winners
         List<SwipePetDTO> finalPetRecs = new ArrayList<>();
         for(int i = 0; i < petScores.size() && i < 5; i++){
             Pet pet = petScores.get(i).getSecond();
             finalPetRecs.add(new SwipePetDTO(pet));
 
-            // log the winners
             PetRecommendation rec = new PetRecommendation();
             rec.setPet(pet);
             rec.setUser(user);

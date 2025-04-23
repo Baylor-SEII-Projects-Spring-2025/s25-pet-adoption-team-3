@@ -18,8 +18,6 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
     List<ChatMessage> findConversation(@Param("userId1") String userId1,
                                        @Param("userId2") String userId2);
 
-
-    // Optionally: get messages sent TO a user that are unread
     List<ChatMessage> findByRecipientIdAndIsReadIsFalse(String recipientId);
 
     List<ChatMessage> findBySenderIdOrRecipientId(String string, String string1);
