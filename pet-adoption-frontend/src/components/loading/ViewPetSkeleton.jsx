@@ -16,7 +16,7 @@ export default function ViewPetSkeleton() {
                 <Skeleton
                   variant="rectangular"
                   width="100%"
-                  height={420}
+                  height="100vh"
                   className={styles.carouselImage}
                   sx={{ borderRadius: "20px" }}
                 />
