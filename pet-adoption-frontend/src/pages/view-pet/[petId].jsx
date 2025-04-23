@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import ProfileNavbar from "@/components/profile/ProfileNavbar";
 import ViewPetComponent from "../../components/view-pet/ViewPetComponent";
+import ViewPetSkeleton from "@/components/loading/ViewPetSkeleton";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -19,14 +20,28 @@ export default function ViewPetPage() {
       return;
     }
 
-    console.log("Router ready. petId is:", petId);
+    const checkSessionAndFetchPet = async () => {
+      try {
+        const sessionRes = await fetch(`${API_URL}/auth/session`, {
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        });
 
-    if (!petId) {
-      console.log("No petId found.");
-      return;
-    }
+        if (sessionRes.status === 401) {
+          router.replace("/login");
+          return;
+        }
+      } catch {
+        setError("Failed to check authentication.");
+        setLoading(false);
+        return;
+      }
 
-    const fetchPet = async () => {
+      if (!petId) {
+        console.log("No petId found.");
+        return;
+      }
+
       console.log("Fetching pet with ID:", petId);
 
       try {
@@ -66,14 +81,14 @@ export default function ViewPetPage() {
       }
     };
 
-    fetchPet();
+    checkSessionAndFetchPet();
   }, [router.isReady, petId]);
 
   return (
     <>
       <ProfileNavbar />
       {loading ? (
-        <div style={{ padding: "2rem" }}>Loading...</div>
+        <ViewPetSkeleton />
       ) : error ? (
         <div style={{ padding: "2rem", color: "red" }}>{error}</div>
       ) : pet ? (
