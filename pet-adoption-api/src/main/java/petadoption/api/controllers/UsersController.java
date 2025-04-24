@@ -315,19 +315,25 @@ public class UsersController {
     }
 
     @PostMapping("/set-location")
-    public ResponseEntity<String> setLocation(@RequestParam("latitude") Double latitude, @RequestParam("longitude") Double longitude, HttpSession session, HttpServletRequest request) {
-        User user = (User) session.getAttribute("user");
+    public ResponseEntity<String> setLocation(
+            @RequestParam("latitude") Double latitude,
+            @RequestParam("longitude") Double longitude,
+            HttpSession session) {
 
-        if(user == null){
+        User user = (User) session.getAttribute("user");
+        if(user == null) {
             return ResponseEntity.status(400).body("Login to set location");
         }
 
-        String response = userService.setLocation(user, latitude, longitude);
-        userRepository.saveAndFlush(user);
-        if(response != null) {
-            return ResponseEntity.ok(response);
-        }else{
-            return ResponseEntity.badRequest().body(null);
+        // Update the user in the database
+        User updatedUser = userService.setLocation(user.getId(), latitude, longitude);
+        if(updatedUser == null) {
+            return ResponseEntity.badRequest().body("Failed to update location");
         }
+
+        // Update the session with the updated user
+        session.setAttribute("user", updatedUser);
+
+        return ResponseEntity.ok("Successfully set location");
     }
 }
