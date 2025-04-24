@@ -12,9 +12,21 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Service for converting a physical address into geographic coordinates (latitude and longitude)
+ * using the US Census Geocoding API.
+ */
 @Service
 public class GeocodeService {
 
+    /**
+     * Retrieves the latitude and longitude for a given address using the US Census Geocoder API.
+     *
+     * @param address the address to geocode (e.g., "1600 Pennsylvania Ave NW, Washington, DC 20500")
+     * @return a Double array: [latitude, longitude], or null if the address could not be resolved
+     * @throws IOException if an I/O error occurs when sending or receiving
+     * @throws InterruptedException if the operation is interrupted
+     */
     public Double[] getCoordinatesFromAddress(String address) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
 

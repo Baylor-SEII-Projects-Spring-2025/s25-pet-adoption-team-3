@@ -17,6 +17,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Service for handling all Pet-related logic and operations, including CRUD operations,
+ * uploading pet images, and retrieving pets for adoption/swipe features.
+ */
 @Service
 public class PetService {
 
@@ -33,6 +37,12 @@ public class PetService {
         this.userService = userService;
     }
 
+    /**
+     * Adds a new pet to the adoption center.
+     *
+     * @param user           The user (adoption center) creating the pet.
+     * @param petRequestDTO  The DTO containing pet information.
+     */
     public void addPet(User user, PetRequestDTO petRequestDTO) {
         Pet pet = new Pet();
         pet.setName(petRequestDTO.getName());
@@ -51,7 +61,14 @@ public class PetService {
         petRepository.save(pet);
     }
 
-
+    /**
+     * Adds a new pet with images to the adoption center.
+     *
+     * @param user           The user (adoption center) creating the pet.
+     * @param petRequestDTO  The DTO containing pet information.
+     * @param files          Array of MultipartFile representing pet images.
+     * @return               The created Pet, or null if image upload fails or images are not exactly 4.
+     */
     public Pet addPetWithImages(User user, PetRequestDTO petRequestDTO, MultipartFile[] files) {
         if (files.length != 4) {
             return null;
@@ -92,7 +109,15 @@ public class PetService {
         return pet;
     }
 
-
+    /**
+     * Edits a pet owned by the given user (adoption center).
+     *
+     * @param user           The adoption center performing the edit.
+     * @param petId          The pet ID to edit.
+     * @param petRequestDTO  The DTO containing new pet data.
+     * @param files          New images to upload for the pet.
+     * @return               true if the update was successful, false otherwise.
+     */
     public boolean editPet(User user, Long petId, PetRequestDTO petRequestDTO, MultipartFile[] files) {
         Optional<Pet> petOptional = petRepository.findById(petId);
 
@@ -139,8 +164,13 @@ public class PetService {
         return true;
     }
 
-
-
+    /**
+     * Deletes a pet owned by the given user (adoption center).
+     *
+     * @param user   The adoption center performing the deletion.
+     * @param petId  The pet ID to delete.
+     * @return       true if the deletion was successful, false otherwise.
+     */
     public boolean deletePet(User user, Long petId) {
         Optional<Pet> petOptional = petRepository.findById(petId);
 
@@ -162,6 +192,12 @@ public class PetService {
         return true;
     }
 
+    /**
+     * Gets all pets for a specific adoption center.
+     *
+     * @param adoptionCenterID  The adoption center's user ID.
+     * @return                 List of pets for the adoption center.
+     */
     public List<Pet> getAllPets(Long adoptionCenterID) {
         List<Pet> pets = petRepository.findByAdoptionCenterId(adoptionCenterID);
 
@@ -174,6 +210,11 @@ public class PetService {
         return pets;
     }
 
+    /**
+     * Gets a pet for swiping (returns the first available pet).
+     *
+     * @return Optional containing a pet if available, or empty if none found.
+     */
     public Optional<Pet> getSwipePet() {
         List<Pet> availablePets = petRepository.findByAvailabilityStatus(Pet.PetStatus.AVAILABLE);
         if (availablePets.isEmpty()) {
@@ -182,6 +223,12 @@ public class PetService {
         return Optional.of(availablePets.get(0));
     }
 
+    /**
+     * Gets the details of a specific pet, including image URLs.
+     *
+     * @param petId The pet ID.
+     * @return      Optional containing the pet if found, or empty otherwise.
+     */
     public Optional<Pet> getPetDetail(Long petId) {
         Optional<Pet> petOptional = petRepository.findById(petId);
 
@@ -197,6 +244,12 @@ public class PetService {
         return Optional.of(pet);
     }
 
+    /**
+     * Gets a list of liked pets for a user (for display on 'My Likes' page).
+     *
+     * @param tempUser The user for whom to retrieve liked pets.
+     * @return         List of SwipePetDTO objects representing liked pets.
+     */
     public List<SwipePetDTO> getLikedPets(User tempUser) {
         User user = userService.getUserFromId(tempUser.getId());
         List<Pet> likedPets = user.getLikedPets();
@@ -211,6 +264,12 @@ public class PetService {
         return petDTOs;
     }
 
+    /**
+     * Gets a list of pets that have been adopted by the user.
+     *
+     * @param user The adopter.
+     * @return     List of Pet objects representing adopted pets.
+     */
     public List<Pet> getMyAdoptedPets(User user) {
         return petRepository.findArchivedPetsByAdopterId(user.getId());
     }
