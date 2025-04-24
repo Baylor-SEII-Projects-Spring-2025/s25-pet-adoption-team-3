@@ -6,6 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import petadoption.api.models.User;
 
+/**
+ * Service class responsible for validating user session and role authorization.
+ * Used to restrict certain API endpoints to users with specific roles (e.g., ADOPTER, ADOPTION_CENTER).
+ */
 @Service
 public class SessionValidation{
 
@@ -19,13 +23,24 @@ public class SessionValidation{
      *                     - 403 Forbidden if the user does not have the required role.
      *                     - 200 OK with the User object if validation succeeds.
      */
-    public ResponseEntity<?> validateSession(HttpSession session, User.Role requiredRole) {
+    public ResponseEntity<?> validateSession(HttpSession session, User.Role... allowedRoles) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No active session.");
         }
-        if (user.getRole() != requiredRole) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized action.");
+
+        // If specific roles were provided, validate against them
+        if (allowedRoles != null && allowedRoles.length > 0) {
+            boolean match = false;
+            for (User.Role role : allowedRoles) {
+                if (user.getRole() == role) {
+                    match = true;
+                    break;
+                }
+            }
+            if (!match) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized action.");
+            }
         }
         return ResponseEntity.ok(user);
     }
