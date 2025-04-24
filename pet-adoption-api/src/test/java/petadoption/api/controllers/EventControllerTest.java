@@ -166,6 +166,38 @@ class EventControllerTest {
      * Asserts that the returned event matches expectations.
      */
     @Test
+    void testGetEventById_Found() {
+        Event event = new Event();
+        event.setId(2L);
+        event.setTitle("Meet & Greet");
+
+        when(eventService.getEventById(2L)).thenReturn(Optional.of(event));
+
+        ResponseEntity<?> response = eventController.getEventById(2L);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(event, response.getBody());
+    }
+
+    /**
+     * Tests retrieval of an event by ID when not found.
+     * Asserts that the appropriate message is returned.
+     */
+    @Test
+    void testGetEventById_NotFound() {
+        when(eventService.getEventById(99L)).thenReturn(Optional.empty());
+
+        ResponseEntity<?> response = eventController.getEventById(99L);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("Event not found.", response.getBody());
+    }
+
+    /**
+     * Tests retrieval of all events for a given adoption center ID.
+     * Asserts that the returned list matches what is provided by the mocked service.
+     */
+    @Test
     void testGetEventsByAdoptionCenterId() {
         List<Event> events = new ArrayList<>();
         Event e1 = new Event();

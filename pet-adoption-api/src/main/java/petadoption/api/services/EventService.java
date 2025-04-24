@@ -39,7 +39,7 @@ public class EventService {
      * @param userRepository          the repository for User entities
      * @param gcsStorageServiceEvents the Google Cloud Storage service for event images
      */
-    public EventService(EventRepository eventRepository, UserRepository userRepository, GCSStorageServiceEvents gcsStorageServiceEvents, EventAttendeeRepository eventAttendeeRepository) {
+    public EventService(EventRepository eventRepository, UserRepository userRepository, GCSStorageServiceEvents gcsStorageServiceEvents) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
         this.gcsStorageServiceEvents = gcsStorageServiceEvents;
@@ -201,10 +201,6 @@ public class EventService {
      */
     public List<Event> getNearbyEvents(User user) {
         return eventRepository.getNearbyEvents(user.getLatitude(), user.getLongitude(), 100);
-    }
-
-    public boolean isUserRegisteredForEvent(Long userId, Long eventId) {
-        return eventAttendeeRepository.existsByIdUserIdAndIdEventId(userId, eventId);
     }
 
     /**

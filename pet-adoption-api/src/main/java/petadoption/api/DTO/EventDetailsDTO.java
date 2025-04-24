@@ -63,9 +63,6 @@ public class EventDetailsDTO {
     @NotNull
     private LocalDate endDate;
 
-    @NotNull
-    private boolean registered;
-
     /**
      * Constructs an {@code EventDetailsDTO} from an {@link Event} entity.
      *
