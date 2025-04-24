@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Fab from "@mui/material/Fab";
 import EventIcon from "@mui/icons-material/Event";
@@ -8,6 +8,7 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import dayjs from "dayjs";
+import Badge from "@mui/material/Badge";
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -28,25 +29,45 @@ const modalStyle = {
 export default function FloatingEventFAB() {
     const [open, setOpen] = useState(false);
     const [events, setEvents] = useState([]);
+    const [showDot, setShowDot] = useState(false);
     const router = useRouter();
 
     const fetchNearbyEvents = async () => {
-        try {
-            const res = await fetch(`${API_URL}/api/event/get-nearby-events`, {
-                method: "GET",
-                credentials: "include",
-            });
-
-            const text = await res.text();
-            const data = text ? JSON.parse(text) : [];
-
-            setEvents(data || []);
-            console.log("Nearby events:", data);
-            setOpen(true);
-        } catch (err) {
-            console.error("Error fetching nearby events:", err);
-        }
+        setOpen(true);
     };
+
+    useEffect(() => {
+        const preloadEvents = async () => {
+            try {
+                const res = await fetch(
+                    `${API_URL}/api/event/get-nearby-events`,
+                    {
+                        method: "GET",
+                        credentials: "include",
+                    },
+                );
+
+                const text = await res.text();
+                const data = text ? JSON.parse(text) : [];
+
+                setEvents(data || []);
+
+                console.log(data);
+
+                const today = dayjs().format("YYYY-MM-DD");
+                const hasTodayEvent = data?.some(
+                    (event) =>
+                        event.registered &&
+                        dayjs(event.startDate).format("YYYY-MM-DD") === today,
+                );
+                setShowDot(hasTodayEvent);
+            } catch (err) {
+                console.error("Error preloading nearby events:", err);
+            }
+        };
+
+        preloadEvents();
+    }, []);
 
     const handleNavigate = (eventId) => {
         router.push(`/view-event/${eventId}`);
@@ -54,19 +75,22 @@ export default function FloatingEventFAB() {
 
     return (
         <>
-            <Fab
-                color="primary"
-                aria-label="nearby-events"
-                onClick={fetchNearbyEvents}
-                style={{
-                    position: "fixed",
-                    bottom: 24,
-                    right: 24,
-                    zIndex: 9999,
-                }}
+            <Badge
+                color="error"
+                variant="dot"
+                overlap="circular"
+                invisible={!showDot}
+                sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999 }}
             >
-                <EventIcon />
-            </Fab>
+                <Fab
+                    color="primary"
+                    aria-label="nearby-events"
+                    onClick={fetchNearbyEvents}
+                >
+                    <EventIcon />
+                </Fab>
+            </Badge>
+
             <Modal open={open} onClose={() => setOpen(false)}>
                 <Box sx={modalStyle}>
                     <Typography variant="h6" component="h2" gutterBottom>
@@ -136,7 +160,6 @@ export default function FloatingEventFAB() {
                                             </Box>
                                         )}
                                     </Stack>
-
                                     <Typography
                                         variant="body2"
                                         color="text.secondary"
