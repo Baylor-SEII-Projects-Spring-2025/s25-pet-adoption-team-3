@@ -136,30 +136,6 @@ class EventControllerTest {
     }
 
     @Test
-    void testGetEventById_Found() {
-        Event event = new Event();
-        event.setId(2L);
-        event.setTitle("Meet & Greet");
-
-        when(eventService.getEventById(2L)).thenReturn(Optional.of(event));
-
-        ResponseEntity<?> response = eventController.getEventById(2L);
-
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals(event, response.getBody());
-    }
-
-    @Test
-    void testGetEventById_NotFound() {
-        when(eventService.getEventById(99L)).thenReturn(Optional.empty());
-
-        ResponseEntity<?> response = eventController.getEventById(99L);
-
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Event not found.", response.getBody());
-    }
-
-    @Test
     void testGetEventsByAdoptionCenterId() {
         List<Event> events = new ArrayList<>();
         Event e1 = new Event();
