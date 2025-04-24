@@ -35,6 +35,9 @@ public class EventDetailsDTO {
     @NotNull
     private LocalDate endDate;
 
+    @NotNull
+    private boolean registered;
+
     public EventDetailsDTO(Event event) {
         this.id = event.getId();
         this.adoptionCenter = event.getAdoptionCenter().getAdoptionCenterName();

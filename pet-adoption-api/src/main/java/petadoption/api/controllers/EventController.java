@@ -134,15 +134,31 @@ public class EventController {
      * @return ResponseEntity with the Event object or a not found message
      */
     @GetMapping("/get-event/{eventId}")
-    public ResponseEntity<?> getEventById(@PathVariable Long eventId) {
+    public ResponseEntity<?> getEventById(HttpSession session, @PathVariable Long eventId) {
+        ResponseEntity<?> validationResponse = sessionValidation.validateSession(
+                session, User.Role.ADOPTER, User.Role.ADOPTION_CENTER
+        );
+        if (!validationResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(validationResponse.getStatusCode()).body("Unauthorized");
+        }
+
+        User user = (User) validationResponse.getBody();
         Optional<Event> eventOptional = eventService.getEventById(eventId);
 
         if (eventOptional.isEmpty()) {
             return ResponseEntity.ok("Event not found.");
         }
 
-        return ResponseEntity.ok(eventOptional.get());
+        Event event = eventOptional.get();
+        boolean isRegistered = eventService.isUserRegisteredForEvent(user.getId(), event.getId());
+
+        EventDetailsDTO dto = new EventDetailsDTO(event);
+        dto.setRegistered(isRegistered);
+
+        return ResponseEntity.ok(dto);
     }
+
+
 
     /**
      * Retrieves all events for a specific adoption center.
@@ -171,9 +187,11 @@ public class EventController {
         }
 
         List<EventDetailsDTO> eventDetailsDTOList = new ArrayList<>();
-
         for (Event event : events) {
-            eventDetailsDTOList.add(new EventDetailsDTO(event));
+            EventDetailsDTO dto = new EventDetailsDTO(event);
+            boolean isRegistered = eventService.isUserRegisteredForEvent(user.getId(), event.getId());
+            dto.setRegistered(isRegistered); // ✅ mark as registered
+            eventDetailsDTOList.add(dto);
         }
 
         return ResponseEntity.ok().body(eventDetailsDTOList);

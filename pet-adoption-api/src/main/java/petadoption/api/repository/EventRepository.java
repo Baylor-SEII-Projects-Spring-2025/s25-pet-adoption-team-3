@@ -18,7 +18,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                             "FROM event e " +
                             "  JOIN users a ON e.adoption_center_id = a.user_id " +
                             "WHERE ST_Distance_Sphere(point(:userLongitude, :userLatitude), " +
-                            "                         point(a.longitude, a.latitude)) * 0.000621371192 <= :maxDistance AND e.start_date > (SELECT CURDATE())" +
+                            "                         point(a.longitude, a.latitude)) * 0.000621371192 <= :maxDistance AND e.start_date >= (SELECT CURDATE())" +
                             "ORDER BY ST_Distance_Sphere(point(:userLongitude, :userLatitude), " +
                             "                           point(a.longitude, a.latitude)) * 0.000621371192",
             nativeQuery = true
