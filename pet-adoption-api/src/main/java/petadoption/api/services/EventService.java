@@ -10,6 +10,7 @@ import petadoption.api.DTO.EventDetailsDTO;
 import petadoption.api.DTO.EventRequestDTO;
 import petadoption.api.models.Event;
 import petadoption.api.models.User;
+import petadoption.api.repository.EventAttendeeRepository;
 import petadoption.api.repository.EventRepository;
 import petadoption.api.repository.UserRepository;
 
@@ -26,11 +27,13 @@ public class EventService {
     private final UserRepository userRepository;
     private static final Logger logger = LoggerFactory.getLogger(EventService.class);
     private final GCSStorageServiceEvents gcsStorageServiceEvents;
+    private final EventAttendeeRepository eventAttendeeRepository;
 
-    public EventService(EventRepository eventRepository, UserRepository userRepository, GCSStorageServiceEvents gcsStorageServiceEvents) {
+    public EventService(EventRepository eventRepository, UserRepository userRepository, GCSStorageServiceEvents gcsStorageServiceEvents, EventAttendeeRepository eventAttendeeRepository) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
         this.gcsStorageServiceEvents = gcsStorageServiceEvents;
+        this.eventAttendeeRepository = eventAttendeeRepository;
     }
 
     public Event createEventWithImage(User user, Long adoptionCenterId, String title, String description,
@@ -131,6 +134,11 @@ public class EventService {
         // Default distance 100 miles
         return eventRepository.getNearbyEvents(user.getLatitude(), user.getLongitude(), 100);
     }
+
+    public boolean isUserRegisteredForEvent(Long userId, Long eventId) {
+        return eventAttendeeRepository.existsByIdUserIdAndIdEventId(userId, eventId);
+    }
+
 
     @Transactional
     public boolean registerUserToEvent(User user, Long eventId) {

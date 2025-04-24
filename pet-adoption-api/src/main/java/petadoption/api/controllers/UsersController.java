@@ -325,13 +325,11 @@ public class UsersController {
             return ResponseEntity.status(400).body("Login to set location");
         }
 
-        // Update the user in the database
         User updatedUser = userService.setLocation(user.getId(), latitude, longitude);
         if(updatedUser == null) {
             return ResponseEntity.badRequest().body("Failed to update location");
         }
 
-        // Update the session with the updated user
         session.setAttribute("user", updatedUser);
 
         return ResponseEntity.ok("Successfully set location");

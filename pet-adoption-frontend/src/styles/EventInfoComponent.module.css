@@ -39,3 +39,62 @@
     text-align: center;
     font-size: 18px;
 }
+
+.titleRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 20px;
+    flex-wrap: nowrap;
+    /* prevent wrapping */
+}
+
+.eventTitle {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0;
+    flex-grow: 1;
+    /* allows it to take remaining space */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.editDeleteBtnGroup {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.editBtn {
+    border: 1px solid #8B80F9;
+    /* MUI primary */
+    background-color: #8B80F9;
+    color: white;
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.editBtn:hover {
+    background-color: #6e62ec;
+}
+
+.deleteBtn {
+    border: 1px solid #d32f2f;
+    /* MUI error */
+    background-color: #d32f2f;
+    color: white;
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.deleteBtn:hover {
+    background-color: rgba(230, 12, 12, 0.749);
+}

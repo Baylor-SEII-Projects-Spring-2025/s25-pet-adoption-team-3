@@ -106,12 +106,37 @@ export default function FloatingEventFAB() {
                                             marginBottom: 8,
                                         }}
                                     />
-                                    <Typography
-                                        variant="subtitle1"
-                                        fontWeight="bold"
+                                    <Stack
+                                        direction="row"
+                                        alignItems="center"
+                                        spacing={1}
+                                        flexWrap="wrap"
                                     >
-                                        {event.title} - {event.adoptionCenter}
-                                    </Typography>
+                                        <Typography
+                                            variant="subtitle1"
+                                            fontWeight="bold"
+                                        >
+                                            {event.title} -{" "}
+                                            {event.adoptionCenter}
+                                        </Typography>
+                                        {event.registered && (
+                                            <Box
+                                                sx={{
+                                                    bgcolor: "#5fe63d",
+                                                    color: "white",
+                                                    px: 1.5,
+                                                    py: 0.4,
+                                                    borderRadius: 1,
+                                                    fontSize: "0.75rem",
+                                                    fontWeight: "bold",
+                                                    textTransform: "uppercase",
+                                                }}
+                                            >
+                                                Registered
+                                            </Box>
+                                        )}
+                                    </Stack>
+
                                     <Typography
                                         variant="body2"
                                         color="text.secondary"

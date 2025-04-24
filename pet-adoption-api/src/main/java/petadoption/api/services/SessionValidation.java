@@ -9,14 +9,27 @@ import petadoption.api.models.User;
 @Service
 public class SessionValidation{
 
-    public ResponseEntity<?> validateSession(HttpSession session, User.Role requiredRole) {
+    public ResponseEntity<?> validateSession(HttpSession session, User.Role... allowedRoles) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No active session.");
         }
-        if (user.getRole() != requiredRole) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized action.");
+
+        // If specific roles were provided, validate against them
+        if (allowedRoles != null && allowedRoles.length > 0) {
+            boolean match = false;
+            for (User.Role role : allowedRoles) {
+                if (user.getRole() == role) {
+                    match = true;
+                    break;
+                }
+            }
+            if (!match) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized action.");
+            }
         }
+
         return ResponseEntity.ok(user);
     }
+
 }
