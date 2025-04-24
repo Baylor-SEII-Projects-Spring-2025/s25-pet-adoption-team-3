@@ -72,11 +72,6 @@ class EventControllerTest {
                 .thenReturn((ResponseEntity) ResponseEntity.ok(adoptionCenter));
     }
 
-    /**
-     * Tests the event creation API for successful creation with valid input.
-     *
-     * @throws IOException if there is an error in the mocked service
-     */
     @Test
     void testCreateEvent_Success() throws IOException {
         when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTION_CENTER)))
@@ -126,10 +121,6 @@ class EventControllerTest {
         assertEquals("Event edited successfully.", response.getBody());
     }
 
-    /**
-     * Tests successful event deletion.
-     * Asserts that the controller returns 200 OK and the expected deletion message.
-     */
     @Test
     void testDeleteEvent_Success() {
         when(session.getAttribute("user")).thenReturn(adoptionCenter);
@@ -141,10 +132,6 @@ class EventControllerTest {
         assertEquals("Event deleted successfully.", response.getBody());
     }
 
-    /**
-     * Tests retrieval of all events.
-     * Asserts the list returned by the controller matches the mocked service.
-     */
     @Test
     void testGetAllEvents() {
         List<Event> eventList = new ArrayList<>();

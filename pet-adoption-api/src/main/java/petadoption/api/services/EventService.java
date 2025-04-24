@@ -10,7 +10,6 @@ import petadoption.api.DTO.EventDetailsDTO;
 import petadoption.api.DTO.EventRequestDTO;
 import petadoption.api.models.Event;
 import petadoption.api.models.User;
-import petadoption.api.repository.EventAttendeeRepository;
 import petadoption.api.repository.EventRepository;
 import petadoption.api.repository.UserRepository;
 
@@ -21,16 +20,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-/**
- * Service class for handling Event CRUD operations and business logic.
- */
 @Service
 public class EventService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private static final Logger logger = LoggerFactory.getLogger(EventService.class);
     private final GCSStorageServiceEvents gcsStorageServiceEvents;
-    private final EventAttendeeRepository eventAttendeeRepository;
 
     /**
      * Constructor for EventService.
@@ -43,22 +38,8 @@ public class EventService {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
         this.gcsStorageServiceEvents = gcsStorageServiceEvents;
-        this.eventAttendeeRepository = eventAttendeeRepository;
     }
 
-    /**
-     * Creates a new Event with an uploaded image and saves it to the database.
-     *
-     * @param user           the adoption center user creating the event
-     * @param adoptionCenterId the ID of the adoption center
-     * @param title          the event title
-     * @param description    the event description
-     * @param startDate      the start date of the event
-     * @param endDate        the end date of the event
-     * @param file           the image file to upload
-     * @return the created Event
-     * @throws IOException if image upload fails
-     */
     public Event createEventWithImage(User user, Long adoptionCenterId, String title, String description,
                                       LocalDate startDate, LocalDate endDate, MultipartFile file) throws IOException {
         String fileName = "event_photo_" + adoptionCenterId + "_" + UUID.randomUUID();
@@ -75,13 +56,6 @@ public class EventService {
         return eventRepository.save(event);
     }
 
-    /**
-     * Creates a new Event with the provided event details.
-     *
-     * @param adoptionCenterId the ID of the adoption center
-     * @param eventRequestDTO  the event details
-     * @return true if event is created successfully, false otherwise
-     */
     public boolean createEvent(Long adoptionCenterId, EventRequestDTO eventRequestDTO) {
         Optional<User> adoptionCenterOptional = userRepository.findById(adoptionCenterId);
 
@@ -105,13 +79,6 @@ public class EventService {
         return true;
     }
 
-    /**
-     * Deletes an event by ID for the specified adoption center.
-     *
-     * @param eventId          the ID of the event to delete
-     * @param adoptionCenterId the ID of the adoption center
-     * @return true if the event was deleted, false otherwise
-     */
     public boolean deleteEvent(Long eventId, Long adoptionCenterId) {
         Optional<Event> eventOptional = eventRepository.findById(eventId);
         if(eventOptional.isEmpty()){
@@ -131,14 +98,6 @@ public class EventService {
         return true;
     }
 
-    /**
-     * Edits an existing event for the specified adoption center.
-     *
-     * @param adoptionCenterId the ID of the adoption center
-     * @param eventId          the ID of the event to edit
-     * @param eventRequestDTO  the new event details
-     * @return true if event was updated, false otherwise
-     */
     public boolean editEvent(Long adoptionCenterId, Long eventId, EventRequestDTO eventRequestDTO) {
         Optional<Event> eventOptional = eventRepository.findById(eventId);
 
@@ -163,43 +122,20 @@ public class EventService {
         return true;
     }
 
-    /**
-     * Returns a list of all events.
-     *
-     * @return list of Event objects
-     */
     public List<Event> getAllEvents() {
         return eventRepository.findAll();
     }
 
-    /**
-     * Retrieves a single event by its ID.
-     *
-     * @param eventId the ID of the event
-     * @return an Optional containing the Event, or empty if not found
-     */
     public Optional<Event> getEventById(Long eventId) {
         return eventRepository.findById(eventId);
     }
 
-    /**
-     * Retrieves all events for a specific adoption center.
-     *
-     * @param adoptionCenterId the ID of the adoption center
-     * @return list of Event objects for that center
-     */
     public List<Event> getEventsByAdoptionCenterId(Long adoptionCenterId) {
         return eventRepository.findByAdoptionCenterId(adoptionCenterId);
     }
 
-    /**
-     * Returns a list of events near the specified user, using their latitude/longitude.
-     * The distance is defaulted to 100 miles.
-     *
-     * @param user the User to use for location reference
-     * @return list of Event objects near the user
-     */
     public List<Event> getNearbyEvents(User user) {
+        // Default distance 100 miles
         return eventRepository.getNearbyEvents(user.getLatitude(), user.getLongitude(), 100);
     }
 
