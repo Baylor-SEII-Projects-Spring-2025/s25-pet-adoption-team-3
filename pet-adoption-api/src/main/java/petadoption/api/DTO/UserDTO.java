@@ -4,6 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 import petadoption.api.models.User;
 
+/**
+ * Data Transfer Object (DTO) for user-related data exchange between API layers and clients.
+ * <p>
+ * This DTO abstracts sensitive details from the User entity while exposing only necessary
+ * properties for authentication, profile, and adoption center operations.
+ * </p>
+ */
 @Getter
 @Setter
 public class UserDTO {
@@ -22,11 +29,18 @@ public class UserDTO {
     private String phoneNumber;
 
 
-
+    /**
+     * Default constructor.
+     */
     public UserDTO(){
 
     }
 
+    /**
+     * Constructs a UserDTO from a {@link User} entity.
+     *
+     * @param user The User entity from which to populate the DTO fields.
+     */
     public UserDTO(User user) {
         this.email = user.getEmail();
         this.firstName = user.getFirstName();

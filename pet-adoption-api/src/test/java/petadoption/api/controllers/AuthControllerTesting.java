@@ -23,6 +23,12 @@ import petadoption.api.DTO.UserDTO;
 import petadoption.api.models.User;
 import petadoption.api.services.UserService;
 
+/**
+ * Unit tests for {@link AuthenticationController} covering user registration and login scenarios.
+ * <p>
+ * Uses Mockito to mock dependencies and verifies controller responses for success and error cases.
+ * </p>
+ */
 class AuthControllerTesting {
 
     @Mock
@@ -41,6 +47,9 @@ class AuthControllerTesting {
     private UserDTO userDTO;
     private LoginRequestsDTO loginRequest;
 
+    /**
+     * Setup test data and mock objects before each test.
+     */
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -66,6 +75,12 @@ class AuthControllerTesting {
         loginRequest.setPassword("password");
     }
 
+    /**
+     * Tests successful user registration.
+     * <p>
+     * Asserts that the controller returns a CREATED status and the expected success message.
+     * </p>
+     */
     @Test
     void testRegisterUserSuccess() {
         when(userService.registerUser(any(UserDTO.class)))
@@ -79,6 +94,12 @@ class AuthControllerTesting {
         verify(userService, times(1)).registerUser(any(UserDTO.class));
     }
 
+    /**
+     * Tests successful user login.
+     * <p>
+     * Asserts that the controller returns OK and a body containing login success message and user name.
+     * </p>
+     */
     @Test
     void testLoginUserSuccess() {
         when(userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword()))
@@ -97,7 +118,12 @@ class AuthControllerTesting {
 
     }
 
-
+    /**
+     * Tests user login with invalid credentials.
+     * <p>
+     * Asserts that the controller returns UNAUTHORIZED status and appropriate error message.
+     * </p>
+     */
     @Test
     void testLoginUserInvalidCredentials() {
         when(userService.authenticateUser(loginRequest.getEmail(), loginRequest.getPassword()))

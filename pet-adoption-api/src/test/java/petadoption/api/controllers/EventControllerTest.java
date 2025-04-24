@@ -26,6 +26,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Unit tests for {@link EventController}, covering all major event-related API endpoints.
+ * <p>
+ * These tests validate controller logic for event creation, editing, deletion, and retrieval.
+ * Mockito is used to mock dependencies and verify controller behaviors.
+ * </p>
+ */
 class EventControllerTest {
 
     @InjectMocks
@@ -43,6 +50,9 @@ class EventControllerTest {
     private User adoptionCenter;
     private EventRequestDTO eventRequestDTO;
 
+    /**
+     * Sets up mock objects and reusable test data before each test.
+     */
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -62,6 +72,11 @@ class EventControllerTest {
                 .thenReturn((ResponseEntity) ResponseEntity.ok(adoptionCenter));
     }
 
+    /**
+     * Tests the event creation API for successful creation with valid input.
+     *
+     * @throws IOException if there is an error in the mocked service
+     */
     @Test
     void testCreateEvent_Success() throws IOException {
         when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTION_CENTER)))
@@ -96,7 +111,10 @@ class EventControllerTest {
         assertEquals("Adoption Fair", response.getBody().getTitle());
     }
 
-
+    /**
+     * Tests successful event editing.
+     * Asserts that the controller returns 200 OK and the expected success message.
+     */
     @Test
     void testEditEvent_Success() {
         when(session.getAttribute("user")).thenReturn(adoptionCenter);
@@ -108,6 +126,10 @@ class EventControllerTest {
         assertEquals("Event edited successfully.", response.getBody());
     }
 
+    /**
+     * Tests successful event deletion.
+     * Asserts that the controller returns 200 OK and the expected deletion message.
+     */
     @Test
     void testDeleteEvent_Success() {
         when(session.getAttribute("user")).thenReturn(adoptionCenter);
@@ -119,6 +141,10 @@ class EventControllerTest {
         assertEquals("Event deleted successfully.", response.getBody());
     }
 
+    /**
+     * Tests retrieval of all events.
+     * Asserts the list returned by the controller matches the mocked service.
+     */
     @Test
     void testGetAllEvents() {
         List<Event> eventList = new ArrayList<>();
@@ -135,6 +161,10 @@ class EventControllerTest {
         assertEquals(eventList, response.getBody());
     }
 
+    /**
+     * Tests retrieval of an event by ID when found.
+     * Asserts that the returned event matches expectations.
+     */
     @Test
     void testGetEventById_Found() {
         Event event = new Event();
@@ -149,6 +179,10 @@ class EventControllerTest {
         assertEquals(event, response.getBody());
     }
 
+    /**
+     * Tests retrieval of an event by ID when not found.
+     * Asserts that the appropriate message is returned.
+     */
     @Test
     void testGetEventById_NotFound() {
         when(eventService.getEventById(99L)).thenReturn(Optional.empty());
@@ -159,6 +193,10 @@ class EventControllerTest {
         assertEquals("Event not found.", response.getBody());
     }
 
+    /**
+     * Tests retrieval of all events for a given adoption center ID.
+     * Asserts that the returned list matches what is provided by the mocked service.
+     */
     @Test
     void testGetEventsByAdoptionCenterId() {
         List<Event> events = new ArrayList<>();

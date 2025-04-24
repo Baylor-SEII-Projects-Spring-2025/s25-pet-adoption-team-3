@@ -13,6 +13,10 @@ import petadoption.api.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+/**
+ * Service layer for handling user-related business logic, including registration,
+ * authentication, password reset, and email verification.
+ */
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -20,6 +24,14 @@ public class UserService {
     private final EmailService emailService;
     private final TokenRepository tokenRepository;
 
+    /**
+     * Constructs the UserService.
+     *
+     * @param userRepository   The repository for User entities.
+     * @param passwordEncoder  The password encoder for secure password handling.
+     * @param emailService     The service for sending verification and reset emails.
+     * @param tokenRepository  The repository for Token entities.
+     */
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService, TokenRepository tokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -27,6 +39,12 @@ public class UserService {
         this.tokenRepository = tokenRepository;
     }
 
+    /**
+     * Registers a new user account and sends a verification email.
+     *
+     * @param userDTO The user registration data.
+     * @return        ResponseEntity with status and message.
+     */
     public ResponseEntity<?> registerUser(UserDTO userDTO) {
         if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("An account already exists with this email.");
@@ -48,6 +66,13 @@ public class UserService {
         return ResponseEntity.status(HttpStatus.CREATED).body("User: " + user.getEmail() + " created successfully");
     }
 
+    /**
+     * Authenticates a user with the provided email and password.
+     *
+     * @param email    The user's email address.
+     * @param password The user's password.
+     * @return         ResponseEntity with status and user object or error message.
+     */
     public ResponseEntity<?> authenticateUser(String email, String password) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         if (optionalUser.isEmpty()) {
@@ -63,6 +88,12 @@ public class UserService {
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
+    /**
+     * Sends a password reset link to the user's email address.
+     *
+     * @param email The user's email address.
+     * @return      ResponseEntity with result message.
+     */
     public ResponseEntity<String> forgotPasswordLink(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         if (optionalUser.isEmpty()) {
@@ -75,6 +106,13 @@ public class UserService {
         return ResponseEntity.ok("Password reset link sent to your email.");
     }
 
+    /**
+     * Resets a user's password given a valid password reset token.
+     *
+     * @param token       The password reset token.
+     * @param newPassword The new password to set.
+     * @return            ResponseEntity with result message.
+     */
     public ResponseEntity<String> resetPassword(String token, String newPassword) {
         Optional<Token> originalToken = tokenRepository.findByTokenAndTokenType(token, Token.TokenType.PASSWORD_RESET);
         if (originalToken.isEmpty()) {
@@ -93,6 +131,12 @@ public class UserService {
 
     }
 
+    /**
+     * Resends the email verification link to the user.
+     *
+     * @param email The user's email address.
+     * @return      ResponseEntity with result message.
+     */
     public ResponseEntity<String> resendVerificationEmail(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         if (optionalUser.isEmpty()) {
@@ -113,10 +157,24 @@ public class UserService {
         return ResponseEntity.ok("Verification email resent successfully.");
     }
 
+    /**
+     * Retrieves a User entity by its ID.
+     *
+     * @param id The user's ID.
+     * @return   The User object if found, otherwise null.
+     */
     public User getUserFromId(Long id){
         return userRepository.findById(id).orElse(null);
     }
 
+    /**
+     * Sets a user's location (latitude and longitude).
+     *
+     * @param user      The user whose location is to be set.
+     * @param latitude  The latitude to set.
+     * @param longitude The longitude to set.
+     * @return          A result message if successful, null otherwise.
+     */
     public String setLocation(User user, Double latitude, Double longitude) {
         Optional<User> optionalUser = userRepository.findById(user.getId());
         if (optionalUser.isEmpty()) {

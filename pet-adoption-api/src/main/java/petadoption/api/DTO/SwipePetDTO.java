@@ -15,6 +15,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Transfer Object (DTO) representing a pet to be displayed on the swipe interface.
+ * <p>
+ * This DTO is used to send pet information to the frontend for display in swipe (Tinder-style)
+ * interfaces. It contains summary data, images, and personality characteristics.
+ * </p>
+ */
 @Data
 public class SwipePetDTO {
     private Long id;
@@ -44,6 +51,12 @@ public class SwipePetDTO {
 
     private List<String> characteristics;
 
+    /**
+     * Constructs a SwipePetDTO from a {@link Pet} entity.
+     * Populates all swipe-viewable properties, including mapped characteristics.
+     *
+     * @param pet The Pet entity to use as the source for this DTO.
+     */
     public SwipePetDTO(Pet pet) {
         this.id = pet.getId();
         this.name = pet.getName();
