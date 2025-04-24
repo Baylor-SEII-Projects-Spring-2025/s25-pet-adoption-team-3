@@ -26,13 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Unit tests for {@link EventController}, covering all major event-related API endpoints.
- * <p>
- * These tests validate controller logic for event creation, editing, deletion, and retrieval.
- * Mockito is used to mock dependencies and verify controller behaviors.
- * </p>
- */
 class EventControllerTest {
 
     @InjectMocks
@@ -50,9 +43,6 @@ class EventControllerTest {
     private User adoptionCenter;
     private EventRequestDTO eventRequestDTO;
 
-    /**
-     * Sets up mock objects and reusable test data before each test.
-     */
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -106,10 +96,7 @@ class EventControllerTest {
         assertEquals("Adoption Fair", response.getBody().getTitle());
     }
 
-    /**
-     * Tests successful event editing.
-     * Asserts that the controller returns 200 OK and the expected success message.
-     */
+
     @Test
     void testEditEvent_Success() {
         when(session.getAttribute("user")).thenReturn(adoptionCenter);
