@@ -155,7 +155,7 @@ export default function EventInfoComponent({ eventId }) {
                         <button
                             className={styles.editBtn}
                             onClick={() =>
-                                Router.push(`/edit-event/${event.id}`)
+                                Router.push(`/view-event/adoption-center/edit-event/${event.id}`)
                             }
                         >
                             Edit Event
@@ -187,7 +187,7 @@ export default function EventInfoComponent({ eventId }) {
                                         setTimeout(
                                             () =>
                                                 Router.push(
-                                                    "/adoption-center/events",
+                                                    "/adoption-center/dashboard",
                                                 ),
                                             2000,
                                         );
