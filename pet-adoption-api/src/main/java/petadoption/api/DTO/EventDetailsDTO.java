@@ -11,6 +11,11 @@ import petadoption.api.models.User;
 
 import java.time.LocalDate;
 
+/**
+ * Constructs an {@code EventDetailsDTO} from an {@link Event} entity.
+ *
+ * @param event the {@link Event} entity to extract details from
+ */
 @Data
 public class EventDetailsDTO {
     @GeneratedValue
