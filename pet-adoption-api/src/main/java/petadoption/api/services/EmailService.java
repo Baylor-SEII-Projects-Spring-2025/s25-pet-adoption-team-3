@@ -28,14 +28,14 @@ public class EmailService {
     private String backendUrl;
 
     @Value("${frontend.url}")
-    private String frontend
+    private String frontendUrl;
+
     /**
      * Constructs the EmailService with the provided JavaMailSender and TokenRepository.
      *
      * @param mailSender      the JavaMailSender used to send emails
      * @param tokenRepository the repository for managing verification and reset tokens
-     */Url;
-
+     */
     public EmailService(JavaMailSender mailSender, TokenRepository tokenRepository) {
         this.mailSender = mailSender;
         this.tokenRepository = tokenRepository;

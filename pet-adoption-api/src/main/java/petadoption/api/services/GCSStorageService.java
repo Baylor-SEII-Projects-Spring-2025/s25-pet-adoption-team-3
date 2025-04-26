@@ -19,7 +19,7 @@ public class GCSStorageService {
      * @param fileName the name to use for the stored file in GCS
      * @return the public URL of the uploaded file in GCS
      * @throws IOException if file upload fails
-     */p
+     */
     public String uploadFile(MultipartFile file, String fileName) throws IOException {
         Storage storage = StorageOptions.getDefaultInstance().getService();
 
