@@ -15,7 +15,6 @@
  *  - Responsive design, styled to fit app theme with Material-UI components
  *  - Shows a registration progress spinner and error alerts as needed
  */
-
 import React, { useRef, useEffect, useState } from "react";
 import Router from "next/router";
 import { TextField, Button, CircularProgress } from "@mui/material";
@@ -28,6 +27,7 @@ import styles from "@/styles/AdoptionCenterRegisterComponent.module.css";
 export default function AdoptionCenterRegisterComponent() {
     const autoCompleteRef = useRef(null);
     const inputRef = useRef(null);
+    const fileInputRef = useRef(null);
     const [step, setStep] = useState(1);
     const libraries = ["places"];
     const [formData, setFormData] = useState({
@@ -45,7 +45,6 @@ export default function AdoptionCenterRegisterComponent() {
     const [passwordScore, setPasswordScore] = useState(0);
     const [passwordFocused, setPasswordFocused] = useState(false);
     const [isPasswordSame, setIsPasswordSame] = useState(false);
-    const [previewImage, setPreviewImage] = useState(null);
     const [loading, setLoading] = useState(false);
 
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -60,15 +59,16 @@ export default function AdoptionCenterRegisterComponent() {
         const maxSize = 5 * 1024 * 1024;
         if (file) {
             if (file.size > maxSize) {
-                alert(
-                    "❌ File size exceeds 5MB. Please upload a smaller file.",
-                );
+                alert("❌ File size exceeds 5MB. Please upload a smaller file.");
                 return;
             }
             setFormData((prev) => ({ ...prev, photo: file }));
-            const reader = new FileReader();
-            reader.onloadend = () => setPreviewImage(reader.result);
-            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleFileButtonClick = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
         }
     };
 
@@ -161,7 +161,6 @@ export default function AdoptionCenterRegisterComponent() {
 
     const initializeAutocomplete = () => {
         if (!inputRef.current || autoCompleteRef.current) return;
-
         try {
             if (
                 !window.google ||
@@ -170,7 +169,6 @@ export default function AdoptionCenterRegisterComponent() {
             ) {
                 return;
             }
-
             autoCompleteRef.current =
                 new window.google.maps.places.Autocomplete(inputRef.current, {
                     types: ["geocode"],
@@ -190,8 +188,6 @@ export default function AdoptionCenterRegisterComponent() {
                     }));
                 }
             });
-
-            console.log("Autocomplete initialized successfully");
         } catch (error) {
             console.error("Error initializing autocomplete:", error);
         }
@@ -372,18 +368,26 @@ export default function AdoptionCenterRegisterComponent() {
                                     value={formData.bio}
                                     onChange={handleChange}
                                 />
+
+                                {/* Custom file upload */}
                                 <input
                                     type="file"
                                     accept=".png, .jpg, .jpeg"
+                                    style={{ display: "none" }}
+                                    ref={fileInputRef}
                                     onChange={handleFileChange}
                                 />
-                                {previewImage && (
-                                    <img
-                                        src={previewImage}
-                                        alt="Preview"
-                                        className={styles.previewImage}
-                                    />
-                                )}
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    component="span"
+                                    onClick={handleFileButtonClick}
+                                    sx={{ mt: 2, mb: 1, textTransform: "none", fontWeight: 500 }}
+                                >
+                                    {formData.photo
+                                        ? `Selected: ${formData.photo.name}`
+                                        : "Choose Profile Photo"}
+                                </Button>
                                 <section className={styles.navigationButtons}>
                                     <Button
                                         variant="outlined"
