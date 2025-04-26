@@ -19,6 +19,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Service class for handling Adoption Center-related business logic.
+ */
 @Service
 public class AdoptionCenterService {
     private final UserRepository userRepository;
@@ -27,6 +30,14 @@ public class AdoptionCenterService {
     private static final Logger logger = LoggerFactory.getLogger(AdoptionCenterService.class);
     private final GeocodeService geocodeService;
 
+    /**
+     * Constructor for AdoptionCenterService.
+     *
+     * @param userRepository  Repository for user entities.
+     * @param passwordEncoder Password encoder for encoding user passwords.
+     * @param emailService    Service for sending emails.
+     * @param geocodeService  Service for geocoding addresses.
+     */
     @Autowired
     public AdoptionCenterService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService, GeocodeService geocodeService) {
         this.userRepository = userRepository;
@@ -35,6 +46,14 @@ public class AdoptionCenterService {
         this.geocodeService = geocodeService;
     }
 
+    /**
+     * Registers a new adoption center user.
+     *
+     * @param adoptionCenterDTO Data transfer object containing the adoption center registration information.
+     * @return A ResponseEntity containing the created user or an error message.
+     * @throws IOException If an error occurs during geocoding or email sending.
+     * @throws InterruptedException If the geocoding process is interrupted.
+     */
     public ResponseEntity<?> registerAdoptionCenter(AdoptionCenterDTO adoptionCenterDTO) throws IOException, InterruptedException {
         Double[] coords = geocodeService.getCoordinatesFromAddress(adoptionCenterDTO.getAddress());
         if(coords == null) {
@@ -61,6 +80,12 @@ public class AdoptionCenterService {
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
+    /**
+     * Updates the adoption center's name for the specified user.
+     *
+     * @param user    The User entity to update.
+     * @param newName The new adoption center name.
+     */
     public void updateName(User user, String newName) {
         user.setAdoptionCenterName(newName);
         userRepository.save(user);

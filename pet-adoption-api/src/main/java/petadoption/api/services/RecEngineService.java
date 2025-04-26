@@ -18,6 +18,11 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * Service responsible for user-pet recommendations, user weights management,
+ * and the logic behind swiping (like/dislike) pets.
+ * Handles adaptive learning of user preferences based on their swipes.
+ */
 @Service
 public class RecEngineService {
     private final UserRepository userRepository;
@@ -30,7 +35,16 @@ public class RecEngineService {
         this.userRepository = userRepository;
         this.petRepository = petRepository;
     }
-    
+
+    /**
+     * Adds a weight for a user's characteristic, representing their preference strength.
+     * If liked is true, weight is positive. Otherwise, negative.
+     * Used internally for preference learning.
+     *
+     * @param characteristic The characteristic being weighted.
+     * @param liked          Whether the user liked (true) or disliked (false) this characteristic.
+     * @param user           The user whose weights are being updated.
+     */
     public void addWeight(Characteristic characteristic, boolean liked, User user){
         Weight weight = new Weight();
         weight.setCharacteristic(characteristic);
@@ -39,6 +53,13 @@ public class RecEngineService {
         user.getWeights().add(weight);
     }
 
+    /**
+     * Registers that the user has liked a given pet, and adapts user characteristic weights accordingly.
+     *
+     * @param userFromSession The user performing the like.
+     * @param petDetail       The Optional-wrapped pet object (may be empty).
+     * @return                Success message or error string.
+     */
     @Transactional
     public String likePet(User userFromSession, Optional<Pet> petDetail) {
         User user = userRepository.findById(userFromSession.getId()).orElseThrow(() -> new RuntimeException("User not found"));
@@ -64,6 +85,14 @@ public class RecEngineService {
         userRepository.save(user);
         return "Successfully liked pet " + pet.getName();
     }
+
+    /**
+     * Registers that the user has disliked a given pet, and adapts user characteristic weights accordingly.
+     *
+     * @param userFromSession The user performing the dislike.
+     * @param petDetail       The Optional-wrapped pet object (may be empty).
+     * @return                Success message or error string.
+     */
     @Transactional
     public String dislikePet(User userFromSession, Optional<Pet> petDetail) {
         User user = userRepository.findById(userFromSession.getId()).orElseThrow(() -> new RuntimeException("User not found"));
@@ -90,6 +119,14 @@ public class RecEngineService {
         return "Successfully disliked pet " + pet.getName();
     }
 
+    /**
+     * Generates a list of pet recommendations (for swipe) for a user,
+     * ranked by compatibility with the user's current weights/preferences.
+     * Marks each pet as recommended for this user to avoid repeat recommendations.
+     *
+     * @param userFromSession The user for whom recommendations are being generated.
+     * @return                A list of up to 5 SwipePetDTOs representing pets to display for swiping.
+     */
     public List<SwipePetDTO> getSwipePetsV2(User userFromSession){
         User user = userRepository.findById(userFromSession.getId()).orElseThrow(() -> new RuntimeException("User not found"));
         List<Pet> potentialRecs = petRepository.getAllPets();

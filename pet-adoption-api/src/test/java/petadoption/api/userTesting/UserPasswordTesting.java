@@ -20,6 +20,12 @@ import org.springframework.http.ResponseEntity;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+/**
+ * Unit tests for the UserService's password reset and forgot password features.
+ * <p>
+ * These tests cover scenarios including successful password reset flows,
+ * invalid and expired token handling, and forgot password email sending.
+ */
 class UserPasswordTesting {
 
     @Mock
@@ -40,6 +46,9 @@ class UserPasswordTesting {
     private User testUser;
     private Token testToken;
 
+    /**
+     * Sets up a valid test user and a valid password reset token before each test.
+     */
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -57,6 +66,10 @@ class UserPasswordTesting {
         testToken.setTokenType(Token.TokenType.PASSWORD_RESET);
     }
 
+    /**
+     * Tests the forgot password flow for a valid email.
+     * Expects the email service to be called and a 200 response returned.
+     */
     @Test
     void testForgotPassword_Success() {
         when(userRepository.findByEmail(testUser.getEmail())).thenReturn(Optional.of(testUser));
@@ -68,6 +81,10 @@ class UserPasswordTesting {
         verify(emailService, times(1)).sendPasswordResetEmail(testUser);
     }
 
+    /**
+     * Tests the forgot password flow for a non-existent email.
+     * Expects a 400 response with an appropriate error message.
+     */
     @Test
     void testForgotPassword_EmailNotFound() {
         when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
@@ -78,6 +95,10 @@ class UserPasswordTesting {
         assertEquals("User with this email does not exist.", response.getBody());
     }
 
+    /**
+     * Tests successful password reset when the provided token is valid and not expired.
+     * Expects user password to be changed and token to be deleted.
+     */
     @Test
     void testResetPassword_Success() {
         when(tokenRepository.findByTokenAndTokenType("valid-token", Token.TokenType.PASSWORD_RESET))
@@ -93,6 +114,10 @@ class UserPasswordTesting {
         verify(userRepository, times(1)).save(any(User.class));
     }
 
+    /**
+     * Tests password reset when the provided token is invalid (not found).
+     * Expects a 401 unauthorized response with an error message.
+     */
     @Test
     void testResetPassword_InvalidToken() {
         when(tokenRepository.findByTokenAndTokenType("invalid-token", Token.TokenType.PASSWORD_RESET))
@@ -104,6 +129,10 @@ class UserPasswordTesting {
         assertEquals("Invalid or Expired Token", response.getBody());
     }
 
+    /**
+     * Tests password reset when the token is expired.
+     * Expects the token to be deleted and a 400 response returned.
+     */
     @Test
     void testResetPassword_ExpiredToken() {
         testToken.setExpiryDate(LocalDateTime.now().minusHours(1)); // Expired token

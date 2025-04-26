@@ -117,6 +117,14 @@ public class UserService {
         return userRepository.findById(id).orElse(null);
     }
 
+    /**
+     * Sets a user's location (latitude and longitude).
+     *
+     * @param user      The user whose location is to be set.
+     * @param latitude  The latitude to set.
+     * @param longitude The longitude to set.
+     * @return          A result message if successful, null otherwise.
+     */
     public User setLocation(Long userId, Double latitude, Double longitude) {
         Optional<User> optionalUser = userRepository.findById(userId);
         if (optionalUser.isEmpty()) {
