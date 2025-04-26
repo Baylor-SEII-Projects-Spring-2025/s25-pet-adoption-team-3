@@ -23,7 +23,7 @@ public class SessionValidation{
      *                     - 403 Forbidden if the user does not have the required role.
      *                     - 200 OK with the User object if validation succeeds.
      */
-    public ResponseEntity<?> validateSession(HttpSession session, User.Role requiredRole) {
+    public ResponseEntity<?> validateSession(HttpSession session, User.Role... allowedRoles) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No active session.");
@@ -42,6 +42,8 @@ public class SessionValidation{
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized action.");
             }
         }
+
         return ResponseEntity.ok(user);
     }
+
 }
