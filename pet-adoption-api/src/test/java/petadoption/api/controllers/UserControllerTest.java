@@ -17,6 +17,14 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for {@link UsersController}, focusing on user profile editing and account management APIs.
+ * <p>
+ * This class verifies scenarios for updating user details, changing email,
+ * deleting and updating profile photos, and handles both success and failure cases.
+ * All service and repository interactions are mocked using Mockito.
+ * </p>
+ */
 class UserControllerTest {
 
     @InjectMocks
@@ -34,6 +42,9 @@ class UserControllerTest {
     private UserDTO userDTO;
     private User testUser;
 
+    /**
+     * Sets up shared mocks and sample user data before each test.
+     */
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -51,6 +62,10 @@ class UserControllerTest {
         when(request.getSession(true)).thenReturn(session);
     }
 
+    /**
+     * Tests successful update of a user's first name.
+     * Expects a 200 OK and correct response message.
+     */
     @Test
     void testChangeFirstName_Success() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
@@ -65,6 +80,10 @@ class UserControllerTest {
         verify(userRepository).saveAndFlush(any(User.class));
     }
 
+    /**
+     * Tests successful update of a user's last name.
+     * Expects a 200 OK and correct response message.
+     */
     @Test
     void testChangeLastName_Success() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
@@ -79,6 +98,10 @@ class UserControllerTest {
         verify(userRepository).saveAndFlush(any(User.class));
     }
 
+    /**
+     * Tests change first name when user is not found.
+     * Expects a 400 Bad Request and proper error message.
+     */
     @Test
     void testChangeFirstName_UserNotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
@@ -89,6 +112,10 @@ class UserControllerTest {
         assertEquals("User not found.", response.getBody());
     }
 
+    /**
+     * Tests change last name when user is not found.
+     * Expects a 400 Bad Request and proper error message.
+     */
     @Test
     void testChangeLastName_UserNotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
@@ -99,6 +126,11 @@ class UserControllerTest {
         assertEquals("User not found.", response.getBody());
     }
 
+
+    /**
+     * Tests successful update of a user's email.
+     * Expects a 200 OK and updated email message.
+     */
     @Test
     void testChangeEmail_Success() {
         userDTO.setEmail("updated@email.com");
@@ -112,6 +144,10 @@ class UserControllerTest {
         verify(userRepository).save(any(User.class));
     }
 
+    /**
+     * Tests update email when user is not found.
+     * Expects a 400 Bad Request and error message.
+     */
     @Test
     void testChangeEmail_UserNotFound() {
         userDTO.setEmail("updated@email.com");
@@ -123,6 +159,10 @@ class UserControllerTest {
         assertEquals("User not found.", response.getBody());
     }
 
+    /**
+     * Tests successful deletion of a user's profile photo.
+     * Ensures session update and success message.
+     */
     @Test
     void testDeleteProfilePhoto_Success() {
         testUser.setProfilePhoto("some-photo-url");
@@ -138,6 +178,10 @@ class UserControllerTest {
         verify(userRepository).save(any(User.class));
     }
 
+    /**
+     * Tests successful update of profile photo URL.
+     * Ensures repository save is called and message is correct.
+     */
     @Test
     void testUpdateProfilePhoto_Success() {
         String newUrl = "https://new-photo-url.com";

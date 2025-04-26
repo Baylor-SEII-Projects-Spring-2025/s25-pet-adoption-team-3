@@ -38,6 +38,15 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for {@link AdoptionCenterService}.
+ * This test class uses Mockito to mock dependencies and JUnit for assertions.
+ * <p>
+ * It verifies that the registration logic for adoption centers works as intended,
+ * including correct population of User entity fields, handling of email sending,
+ * and proper handling of coordinates lookup via GeocodeService.
+ * </p>
+ */
 class AdoptionCenterServiceTest {
 
     @Mock
@@ -58,6 +67,9 @@ class AdoptionCenterServiceTest {
     private AdoptionCenterDTO testCenterDTO;
     private User testUser;
 
+    /**
+     * Initializes mocks and sets up test data before each test.
+     */
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -104,6 +116,21 @@ class AdoptionCenterServiceTest {
 
     }
 
+    /**
+     * Test the successful registration of an adoption center.
+     * <p>
+     * This test verifies:
+     * <ul>
+     *     <li>No existing user with the same email.</li>
+     *     <li>Password is encoded.</li>
+     *     <li>Email service is called once.</li>
+     *     <li>Returned User object has correct fields.</li>
+     *     <li>Coordinates are set via GeocodeService.</li>
+     * </ul>
+     * </p>
+     * @throws IOException If GeocodeService throws.
+     * @throws InterruptedException If GeocodeService throws.
+     */
     @Test
     void testRegisterAdoptionCenter_Success() throws IOException, InterruptedException {
         when(userRepository.findByEmail(testCenterDTO.getEmail())).thenReturn(Optional.empty());

@@ -15,6 +15,10 @@ import petadoption.api.models.Token;
 import petadoption.api.models.User;
 import petadoption.api.repository.TokenRepository;
 
+/**
+ * Service for handling all email-related actions such as sending
+ * verification and password reset emails.
+ */
 @Service
 public class EmailService {
     private final JavaMailSender mailSender;
@@ -24,13 +28,26 @@ public class EmailService {
     private String backendUrl;
 
     @Value("${frontend.url}")
-    private String frontendUrl;
+    private String frontend
+    /**
+     * Constructs the EmailService with the provided JavaMailSender and TokenRepository.
+     *
+     * @param mailSender      the JavaMailSender used to send emails
+     * @param tokenRepository the repository for managing verification and reset tokens
+     */Url;
 
     public EmailService(JavaMailSender mailSender, TokenRepository tokenRepository) {
         this.mailSender = mailSender;
         this.tokenRepository = tokenRepository;
     }
 
+    /**
+     * Sends an email to the user for verifying their email address.
+     * Generates a unique verification token and constructs a verification link.
+     *
+     * @param user the User to send the verification email to
+     * @throws RuntimeException if email sending fails
+     */
     public void sendVerificationEmail(User user){
         String token = generateToken(user, Token.TokenType.EMAIL_VERIFICATION);
         String verificationLink = backendUrl + "/api/users/verify-email?token=" + token;
@@ -49,6 +66,13 @@ public class EmailService {
         }
     }
 
+    /**
+     * Sends a password reset email to the user.
+     * Generates a unique password reset token and constructs a reset link.
+     *
+     * @param user the User to send the password reset email to
+     * @throws RuntimeException if email sending fails
+     */
     public void sendPasswordResetEmail(User user) {
         String token = generateToken(user, Token.TokenType.PASSWORD_RESET);
         String resetLink = frontendUrl + "/reset-password?token=" + token;
@@ -67,6 +91,14 @@ public class EmailService {
         }
     }
 
+    /**
+     * Generates a unique token for the user for the given token type (verification or reset).
+     * Stores the token in the database with an expiry of 24 hours.
+     *
+     * @param user      the User to associate with the token
+     * @param tokenType the type of token (EMAIL_VERIFICATION or PASSWORD_RESET)
+     * @return the generated token string
+     */
     public String generateToken(User user, Token.TokenType tokenType) {
         String token = UUID.randomUUID().toString();
         Token tokenEntity = new Token();
