@@ -530,7 +530,7 @@ export default function ProfileDashboardComponent() {
             return;
         }
 
-        const newimagesconst newImages = [...eventData.images];
+        const newImages = [...eventData.images];
         newImages[0] = {
             preview: URL.createObjectURL(file),
             file: file,
