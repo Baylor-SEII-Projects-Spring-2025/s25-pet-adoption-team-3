@@ -10,6 +10,7 @@ import petadoption.api.DTO.EventDetailsDTO;
 import petadoption.api.DTO.EventRequestDTO;
 import petadoption.api.models.Event;
 import petadoption.api.models.User;
+import petadoption.api.repository.EventAttendeeRepository;
 import petadoption.api.repository.EventRepository;
 import petadoption.api.repository.UserRepository;
 
@@ -26,18 +27,13 @@ public class EventService {
     private final UserRepository userRepository;
     private static final Logger logger = LoggerFactory.getLogger(EventService.class);
     private final GCSStorageServiceEvents gcsStorageServiceEvents;
+    private final EventAttendeeRepository eventAttendeeRepository;
 
-    /**
-     * Constructor for EventService.
-     *
-     * @param eventRepository         the repository for Event entities
-     * @param userRepository          the repository for User entities
-     * @param gcsStorageServiceEvents the Google Cloud Storage service for event images
-     */
-    public EventService(EventRepository eventRepository, UserRepository userRepository, GCSStorageServiceEvents gcsStorageServiceEvents) {
+    public EventService(EventRepository eventRepository, UserRepository userRepository, GCSStorageServiceEvents gcsStorageServiceEvents, EventAttendeeRepository eventAttendeeRepository) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
         this.gcsStorageServiceEvents = gcsStorageServiceEvents;
+        this.eventAttendeeRepository = eventAttendeeRepository;
     }
 
     public Event createEventWithImage(User user, Long adoptionCenterId, String title, String description,
@@ -139,14 +135,11 @@ public class EventService {
         return eventRepository.getNearbyEvents(user.getLatitude(), user.getLongitude(), 100);
     }
 
-    /**
-     * Registers a user as an attendee to the specified event.
-     * If the user is already registered, nothing is changed.
-     *
-     * @param user    the User to register for the event
-     * @param eventId the ID of the event
-     * @return true if registration was successful, false if already registered or event not found
-     */
+    public boolean isUserRegisteredForEvent(Long userId, Long eventId) {
+        return eventAttendeeRepository.existsByIdUserIdAndIdEventId(userId, eventId);
+    }
+
+
     @Transactional
     public boolean registerUserToEvent(User user, Long eventId) {
         Optional<Event> eventOpt = eventRepository.findById(eventId);
