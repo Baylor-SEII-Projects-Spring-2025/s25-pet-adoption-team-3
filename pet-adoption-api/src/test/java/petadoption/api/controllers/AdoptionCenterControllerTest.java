@@ -17,6 +17,13 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for {@link AdoptionCenterController} covering CRUD operations for adoption center fields.
+ * <p>
+ * Each test mocks dependencies using Mockito, sets up a test user and DTO,
+ * and asserts that controller endpoints respond correctly to both happy path and failure cases.
+ * </p>
+ */
 class AdoptionCenterControllerTest {
 
     @InjectMocks
@@ -40,6 +47,9 @@ class AdoptionCenterControllerTest {
     private User testUser;
     private AdoptionCenterDTO dto;
 
+    /**
+     * Initialize test mocks and reusable objects before each test.
+     */
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -58,6 +68,9 @@ class AdoptionCenterControllerTest {
         when(request.getSession(true)).thenReturn(session);
     }
 
+    /**
+     * Tests successful update of adoption center name.
+     */
     @Test
     void testChangeAdoptionCenterName_Success() {
         dto.setAdoptionCenterName("New Name");
@@ -73,6 +86,9 @@ class AdoptionCenterControllerTest {
         verify(session).setAttribute(eq("user"), any(User.class));
     }
 
+    /**
+     * Tests successful update of website field.
+     */
     @Test
     void testUpdateWebsiteLink_Success() {
         dto.setWebsite("http://newsite.com");
@@ -84,6 +100,9 @@ class AdoptionCenterControllerTest {
         assertEquals("Website updated to: " + dto.getWebsite(), response.getBody());
     }
 
+    /**
+     * Tests successful update of bio field.
+     */
     @Test
     void testUpdateBio_Success() {
         dto.setBio("New bio!");
@@ -95,6 +114,9 @@ class AdoptionCenterControllerTest {
         assertEquals("Bio updated to: " + dto.getBio(), response.getBody());
     }
 
+    /**
+     * Tests successful update of phone number field.
+     */
     @Test
     void testUpdatePhoneNumber_Success() {
         dto.setPhoneNumber("9876543210");
@@ -106,7 +128,9 @@ class AdoptionCenterControllerTest {
         assertEquals("Phone number updated to: " + dto.getPhoneNumber(), response.getBody());
     }
 
-
+    /**
+     * Tests failure to update name when user does not exist.
+     */
     @Test
     void testChangeAdoptionCenterName_UserNotFound() {
         dto.setAdoptionCenterName("New Name");
@@ -118,6 +142,9 @@ class AdoptionCenterControllerTest {
         assertEquals("User not found.", response.getBody());
     }
 
+    /**
+     * Tests failure to update website when user does not exist.
+     */
     @Test
     void testUpdateWebsiteLink_UserNotFound() {
         dto.setWebsite("http://newsite.com");
@@ -129,6 +156,9 @@ class AdoptionCenterControllerTest {
         assertEquals("User not found.", response.getBody());
     }
 
+    /**
+     * Tests failure to update bio when user does not exist.
+     */
     @Test
     void testUpdateBio_UserNotFound() {
         dto.setBio("New bio!");
@@ -140,6 +170,9 @@ class AdoptionCenterControllerTest {
         assertEquals("User not found.", response.getBody());
     }
 
+    /**
+     * Tests failure to update phone number when user does not exist.
+     */
     @Test
     void testUpdatePhoneNumber_UserNotFound() {
         dto.setPhoneNumber("9876543210");
@@ -151,6 +184,9 @@ class AdoptionCenterControllerTest {
         assertEquals("User not found.", response.getBody());
     }
 
+    /**
+     * Tests successful update of address field.
+     */
     @Test
     void testUpdateAddress_Success() {
         dto.setAddress("456 New Shelter Lane");
@@ -166,6 +202,9 @@ class AdoptionCenterControllerTest {
         verify(session).setAttribute(eq("user"), any(User.class));
     }
 
+    /**
+     * Tests failure to update address when user does not exist.
+     */
     @Test
     void testUpdateAddress_UserNotFound() {
         dto.setAddress("456 New Shelter Lane");

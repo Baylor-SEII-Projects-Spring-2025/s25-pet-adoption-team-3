@@ -25,6 +25,14 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for pet recommendation and swipe features exposed in {@link PetController}.
+ * <p>
+ * Tests focus on the core functionalities of the RecEngine, including swiping/liking/disliking pets,
+ * and returning lists of pets available for swiping or liked by the user.
+ * The RecEngineService and other dependencies are mocked.
+ * </p>
+ */
 class RecEngineTest {
 
     @InjectMocks
@@ -46,6 +54,9 @@ class RecEngineTest {
     private Pet testPet;
     private SwipePetDTO testSwipePetDTO;
 
+    /**
+     * Sets up mocks and test data before each test.
+     */
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -65,6 +76,10 @@ class RecEngineTest {
         testSwipePetDTO = new SwipePetDTO(testPet);
     }
 
+    /**
+     * Tests that a user can successfully get swipeable pets.
+     * Expects HTTP 200 and a non-empty list containing the test DTO.
+     */
     @Test
     void testGetSwipePet_Success() {
         when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTER)))
@@ -78,6 +93,10 @@ class RecEngineTest {
         assertEquals(List.of(testSwipePetDTO), response.getBody());
     }
 
+    /**
+     * Tests that liking a pet with a valid pet and user succeeds.
+     * Expects HTTP 200 and a success message.
+     */
     @Test
     void testLikePet_Success() {
         when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTER)))
@@ -92,6 +111,11 @@ class RecEngineTest {
         assertEquals("Successfully liked pet", response.getBody());
         verify(recEngineService).likePet(testUser, Optional.ofNullable(testPet));
     }
+
+    /**
+     * Tests that liking a pet which does not exist returns an error.
+     * Expects HTTP 400 and error message.
+     */
     @Test
     void testLikePet_NoPetFound() {
         when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTER)))
@@ -106,7 +130,10 @@ class RecEngineTest {
         assertEquals("Error: Pet not found", response.getBody());
     }
 
-
+    /**
+     * Tests that disliking a pet with a valid pet and user succeeds.
+     * Expects HTTP 200 and a success message.
+     */
     @Test
     void testDislikePet_Success() {
         when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTER)))
@@ -122,6 +149,10 @@ class RecEngineTest {
         verify(recEngineService).dislikePet(testUser, Optional.ofNullable(testPet));
     }
 
+    /**
+     * Tests that disliking a non-existent pet returns an error.
+     * Expects HTTP 400 and error message.
+     */
     @Test
     void testDislikePet_NoPetFound() {
         when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTER)))
@@ -136,6 +167,10 @@ class RecEngineTest {
         assertEquals("Error: Pet not found", response.getBody());
     }
 
+    /**
+     * Tests that a user can fetch their liked pets.
+     * Expects HTTP 200 and the correct DTO list.
+     */
     @Test
     void testGetLikedPet_Success() {
         when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTER)))
@@ -149,6 +184,10 @@ class RecEngineTest {
         verify(petService).getLikedPets(testUser);
     }
 
+    /**
+     * Tests fetching liked pets with an invalid session.
+     * Expects HTTP 403 and null body.
+     */
     @Test
     void testGetLikedPet_InvalidSession() {
         when(sessionValidation.validateSession(any(HttpSession.class), eq(User.Role.ADOPTER)))

@@ -135,6 +135,10 @@ class EventControllerTest {
         assertEquals(eventList, response.getBody());
     }
 
+    /**
+     * Tests retrieval of all events for a given adoption center ID.
+     * Asserts that the returned list matches what is provided by the mocked service.
+     */
     @Test
     void testGetEventsByAdoptionCenterId() {
         List<Event> events = new ArrayList<>();

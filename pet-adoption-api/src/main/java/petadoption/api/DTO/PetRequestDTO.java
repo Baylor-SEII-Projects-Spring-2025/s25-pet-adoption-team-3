@@ -10,39 +10,88 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Transfer Object (DTO) for creating or updating a pet's information.
+ * <p>
+ * This DTO is used to send or receive pet details between the frontend and backend API
+ * when performing operations such as adding or editing a pet profile.
+ * </p>
+ */
 @Data
 public class PetRequestDTO {
+    /**
+     * Data Transfer Object (DTO) for creating or updating a pet's information.
+     * <p>
+     * This DTO is used to send or receive pet details between the frontend and backend API
+     * when performing operations such as adding or editing a pet profile.
+     * </p>
+     */
     @NotNull
     private String name;
 
+    /**
+     * The breed of the pet.
+     */
     @NotNull
     private String breed;
 
+    /**
+     * The spay/neuter status of the pet (e.g., "Spayed", "Neutered", "Intact").
+     */
     @NotNull
     private String spayedStatus;
 
+    /**
+     * The birthdate of the pet.
+     */
     @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate birthdate;
 
+    /**
+     * The birthdate of the pet.
+     */
     @NotNull
     private String aboutMe;
 
+    /**
+     * The birthdate of the pet.
+     */
     @NotNull
     private String extra1;
+
+    /**
+     * The birthdate of the pet.
+     */
     @NotNull
     private String extra2;
+
+    /**
+     * The birthdate of the pet.
+     */
     @NotNull
     private String extra3;
 
+    /**
+     * List of personality characteristics or tags for the pet.
+     */
     @NotNull
     private List<Characteristic> characteristics;
 
+    /**
+     * Current adoption availability status of the pet (e.g., AVAILABLE, ARCHIVED).
+     */
     @NotNull
     private Pet.PetStatus availabilityStatus;
 
+    /**
+     * Current adoption availability status of the pet (e.g., AVAILABLE, ARCHIVED).
+     */
     public PetRequestDTO() {}
 
+    /**
+     * Current adoption availability status of the pet (e.g., AVAILABLE, ARCHIVED).
+     */
     public PetRequestDTO(Pet pet) {
         this.name = pet.getName();
         this.breed = pet.getBreed();
