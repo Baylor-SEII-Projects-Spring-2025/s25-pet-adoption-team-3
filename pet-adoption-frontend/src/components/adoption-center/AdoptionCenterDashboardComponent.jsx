@@ -2012,6 +2012,11 @@ export default function ProfileDashboardComponent() {
                                                                         className={
                                                                             styles.eventImageWrapper
                                                                         }
+                                                                        onClick={() =>
+                                                                            Router.push(
+                                                                                `/view-event/${eventData.id}`,
+                                                                            )
+                                                                        }
                                                                     >
                                                                         <img
                                                                             src={

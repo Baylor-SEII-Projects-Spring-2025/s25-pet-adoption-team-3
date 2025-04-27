@@ -95,13 +95,15 @@ export function SwipeComponent() {
             }
             const data = await res.json();
 
+            const petIdsOnScreen = new Set(pets.map((p) => p.id));
+
             const filteredPets = data.filter(
-                (pet) => !swipedPetIds.current.has(pet.id),
+                (pet) =>
+                    !swipedPetIds.current.has(pet.id) &&
+                    !petIdsOnScreen.has(pet.id),
             );
 
-            const remainingPets = pets.filter((_, i) => !gone.has(i));
-
-            setPets([...remainingPets, ...filteredPets]);
+            setPets((prev) => [...prev, ...filteredPets]);
             setIsPageLoading(false);
 
             gone.clear();
@@ -113,6 +115,7 @@ export function SwipeComponent() {
             console.error("Fetch pets error:", err);
         }
     };
+
 
     let initialized = false;
     useEffect(() => {
@@ -131,26 +134,27 @@ export function SwipeComponent() {
         if (pets.length > 0) api.start((i) => ({ ...to(i), from: from(i) }));
     }, [pets, api]);
 
-    const handleSwipe = async (petId, liked) => {
-        try {
-            const response = await fetch(
-                `${API_URL}/api/pet/${liked ? "like" : "dislike"}-pet/${petId}`,
-                {
-                    method: "POST",
-                    credentials: "include",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Cache-Control": "no-cache",
-                    },
-                    body: JSON.stringify({ petId }),
+const handleSwipe = async (petId, liked) => {
+    swipedPetIds.current.add(petId);
+    try {
+        const response = await fetch(
+            `${API_URL}/api/pet/${liked ? "like" : "dislike"}-pet/${petId}`,
+            {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Cache-Control": "no-cache",
                 },
-            );
+                body: JSON.stringify({ petId }),
+            },
+        );
+        console.log("Response status:", response.status);
+    } catch (err) {
+        console.error("Swipe error:", err);
+    }
+};
 
-            console.log("Response status:", response.status);
-        } catch (err) {
-            console.error("Swipe error:", err);
-        }
-    };
 
     const bind = useDrag(
         ({
