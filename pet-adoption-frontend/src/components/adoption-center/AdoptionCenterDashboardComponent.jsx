@@ -2240,6 +2240,14 @@ export default function ProfileDashboardComponent() {
                                                                     className={
                                                                         styles.eventCard
                                                                     }
+                                                                    onClick={() =>
+                                                                        Router.push(
+                                                                            `/view-event/adoption-center/${event.id}`,
+                                                                        )
+                                                                    }
+                                                                    style={{
+                                                                        cursor: "pointer",
+                                                                    }}
                                                                 >
                                                                     <img
                                                                         src={
