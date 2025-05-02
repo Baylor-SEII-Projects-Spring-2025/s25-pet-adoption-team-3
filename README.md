@@ -144,7 +144,7 @@ gcloud secrets versions access latest --secret=google-client-id
     ```bash
     export SPRING_PROFILES_ACTIVE=prod  
     ```  
-    depending on your use case.- 
+    depending on your use case. 
 
 
 - You may also set the environment variable in your IDE. For example, in IntelliJ, you can set it in the run configuration for the Spring Boot application.
