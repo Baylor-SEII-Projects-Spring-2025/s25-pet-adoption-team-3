@@ -85,6 +85,8 @@ Update the variable in .env.local to the local api url:
 NEXT_PUBLIC_API_BASE_URL=http://example:8080
 ```
 
+For local testing, you can use replace `http://example:8080` with `http://localhost:8080` if you are running the backend locally.
+
 Update the variable in .env.development to the development api url:
 
 ```env
@@ -142,20 +144,37 @@ gcloud secrets versions access latest --secret=google-client-id
     ```bash
     export SPRING_PROFILES_ACTIVE=prod  
     ```  
-    depending on your use case.  
+    depending on your use case.- 
+
+
+- You may also set the environment variable in your IDE. For example, in IntelliJ, you can set it in the run configuration for the Spring Boot application.
+  - In IntelliJ, go to `Run` > `Edit Configurations...` > `Environment Variables` and add `SPRING_PROFILES_ACTIVE=dev`.
 
 ---
 
 ## 📌 **Frontend Routing Table**  
 
-| **Route**                 | **Component**        | **Description**                                         | **Access**          |
-|---------------------------|----------------------|---------------------------------------------------------|---------------------|
-| `/`                       | `HomePage`          | Landing page with an overview and call-to-action.       | Public             |
-| `/about`                  | `AboutPage`         | Information about the platform and mission.            | Public             |
-| `/login`                  | `LoginPage`         | User authentication page (OAuth/Email).                | Public (redirects if logged in) |
-| `/register`               | `RegisterPage`      | User signup page.                                       | Public (redirects if logged in) |
-| `/dashboard`              | `DashboardPage`     | User dashboard after logging in.                        | Private (Auth required) |
-| `/profile`                | `ProfilePage`       | User profile settings.                                  | Private (Auth required) |
+| **Route**                 | **Component**        | **Description**                                     | **Access**                      |
+|---------------------------|----------------------|-----------------------------------------------------|---------------------------------|
+| `/`                       | `HomePage`          | Landing page with an overview and call-to-action.   | Public                          |
+| `/about`                  | `AboutPage`         | Information about the platform and mission.         | Public                          |
+| `/gallery`                | `GalleryPage`       | Gallery of adoptable pets.                          | Public                          |
+| `/learn`                  | `LearnPage`         | Educational resources about pet adoption.           | Public                          |
+| `/login`                  | `LoginPage`         | User authentication page (OAuth/Email).             | Public (redirects if logged in) |
+| `/register`               | `RegisterPage`      | User signup page.                                   | Public (redirects if logged in) |
+| `/forgot-password`        | `ForgotPasswordPage` | Password recovery page.                             | Public (redirects if logged in) |
+| `/reset-password`        | `ResetPasswordPage`  | Password reset page.                                | Public (redirects if logged in) |
+| `/profile`                | `ProfilePage`       | User profile settings and dashboard.                | Private (Auth required)         |
+| `/adoption-center/dashboard` | `AdoptionCenterDashboardPage` | Dashboard for adoption center users.                | Private (Auth required)         |
+| `/adoption-center/register` | `AdoptionCenterRegisterPage` | Adoption center registration page.                  | Private (Auth required)         |
+| `/chat/:id`          | `ChatPage`          | Chat interface for user communication.              | Private (Auth required)         |
+| `/chat`                  | `ChatListPage`      | List of user chats.                                 | Private (Auth required)         |
+| `/my-pet/:petId` | `MyPetPage`         | Pet details for an adopted pet for logged-in users. | Private (Auth required)         |
+| `/pet-info:petUUID` | `PetInfoPage`       | Detailed view of a specific pet.                    | Private (Auth required)         |
+| `/view-event/:eventId` | `EventPage`         | Detailed view of a specific event.                  | Private (Auth required)         |
+| `/view-event/adoption-center/:eventId` | `AdoptionCenterEventPage` | Detailed view of a specific event for adoption centers. | Private (Auth required)         |
+| `/view-event/adoption-center/edit-event/:eventId` | `EditEventPage` | Edit event page for adoption centers.               | Private (Auth required)         |
+| `/swipe`                | `SwipePage`         | Swipe interface for pet adoption.                   | Private (Auth required)         |
 | `*`                       | `NotFoundPage`      | 404 page for undefined routes.                         | Public             |
 
 ---
