@@ -104,6 +104,8 @@ public class PetService {
             }
         }
 
+        pet.setPetCharacteristics(petRequestDTO.getCharacteristics());
+
         pet.setImage(uploadedUrls);
         petRepository.save(pet);
 
