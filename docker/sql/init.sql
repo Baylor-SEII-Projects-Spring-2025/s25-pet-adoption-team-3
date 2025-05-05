@@ -225,7 +225,7 @@ INSERT INTO users (
     website
 ) VALUES (
     1,
-    '$2a$10$qLPzS/zi.Fya7pAcbRtkmu3oDh63rIovhEvg1S.fI9hDeMAsPbDAy',
+    '$2a$10$pnyZ/M4.GhXThDMoVtnp1.QnhJZZtj69qkeqj/MUahuwUGh9l2MoC',
     'happy_paws@adoptcenter.com',
     'Lisa',
     'Mendez',
