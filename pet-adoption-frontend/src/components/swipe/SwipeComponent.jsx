@@ -21,6 +21,8 @@ import { useDrag } from "react-use-gesture";
 import styles from "@/styles/SwipeComponent.module.css";
 import { useRouter } from "next/router";
 import Loading from "@/components/swipe/Loading";
+import { flushSync } from "react-dom";
+
 
 const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -36,7 +38,7 @@ export function SwipeComponent() {
     const swipedPetIds = useRef(new Set());
     const [isPageLoading, setIsPageLoading] = useState(true);
     const [dragDisabled, setDragDisabled] = useState(false);
-;
+    const isFetchingPets = useRef(false);
 
     const navigateImage = (petId, direction) => {
         setCurrentImageIndices((prev) => {
@@ -78,6 +80,8 @@ export function SwipeComponent() {
     }, []);
 
     const fetchPets = async () => {
+        if (isFetchingPets.current) return;
+        isFetchingPets.current = true;
         try {
             const res = await fetch(`${API_URL}/api/pet/swipe/temp-get-pets`, {
                 method: "GET",
@@ -113,16 +117,21 @@ export function SwipeComponent() {
             setCurrentImageIndices((prev) => ({ ...prev, ...newIndices }));
         } catch (err) {
             console.error("Fetch pets error:", err);
+        } finally {
+            isFetchingPets.current = false;
         }
     };
 
-
-    let initialized = false;
+    const initialized = useRef(false);
     useEffect(() => {
-        if(!initialized){
-            initialized = true;
-            fetchPets();
-        }
+        const load = async () => {
+            await fetchUserSession();
+            if (!initialized.current) {
+                initialized.current = true;
+                fetchPets();
+            }
+        };
+        load();
     }, []);
 
     const [springs, api] = useSprings(pets.length || 0, (i) => ({
@@ -134,27 +143,36 @@ export function SwipeComponent() {
         if (pets.length > 0) api.start((i) => ({ ...to(i), from: from(i) }));
     }, [pets, api]);
 
-const handleSwipe = async (petId, liked) => {
-    swipedPetIds.current.add(petId);
-    try {
-        const response = await fetch(
-            `${API_URL}/api/pet/${liked ? "like" : "dislike"}-pet/${petId}`,
-            {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Cache-Control": "no-cache",
-                },
-                body: JSON.stringify({ petId }),
-            },
+    const handleSwipe = async (petId, liked, direction, index) => {
+        swipedPetIds.current.add(petId); // Immediately mark as swiped
+        setDragDisabled(true); // Disable drag during the swipe
+        api.start((i) =>
+            i === index ? { x: direction * window.innerWidth, scale: 1 } : {},
         );
-        console.log("Response status:", response.status);
-    } catch (err) {
-        console.error("Swipe error:", err);
-    }
-};
+        setTimeout(() => {
+            flushSync(() => {
+                setPets((prev) => prev.filter((pet) => pet.id !== petId));
+            });
+            setDragDisabled(false);
+        }, 250);
 
+        try {
+            await fetch(
+                `${API_URL}/api/pet/${liked ? "like" : "dislike"}-pet/${petId}`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Cache-Control": "no-cache",
+                    },
+                    body: JSON.stringify({ petId }),
+                },
+            );
+        } catch (err) {
+            console.error("Swipe error:", err);
+        }
+    };
 
     const bind = useDrag(
         ({
@@ -170,7 +188,7 @@ const handleSwipe = async (petId, liked) => {
             if (!down && trigger) {
                 gone.add(index);
                 if (pets[index] && pets[index].id)
-                    handleSwipe(pets[index].id, dir === 1);
+                    handleSwipe(pets[index].id, dir === 1, dir, index);
             }
 
             api.start((i) => {
@@ -263,37 +281,79 @@ const handleSwipe = async (petId, liked) => {
                                                         styles.carouselImage
                                                     }
                                                 />
-                                                <div className={styles.imageActionButtons}>
+                                                <div
+                                                    className={
+                                                        styles.imageActionButtons
+                                                    }
+                                                >
                                                     <button
-                                                    className={`${styles.actionButton} ${styles.dislike}`}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleSwipe(pet.id, false);
-                                                        gone.add(i);
-                                                        setDragDisabled(true);
-                                                        api.start((index) =>
-                                                        index === i ? { x: -window.innerWidth, scale: 1 } : {}
-                                                        );
-                                                        setTimeout(() => setDragDisabled(false), 300);
-                                                    }}
+                                                        className={`${styles.actionButton} ${styles.dislike}`}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleSwipe(
+                                                                pet.id,
+                                                                false,
+                                                                -1,
+                                                                i,
+                                                            );
+                                                            gone.add(i);
+                                                            setDragDisabled(
+                                                                true,
+                                                            );
+                                                            api.start(
+                                                                (index) =>
+                                                                    index === i
+                                                                        ? {
+                                                                              x: -window.innerWidth,
+                                                                              scale: 1,
+                                                                          }
+                                                                        : {},
+                                                            );
+                                                            setTimeout(
+                                                                () =>
+                                                                    setDragDisabled(
+                                                                        false,
+                                                                    ),
+                                                                300,
+                                                            );
+                                                        }}
                                                     >
-                                                    ✖
+                                                        ✖
                                                     </button>
 
                                                     <button
-                                                    className={`${styles.actionButton} ${styles.like}`}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleSwipe(pet.id, true);
-                                                        gone.add(i);
-                                                        setDragDisabled(true);
-                                                        api.start((index) =>
-                                                        index === i ? { x: window.innerWidth, scale: 1 } : {}
-                                                        );
-                                                        setTimeout(() => setDragDisabled(false), 300);
-                                                    }}
+                                                        className={`${styles.actionButton} ${styles.like}`}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleSwipe(
+                                                                pet.id,
+                                                                true,
+                                                                1,
+                                                                i,
+                                                            );
+                                                            gone.add(i);
+                                                            setDragDisabled(
+                                                                true,
+                                                            );
+                                                            api.start(
+                                                                (index) =>
+                                                                    index === i
+                                                                        ? {
+                                                                              x: window.innerWidth,
+                                                                              scale: 1,
+                                                                          }
+                                                                        : {},
+                                                            );
+                                                            setTimeout(
+                                                                () =>
+                                                                    setDragDisabled(
+                                                                        false,
+                                                                    ),
+                                                                300,
+                                                            );
+                                                        }}
                                                     >
-                                                    🤍
+                                                        🤍
                                                     </button>
                                                 </div>
                                                 {hasMultipleImages && (
