@@ -192,9 +192,6 @@ export default function AdoptionNavbar() {
             </div>
             <ul className={styles.navLinks}>
                 <li>
-                    <Link href="/learn">Learn</Link>
-                </li>
-                <li>
                     <Link href="/locations">Locations</Link>
                 </li>
                 <li>

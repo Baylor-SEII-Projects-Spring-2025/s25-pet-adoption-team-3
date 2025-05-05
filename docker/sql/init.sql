@@ -17,8 +17,6 @@ CREATE TABLE IF NOT EXISTS users (
     address              VARCHAR(255)
 
 );
-INSERT INTO users(user_id, password, email, role, is_email_verified) VALUES(2, '$2a$10$rhxduNZL9EsagAP8ubcpWOrddEbkrJwa5R0ru2rIuH8tfNy6PUTLq', 'chase_crayne1@baylor.edu', 'ADOPTION_CENTER', 1);
-
 
 CREATE TABLE IF NOT EXISTS token (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -225,7 +223,7 @@ INSERT INTO users (
     website
 ) VALUES (
     1,
-    '$2a$10$pnyZ/M4.GhXThDMoVtnp1.QnhJZZtj69qkeqj/MUahuwUGh9l2MoC',
+    '$2a$10$x7k30Pr62Ejjh.v/9MFw4e2YAPya25pgVgPmgdyWXJsyFDbjLeJMW',
     'happy_paws@adoptcenter.com',
     'Lisa',
     'Mendez',
