@@ -224,7 +224,7 @@ export default function Navbar() {
             </div>
             <ul className={styles.navLinks}>
                 <li>
-                    <Link href="/locations">Locations</Link>
+                    <Link href="/learn">Learn</Link>
                 </li>
                 <li>
                     <Link href="/gallery">Gallery</Link>
